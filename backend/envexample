@@ -1,0 +1,15 @@
+PORT=3000
+DATABASE_URL=postgres://postgres:password@localhost:5432/tollvakt
+
+# Logs: "json" writes one JSON object per line (the default, for servers);
+# "pretty" writes readable, coloured lines (for development, needs the dev
+# dependencies). LOG_LEVEL is the lowest level written: trace, debug, info,
+# warn, error, fatal or silent.
+LOG_FORMAT=pretty
+LOG_LEVEL=info
+
+# Rate limit: all API requests per address in 15 minutes
+REQUESTS_PER_ADDRESS=1500
+# Proxies whose X-Forwarded-For is trusted for the client's address. The default
+# trusts this machine and private networks (the web app, Docker).
+TRUST_PROXY=loopback, linklocal, uniquelocal

@@ -13,9 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from tollvakt_etl.ckan import CkanClient
-
-TOLL_CKAN_URL = "https://data.toll.no"
-RAW_DIR = Path(__file__).resolve().parent.parent / "data" / "raw" / "norway"
+from tollvakt_etl.config import NORWAY_RAW_DIR, TOLL_CKAN_URL
 
 
 def summarize_dataset(dataset: dict[str, Any]) -> dict[str, Any]:
@@ -45,7 +43,7 @@ def build_catalog(client: CkanClient) -> list[dict[str, Any]]:
     return [summarize_dataset(client.get_dataset(name)) for name in names]
 
 
-def save_catalog(catalog: list[dict[str, Any]], directory: Path = RAW_DIR) -> Path:
+def save_catalog(catalog: list[dict[str, Any]], directory: Path = NORWAY_RAW_DIR) -> Path:
     """Write the catalog as a dated JSON file and return its path."""
     directory.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d")

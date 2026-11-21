@@ -1,0 +1,40 @@
+{
+  
+  "compilerOptions": {
+    // File Layout
+     "rootDir": "./src",
+     "outDir": "./dist",
+
+    // Environment Settings   
+    "module": "nodenext",
+    "target": "esnext",
+    "types": ["node"],
+    // For nodejs:
+    "lib": ["esnext"],
+    "experimentalDecorators":true,
+    "emitDecoratorMetadata":true,
+    
+
+    // Other Outputs
+    "sourceMap": false,
+    "declaration": false,
+    "declarationMap": false,
+
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    
+
+    // Recommended Options
+    "strict": true,    
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+    "moduleResolution":"nodenext"
+  },
+  "include":["src/**/*"],
+  "exclude":["node_modules","**/*.spec.ts"]
+}
