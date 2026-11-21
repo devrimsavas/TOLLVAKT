@@ -1,10 +1,12 @@
 # Tollvakt
 
+[![CI](https://github.com/devrimsavas/TOLLVAKT/actions/workflows/ci.yml/badge.svg)](https://github.com/devrimsavas/TOLLVAKT/actions/workflows/ci.yml)
+
 **AI-assisted customs classification and duty estimation for Norwegian importers and exporters.**
 
 Tollvakt helps small Norwegian businesses find the right commodity code (varenummer), estimate customs duty and VAT, and check whether a free trade agreement can lower the duty, before the goods reach the border.
 
-> Status: planning. Not yet in development.
+> Status: in development. Norwegian data import and duty calculation API are working.
 
 ---
 
@@ -13,7 +15,7 @@ Tollvakt helps small Norwegian businesses find the right commodity code (varenum
 - Every imported or exported item needs the correct commodity code. Duty rates, VAT basis and import/export requirements all depend on it.
 - If Tolletaten finds a wrong code in an audit and too little duty was paid, the difference is reassessed afterwards (etterberegning).
 - Tolletaten's own tariff search is a starting point, not a final answer: section, chapter and subheading notes must still be checked by hand.
-- From **1 March 2027**, customs declarations must be submitted at the latest at the border crossing (Digitoll), and the direct-driving arrangement (direktekjøring) ends. Importers need correct goods data, including the commodity code, *before* the goods arrive.
+- From **1 March 2027**, customs declarations must be submitted at the latest at the border crossing (Digitoll), and the direct-driving arrangement (direktekjøring) ends. Importers need correct goods data, including the commodity code, _before_ the goods arrive.
 - Exporters need to know what their buyer will pay in the destination country, and which proof of origin unlocks preferential duty.
 
 ## Target users
@@ -35,12 +37,12 @@ Tollvakt helps small Norwegian businesses find the right commodity code (varenum
 
 ## Countries (first wave)
 
-| Country | Role | Data source |
-|---|---|---|
-| Norway | Import + export (base) | Tolletaten open data (tariff structure, duty rates, exchange rates) |
-| EU (27) | Export destination | EU TARIC (free Excel download) |
-| United Kingdom | Export destination | GOV.UK Trade Tariff API |
-| USA | Export destination | USITC HTS REST API |
+| Country        | Role                   | Data source                                                         |
+| -------------- | ---------------------- | ------------------------------------------------------------------- |
+| Norway         | Import + export (base) | Tolletaten open data (tariff structure, duty rates, exchange rates) |
+| EU (27)        | Export destination     | EU TARIC (free Excel download)                                      |
+| United Kingdom | Export destination     | GOV.UK Trade Tariff API                                             |
+| USA            | Export destination     | USITC HTS REST API                                                  |
 
 Why these: based on Statistics Norway trade data for 2025, the EU and the UK together take the large majority of Norway's exports among the top 10 partners, and Germany, Sweden and the USA are among the largest import sources. Imports from any origin (including China and Türkiye) are covered by the Norwegian tariff and Norway's free trade agreements; no foreign tariff data is needed for imports.
 
@@ -99,11 +101,13 @@ Later candidates: other destination countries only when customers ask for them.
 ## Roadmap
 
 ### Phase 0: Foundation
+
 - [ ] Repository, README, licence
 - [ ] Common tariff data model (design + migrations)
 - [ ] Backend skeleton (Express + TypeScript, auth, Swagger) reusing Leverandørvakt/Regelvakt patterns
 
 ### Phase 1: Norway
+
 - [ ] ETL: Tolletaten tariff structure, duty rates, exchange rates
 - [ ] ETL: BKU rulings (depending on availability)
 - [ ] Duty + VAT calculator (deterministic, tested against Tolletaten's own examples)
@@ -111,18 +115,21 @@ Later candidates: other destination countries only when customers ask for them.
 - [ ] Free-trade-agreement check and proof-of-origin guidance
 
 ### Phase 2: Export destinations
+
 - [ ] ETL: EU TARIC
 - [ ] ETL: UK Trade Tariff API
 - [ ] ETL: USA (USITC HTS API)
 - [ ] Destination duty lookup via 6-digit HS mapping
 
 ### Phase 3: Frontend and pilot
+
 - [ ] Next.js UI (nb / en)
 - [ ] "Free customs check" demo for pilot users
 - [ ] Deployment to production
 - [ ] Pilot with Norwegian importers and exporters
 
 ### Later
+
 - [ ] Batch classification (CSV upload of product lists)
 - [ ] Change alerts when a rate for a saved code changes
 - [ ] API for freight forwarders
