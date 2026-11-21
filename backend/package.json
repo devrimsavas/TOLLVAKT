@@ -11,6 +11,7 @@
     "predev": "npm run build && npm run swagger",
     "dev": "concurrently \"tsc -w --preserveWatchOutput\" \"node --watch --watch-preserve-output dist/server.js\"",
     "swagger": "node dist/swagger.js",
+    "migrate": "node dist/migrate.js",
     "pretest": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
