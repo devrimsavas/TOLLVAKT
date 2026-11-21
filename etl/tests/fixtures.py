@@ -207,6 +207,92 @@ REFERENCE = {
     ],
 }
 
+TOLLAVGIFTSSATS = {
+    "versjon": "1.2",
+    "varer": [
+        {
+            "id": "01012100", "enhet": "Stk", "enhetBeskrivelse": "Per stk.", "annenEnhet": None, "annenEnhetBeskrivelse": None,
+            "avtalesatser": [
+                {"landgruppe": "TALL", "sats": [{"satsVerdi": "2000,00", "satsEnhet": "S", "satsEnhetBeskrivelse": "Per stk.", "fomdato": "1996-01-01", "tomdato": ""}]},
+                {"landgruppe": "TTYR", "sats": [{"satsVerdi": "0,00", "satsEnhet": "S", "satsEnhetBeskrivelse": "Per stk.", "fomdato": "1996-01-01", "tomdato": ""}]},
+            ],
+        },
+        {
+            "id": "00000011", "enhet": "Kg", "enhetBeskrivelse": "Per kilo.", "annenEnhet": None, "annenEnhetBeskrivelse": None,
+            "avtalesatser": [
+                {"landgruppe": "TALL", "sats": [{"satsVerdi": "999999,99", "satsEnhet": " ", "satsEnhetBeskrivelse": None, "fomdato": "1996-01-01", "tomdato": ""}]},
+            ],
+        },
+    ],
+}
+
+TILLEGGSTOLLAVGIFTSSATS = {
+    "versjon": "1.0",
+    "varer": [
+        {
+            "id": "01012100", "enhet": "Stk", "enhetBeskrivelse": "Per stk.", "annenEnhet": None, "annenEnhetBeskrivelse": None,
+            "avtalesatser": [
+                {"landgruppe": "TEF", "sats": [{"satsVerdi": "50,00", "satsEnhet": "P", "satsEnhetBeskrivelse": "Prosent av verdien", "fomdato": "2026-07-01", "tomdato": ""}]},
+            ],
+        },
+    ],
+}
+
+RAAVARETOLLAVGIFTSSATS = {"versjon": "1.2", "varer": []}
+
+RATETRADEAGREEMENTS = {
+    "version": "1.1",
+    "commodities": [
+        {"id": "01012100", "rateTradeAgreements": [
+            {"customDuty": {"value": None, "type": None, "classifier": "FREE"}, "landCodes": ["EU", "TR"]},
+            {"customDuty": {"value": 2000, "type": "pr.item", "classifier": "TARIFF"}, "landCodes": ["CN"]},
+        ]},
+    ],
+}
+
+INNFOERSELSAVGIFT = {
+    "versjon": "1.1",
+    "varer": [
+        {"id": "01012902", "avgiftsatser": [{"landgruppe": "TALL", "landgruppenavn": "Toll fra alle land", "avgiftstyper": [
+            {"avgiftstype": "MV", "avgiftstypebeskrivelse": "Merverdiavgift", "avgiftsgrupper": [
+                {"avgiftsgruppe": 2, "avgiftsgruppebeskrivelse": "Merverdiavgift næringsmidler", "sats": "15,00", "oresats": "false", "enhet": "P", "enhetbeskrivelse": "Prosent av verdien", "fomdato": "2022-01-01", "tomdato": ""},
+            ]},
+        ]}]},
+    ],
+}
+
+UTFOERSELSAVGIFT = {
+    "versjon": "1.1",
+    "varer": [
+        {"id": "01012100", "avgiftsatser": [{"landgruppe": "TEF", "landgruppenavn": "Toll fra EU", "avgiftstyper": [
+            {"avgiftstype": "FF", "avgiftstypebeskrivelse": "Eksportavgift for fisk", "avgiftsgrupper": [
+                {"avgiftsgruppe": 100, "avgiftsgruppebeskrivelse": "Eksportavgift for fisk", "sats": "1,05", "oresats": None, "enhet": "P", "enhetbeskrivelse": "Prosent av verdien", "fomdato": "2012-01-01", "tomdato": ""},
+            ]},
+        ]}]},
+    ],
+}
+
+INNFOERSELSRESTRIKSJON = {
+    "versjon": "1.1",
+    "varer": [
+        {"id": "01012100", "restriksjoner": [
+            {"landgruppe": "TALL", "landgruppebeskrivelse": "Alle land", "gjelder": "avsenderland", "restriksjontype": "V5",
+             "restriksjonstypebeskrivelse": "Veterinæravtalen", "restriksjonsgruppe": 200, "restriksjonsgruppebeskrivelse": "Varsel Mattilsynet",
+             "fomdato": "2012-01-01", "tomdato": ""},
+        ]},
+    ],
+}
+
+UTFOERSELSRESTRIKSJON = {"versjon": "1.1", "varer": []}
+
+VALUTAKURS = {
+    "versjon": "1.1",
+    "omregningskurser": [
+        {"valutakode": "EUR", "valutabeskrivelse": "EURO", "valutakurs": "10,454", "omregningsenhet": 1, "fomdato": "2026-11-12", "tomdato": "2026-11-25"},
+        {"valutakode": "NOK", "valutabeskrivelse": "NORSKE KRONER", "valutakurs": "100,000", "omregningsenhet": 100, "fomdato": "1993-01-01", "tomdato": ""},
+    ],
+}
+
 FILES = {
     "tolltariffstruktur": NB_TREE,
     "customstariffstructure": EN_TREE,
@@ -215,6 +301,15 @@ FILES = {
     "medlemsland": MEDLEMSLAND,
     "henvisning": HENVISNING,
     "reference": REFERENCE,
+    "tollavgiftssats": TOLLAVGIFTSSATS,
+    "tilleggstollavgiftssats": TILLEGGSTOLLAVGIFTSSATS,
+    "raavaretollavgiftssats": RAAVARETOLLAVGIFTSSATS,
+    "ratetradeagreements": RATETRADEAGREEMENTS,
+    "innfoerselsavgift": INNFOERSELSAVGIFT,
+    "utfoerselsavgift": UTFOERSELSAVGIFT,
+    "innfoerselsrestriksjon": INNFOERSELSRESTRIKSJON,
+    "utfoerselsrestriksjon": UTFOERSELSRESTRIKSJON,
+    "valutakurs": VALUTAKURS,
 }
 
 

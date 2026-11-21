@@ -124,6 +124,21 @@ describe("tariff schema", () => {
   });
 });
 
+describe("exchange rates", () => {
+  it("accepts a rate without an end date", async () => {
+    await sequelize.query(
+      `INSERT INTO exchange_rates (currency_code, valid_from, valid_to, rate, rate_raw, unit)
+       VALUES ('NOK', '1993-01-01', NULL, 100, '100,000', 100)`,
+    );
+
+    const [row] = await sequelize.query<{ valid_to: string | null }>(
+      "SELECT valid_to FROM exchange_rates WHERE currency_code = 'NOK'",
+      { type: QueryTypes.SELECT },
+    );
+    expect(row?.valid_to).toBeNull();
+  });
+});
+
 describe("migrations", () => {
   it("can be rolled back and applied again", async () => {
     // "to" is the last migration undone, inclusive

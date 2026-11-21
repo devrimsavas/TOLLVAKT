@@ -1,6 +1,7 @@
 # Tollvakt data model
 
 Designed from the structure of the real Tolletaten files (download of 2026-11-21).
+Implemented in `backend/src/migrations/0002` to `0010`.
 Database: PostgreSQL + pgvector. Schema is owned by `backend/` (umzug migrations); the ETL only writes data.
 
 ## Conventions
@@ -9,14 +10,14 @@ Database: PostgreSQL + pgvector. Schema is owned by `backend/` (umzug migrations
 - Commodity codes (varenummer) are stored as `char(8)`, HS codes as `varchar(6)`, always as text (leading zeros matter).
 - Dates: `valid_from date NOT NULL`, `valid_to date NULL`. An empty `tomdato` in the source means "still valid" and becomes `NULL`.
 - Decimal values in the source are strings with a comma (`"24,67"`). They are stored as `numeric(14,4)`, and the original string is kept in a `*_raw` column so nothing is lost if parsing rules change.
-- Every import table is replaced as a whole inside one transaction per run (the source files are complete snapshots). Each run is logged in `import_runs`.
+- Every import table is replaced as a whole inside one transaction per run (the source files are complete snapshots). The exception is `exchange_rates`, which is upserted so old periods are kept. Each run is logged in `import_runs`.
 
 ## Source → table map
 
 | Source file | Table(s) |
 |---|---|
 | tolltariffstruktur + customstariffstructure | `tariff_nodes`, `tariff_node_references` |
-| henvisning + reference | `references` |
+| henvisning + reference | `tariff_references` |
 | varenummer | `commodities`, `commodity_classifications` |
 | medlemsland | `countries`, `country_group_members` |
 | landgruppe | `country_groups` |
@@ -70,10 +71,12 @@ Indexes: `(code)`, `(hs_code)`, `(parent_id, sort_order)`, `path text_pattern_op
 | Column | Type | Notes |
 |---|---|---|
 | node_id | int FK → tariff_nodes | |
-| reference_code | varchar FK → references | e.g. `TKV 031`, `AGRI` |
+| reference_code | varchar FK → tariff_references | e.g. `TKV 031`, `AGRI` |
 | PK | (node_id, reference_code) | |
 
-### `references`
+### `tariff_references`
+
+`references` is a reserved word in SQL, so the table has a prefix.
 
 | Column | Type | Notes |
 |---|---|---|
@@ -256,7 +259,7 @@ English snapshot of current free trade agreement rates (`ratetradeagreements`). 
 | rate_raw | varchar | |
 | unit | int | `omregningsenhet` |
 | valid_from | date | |
-| valid_to | date | |
+| valid_to | date NULL | NOK has a fixed rate without an end date (migration 0011) |
 | PK | (currency_code, valid_from) | kept over time, so old calculations stay reproducible |
 
 ---
@@ -296,6 +299,8 @@ English snapshot of current free trade agreement rates (`ratetradeagreements`). 
 ---
 
 ## 9. AI retrieval
+
+The embedding tables need the pgvector extension and a fixed vector dimension, so they get their own migration when the embedding model is chosen. `bku_rulings` is already created (migration 0010).
 
 ### `tariff_node_embeddings`
 
@@ -348,12 +353,12 @@ English snapshot of current free trade agreement rates (`ratetradeagreements`). 
 1. Norwegian and English trees have identical shape.
 2. Every commodity leaf in the tree exists in `commodities`, and the reverse; differences are reported (today: 7 445 codes in `varenummer`, 7 440 in the rate files).
 3. Every `country_group_code` used in rates, fees and restrictions exists in `country_groups`.
-4. Every reference code in the tree exists in `references`.
+4. Every reference code in the tree exists in `tariff_references`.
 5. All numeric strings parse; values like `999999,99` are flagged `is_special_value`.
 6. Row counts do not drop by more than 5 % compared to the previous successful run (protects against a broken or partial file).
 7. Reference products: a fixed list of known codes whose duty and VAT must match expected values (e.g. Tolletaten's own calculation examples).
 
 ## Open points
 
-- Meaning of the placeholder rate `999999,99` and of a blank `satsEnhet`: check against `references` (e.g. `AGRI`) and Tolletaten's tariff before using in calculations.
+- Meaning of the placeholder rate `999999,99` and of a blank `satsEnhet`: check against `tariff_references` (e.g. `AGRI`) and Tolletaten's tariff before using in calculations.
 - Embedding model and vector dimension: chosen when the classification flow is built.

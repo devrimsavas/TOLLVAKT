@@ -2,7 +2,7 @@ import copy
 
 import pytest
 
-from tests.fixtures import VARENUMMER, write_folder
+from tests.fixtures import VALUTAKURS, VARENUMMER, write_folder
 from tollvakt_etl.norway.dataset import load_dataset
 from tollvakt_etl.norway.load import import_dataset
 
@@ -24,13 +24,18 @@ def test_imports_everything_and_records_the_run(db, tmp_path):
     assert count(db, "tariff_nodes") == 10
     assert count(db, "commodities") == 4
     assert count(db, "country_group_members") == 2
+    assert count(db, "duty_rates") == 4
+    assert count(db, "trade_agreement_rates") == 2
+    assert count(db, "fees") == 2
+    assert count(db, "restrictions") == 1
+    assert count(db, "exchange_rates") == 2
     row = db.execute(
         "SELECT status, row_counts->>'commodities', validation_report->'warnings' FROM import_runs WHERE id = %s",
         (run_id,),
     ).fetchone()
     assert row[0] == "succeeded"
     assert row[1] == "4"
-    assert len(row[2]) == 1
+    assert len(row[2]) == 2  # code outside the tree, placeholder rate
 
 
 def test_links_codes_to_their_tree_leaf(db, tmp_path):
@@ -96,3 +101,33 @@ def test_a_failure_while_writing_rolls_back_and_is_recorded(db, tmp_path):
     status, error = runs(db)[-1]
     assert status == "failed"
     assert "tariff_nodes_node_type_check" in error
+
+
+def test_stores_rates_with_raw_values_and_agreement_lists(db, tmp_path):
+    dataset, report = load_dataset(write_folder(tmp_path))
+    import_dataset(db, dataset, report)
+
+    assert db.execute(
+        "SELECT rate_value, rate_raw, is_special_value FROM duty_rates "
+        "WHERE commodity_code = '00000011'"
+    ).fetchone() == (None, "999999,99", True)
+    assert db.execute(
+        "SELECT agreement_codes FROM trade_agreement_rates WHERE classifier = 'FREE'"
+    ).fetchone() == (["EU", "TR"],)
+
+
+def test_keeps_old_exchange_rate_periods(db, tmp_path):
+    dataset, report = load_dataset(write_folder(tmp_path / "a"))
+    import_dataset(db, dataset, report)
+
+    later = copy.deepcopy(VALUTAKURS)
+    later["omregningskurser"][0].update(
+        {"valutakurs": "10,532", "fomdato": "2026-11-26", "tomdato": "2026-12-09"}
+    )
+    dataset, report = load_dataset(write_folder(tmp_path / "b", {"valutakurs": later}))
+    assert import_dataset(db, dataset, report)[1] == "succeeded"
+
+    periods = db.execute(
+        "SELECT valid_from::text, rate::text FROM exchange_rates WHERE currency_code = 'EUR' ORDER BY valid_from"
+    ).fetchall()
+    assert periods == [("2026-11-12", "10.454000"), ("2026-11-26", "10.532000")]

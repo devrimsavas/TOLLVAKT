@@ -17,9 +17,13 @@ from tollvakt_etl.validation import ValidationReport, check_row_counts
 
 SOURCE = "norway"
 
-# Tables this import owns. CASCADE also empties tables that point at them
-# (e.g. duty_rates via country_groups); those are loaded in the same run.
+# Tables this import replaces on every run. Exchange rates are not here:
+# they are kept over time (see write_exchange_rates).
 OWNED_TABLES = (
+    "duty_rates",
+    "trade_agreement_rates",
+    "fees",
+    "restrictions",
     "tariff_node_references",
     "tariff_nodes",
     "tariff_references",
@@ -139,6 +143,97 @@ def write_dataset(conn: psycopg.Connection, dataset: NorwayDataset) -> None:
         )
 
 
+def copy_rows(cur: psycopg.Cursor, table: str, columns: list[str], rows) -> None:
+    """Bulk insert with COPY: much faster than INSERT for large tables."""
+    with cur.copy(f"COPY {table} ({', '.join(columns)}) FROM STDIN") as copy:
+        for row in rows:
+            copy.write_row(row)
+
+
+def write_rates(conn: psycopg.Connection, dataset: NorwayDataset) -> None:
+    """Writes rates, fees and restrictions. Must run in a transaction, after
+    write_dataset (the rates point at country groups)."""
+    with conn.cursor() as cur:
+        copy_rows(
+            cur,
+            "duty_rates",
+            [
+                "commodity_code", "duty_kind", "country_group_code", "measure_unit",
+                "measure_secondary_unit", "rate_unit", "rate_unit_description", "rate_value",
+                "rate_raw", "is_special_value", "valid_from", "valid_to",
+            ],
+            (
+                (
+                    r.commodity_code, r.duty_kind, r.country_group_code, r.measure_unit,
+                    r.measure_secondary_unit, r.rate_unit, r.rate_unit_description, r.rate_value,
+                    r.rate_raw, r.is_special_value, r.valid_from, r.valid_to,
+                )
+                for r in dataset.duty_rates
+            ),
+        )
+        cur.executemany(
+            "INSERT INTO trade_agreement_rates (commodity_code, agreement_codes, value, value_type, classifier) "
+            "VALUES (%s, %s, %s, %s, %s)",
+            [
+                (r.commodity_code, r.agreement_codes, r.value, r.value_type, r.classifier)
+                for r in dataset.trade_agreement_rates
+            ],
+        )
+        copy_rows(
+            cur,
+            "fees",
+            [
+                "direction", "commodity_code", "country_group_code", "fee_type",
+                "fee_type_description", "fee_group", "fee_group_description", "rate_value",
+                "rate_raw", "is_ore_rate", "rate_unit", "rate_unit_description",
+                "valid_from", "valid_to",
+            ],
+            (
+                (
+                    f.direction, f.commodity_code, f.country_group_code, f.fee_type,
+                    f.fee_type_description, f.fee_group, f.fee_group_description, f.rate_value,
+                    f.rate_raw, f.is_ore_rate, f.rate_unit, f.rate_unit_description,
+                    f.valid_from, f.valid_to,
+                )
+                for f in dataset.fees
+            ),
+        )
+        copy_rows(
+            cur,
+            "restrictions",
+            [
+                "direction", "commodity_code", "country_group_code", "applies_to",
+                "restriction_type", "restriction_type_description", "restriction_group",
+                "restriction_group_description", "valid_from", "valid_to",
+            ],
+            (
+                (
+                    r.direction, r.commodity_code, r.country_group_code, r.applies_to,
+                    r.restriction_type, r.restriction_type_description, r.restriction_group,
+                    r.restriction_group_description, r.valid_from, r.valid_to,
+                )
+                for r in dataset.restrictions
+            ),
+        )
+
+
+def write_exchange_rates(conn: psycopg.Connection, dataset: NorwayDataset) -> None:
+    """Adds new periods and updates known ones; old periods are never deleted,
+    so earlier calculations can be repeated with the rate that applied then."""
+    with conn.cursor() as cur:
+        cur.executemany(
+            "INSERT INTO exchange_rates (currency_code, valid_from, valid_to, description, rate, rate_raw, unit) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s) "
+            "ON CONFLICT (currency_code, valid_from) DO UPDATE SET valid_to = EXCLUDED.valid_to, "
+            "description = EXCLUDED.description, rate = EXCLUDED.rate, rate_raw = EXCLUDED.rate_raw, "
+            "unit = EXCLUDED.unit",
+            [
+                (r.currency_code, r.valid_from, r.valid_to, r.description, r.rate, r.rate_raw, r.unit)
+                for r in dataset.exchange_rates
+            ],
+        )
+
+
 def import_dataset(
     conn: psycopg.Connection, dataset: NorwayDataset, report: ValidationReport
 ) -> tuple[int, str]:
@@ -158,6 +253,8 @@ def import_dataset(
     try:
         with conn.transaction():
             write_dataset(conn, dataset)
+            write_rates(conn, dataset)
+            write_exchange_rates(conn, dataset)
     except Exception as exc:  # noqa: BLE001 - record any failure, old data stays
         finish_run(conn, run_id, "failed", report, row_counts, f"{type(exc).__name__}: {exc}")
         raise

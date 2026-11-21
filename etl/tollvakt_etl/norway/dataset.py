@@ -19,6 +19,18 @@ from tollvakt_etl.norway.registry import (
     build_country_groups,
     build_references,
 )
+from tollvakt_etl.norway.rates import (
+    DutyRate,
+    ExchangeRate,
+    Fee,
+    Restriction,
+    TradeAgreementRate,
+    build_duty_rates,
+    build_exchange_rates,
+    build_fees,
+    build_restrictions,
+    build_trade_agreement_rates,
+)
 from tollvakt_etl.norway.tree import TariffNode, TreeMismatchError, build_tree
 from tollvakt_etl.validation import ValidationReport, find_duplicates, sample
 
@@ -30,7 +42,23 @@ REQUIRED_FILES = (
     "medlemsland",
     "henvisning",
     "reference",
+    "tollavgiftssats",
+    "tilleggstollavgiftssats",
+    "raavaretollavgiftssats",
+    "ratetradeagreements",
+    "innfoerselsavgift",
+    "utfoerselsavgift",
+    "innfoerselsrestriksjon",
+    "utfoerselsrestriksjon",
+    "valutakurs",
 )
+
+# Duty rate file -> duty_kind
+DUTY_FILES = {
+    "tollavgiftssats": "customs",
+    "tilleggstollavgiftssats": "additional",
+    "raavaretollavgiftssats": "raw_material",
+}
 
 
 @dataclass
@@ -42,6 +70,11 @@ class NorwayDataset:
     countries: list[Country] = field(default_factory=list)
     country_groups: list[CountryGroup] = field(default_factory=list)
     members: list[CountryGroupMember] = field(default_factory=list)
+    duty_rates: list[DutyRate] = field(default_factory=list)
+    trade_agreement_rates: list[TradeAgreementRate] = field(default_factory=list)
+    fees: list[Fee] = field(default_factory=list)
+    restrictions: list[Restriction] = field(default_factory=list)
+    exchange_rates: list[ExchangeRate] = field(default_factory=list)
     manifest: dict[str, Any] | None = None
 
     def node_reference_links(self) -> list[tuple[int, str]]:
@@ -57,6 +90,11 @@ class NorwayDataset:
             "countries": len(self.countries),
             "country_groups": len(self.country_groups),
             "country_group_members": len(self.members),
+            "duty_rates": len(self.duty_rates),
+            "trade_agreement_rates": len(self.trade_agreement_rates),
+            "fees": len(self.fees),
+            "restrictions": len(self.restrictions),
+            "exchange_rates": len(self.exchange_rates),
         }
 
 
@@ -96,6 +134,18 @@ def load_dataset(folder: Path) -> tuple[NorwayDataset, ValidationReport]:
         )
         dataset.country_groups = build_country_groups(read_json(folder, "landgruppe"))
         dataset.countries, dataset.members = build_countries(read_json(folder, "medlemsland"))
+        for name, kind in DUTY_FILES.items():
+            dataset.duty_rates.extend(build_duty_rates(read_json(folder, name), kind))
+        dataset.trade_agreement_rates = build_trade_agreement_rates(
+            read_json(folder, "ratetradeagreements")
+        )
+        dataset.fees = build_fees(read_json(folder, "innfoerselsavgift"), "import") + build_fees(
+            read_json(folder, "utfoerselsavgift"), "export"
+        )
+        dataset.restrictions = build_restrictions(
+            read_json(folder, "innfoerselsrestriksjon"), "import"
+        ) + build_restrictions(read_json(folder, "utfoerselsrestriksjon"), "export")
+        dataset.exchange_rates = build_exchange_rates(read_json(folder, "valutakurs"))
     except (KeyError, ValueError) as exc:
         report.error(f"Could not read the source data: {exc!r}")
         return dataset, report
@@ -142,6 +192,47 @@ def validate(dataset: NorwayDataset, report: ValidationReport) -> None:
     orphan_classifications = {c.commodity_code for c in dataset.classifications} - commodity_codes
     if orphan_classifications:
         report.error(f"Classifications for unknown codes: {sample(orphan_classifications)}")
+
+    # Rates must use known country groups (a foreign key); fees and
+    # restrictions should too
+    unknown_rate_groups = {r.country_group_code for r in dataset.duty_rates} - group_codes
+    if unknown_rate_groups:
+        report.error(f"Duty rates use unknown country groups: {sample(unknown_rate_groups)}")
+    unknown_other_groups = (
+        {f.country_group_code for f in dataset.fees}
+        | {r.country_group_code for r in dataset.restrictions}
+    ) - group_codes
+    if unknown_other_groups:
+        report.warning(
+            f"Fees or restrictions use unknown country groups: {sample(unknown_other_groups)}"
+        )
+
+    # Codes in the rate files should exist in the code list
+    used_codes = (
+        {r.commodity_code for r in dataset.duty_rates}
+        | {r.commodity_code for r in dataset.trade_agreement_rates}
+        | {f.commodity_code for f in dataset.fees}
+        | {r.commodity_code for r in dataset.restrictions}
+    )
+    unknown_codes = used_codes - commodity_codes
+    if unknown_codes:
+        report.warning(
+            f"{len(unknown_codes)} codes in rate, fee or restriction files are not in varenummer: "
+            f"{sample(unknown_codes)}"
+        )
+
+    special = [r for r in dataset.duty_rates if r.is_special_value]
+    if special:
+        report.warning(
+            f"{len(special)} duty rates have placeholder values (e.g. 999999,99) and are not used "
+            f"in calculations: {sample({r.commodity_code for r in special})}"
+        )
+
+    duplicate_rates = find_duplicates(
+        (r.currency_code, r.valid_from) for r in dataset.exchange_rates
+    )
+    if duplicate_rates:
+        report.error(f"Duplicate exchange rates: {sample(map(str, duplicate_rates))}")
 
     # References used in the tree should be defined; unknown ones are dropped
     reference_codes = {r.code for r in dataset.references}
