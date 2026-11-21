@@ -19,7 +19,7 @@ from typing import Any
 from tollvakt_etl.config import NORWAY_RAW_DIR
 
 LIST_SAMPLE_SIZE = 200  # list items merged to infer the item structure
-MAX_DEPTH = 20
+MAX_DEPTH = 8
 MAX_EXAMPLE_LENGTH = 60
 
 
