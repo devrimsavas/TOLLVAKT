@@ -1,9 +1,10 @@
-// Entry point: loads .env, connects to the database, runs migrations
-// and starts the HTTP server.
+// Entry point: loads .env, connects to the database, runs migrations,
+// creates the admin account if needed and starts the HTTP server.
 import "dotenv/config";
 import app from "./app.js";
 import { sequelize } from "./config/database.js";
 import { runMigrations } from "./config/migrator.js";
+import { ensureAdmin } from "./config/ensureAdmin.js";
 import { logger } from "./config/logger.js";
 
 const log = logger.child({ module: "server" });
@@ -26,6 +27,7 @@ const startServer = async () => {
     await sequelize.authenticate();
     log.info("Database connected");
     await runMigrations();
+    await ensureAdmin();
     app.listen(PORT, () => {
       log.info(`listening at ${PORT}`);
     });

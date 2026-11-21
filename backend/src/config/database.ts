@@ -1,4 +1,5 @@
 import { Sequelize } from "sequelize-typescript";
+import { User } from "../models/User.js";
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -10,5 +11,5 @@ if (!databaseUrl) {
 export const sequelize = new Sequelize(databaseUrl, {
   dialect: "postgres",
   logging: false,
-  models: [],
+  models: [User],
 });

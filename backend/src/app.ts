@@ -12,6 +12,7 @@ import { errorHandler, notFoundHandler } from "./middlewares/errorHandling.js";
 import { apiLimit } from "./middlewares/rateLimits.js";
 import indexRouter from "./routes/index.js";
 import healthRouter from "./routes/health.js";
+import authRouter from "./routes/auth.js";
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use(express.json());
 
 app.use("/", indexRouter);
 app.use("/api/health", healthRouter);
+app.use("/api/auth", authRouter);
 
 const swaggerPath = path.join(process.cwd(), "swagger_output.json");
 

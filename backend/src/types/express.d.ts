@@ -1,14 +1,14 @@
+import type { UserRole } from "../models/User.js";
+
 // Adds the authenticated user to Express requests.
-// requireAuth (added with authentication) fills it in after verifying the token.
+// requireAuth fills it in after verifying the token.
 declare global {
   namespace Express {
     interface Request {
       auth?: {
         userId: string;
-        role: "user" | "admin";
+        role: UserRole;
       };
     }
   }
 }
-
-export {};

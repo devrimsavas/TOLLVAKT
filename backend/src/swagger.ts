@@ -9,7 +9,10 @@ const doc = {
     version: "0.1.0",
   },
   servers: [{ url: "/" }],
-  tags: [{ name: "General", description: "API status" }],
+  tags: [
+    { name: "Auth", description: "Registration, login and the current user" },
+    { name: "General", description: "API status" },
+  ],
   components: {
     securitySchemes: {
       bearerAuth: {

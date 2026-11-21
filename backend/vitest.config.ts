@@ -9,10 +9,15 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/**/*.test.ts"],
-    // The rate limit is set out of reach, so tests can call the API freely
+    // The rate limits are set out of reach, so tests can register and log in
+    // as often as they need; tests that check a limit set a low one themselves
     env: {
+      JWT_SECRET: "test-secret",
       ...testEnv,
       REQUESTS_PER_ADDRESS: "1000000",
+      REGISTRATIONS_PER_ADDRESS: "100000",
+      LOGIN_FAILURES_PER_ACCOUNT: "100000",
+      LOGIN_FAILURES_PER_ADDRESS: "100000",
     },
     globalSetup: ["tests/helpers/globalSetup.ts"],
     setupFiles: ["tests/helpers/setup.ts"],

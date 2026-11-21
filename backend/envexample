@@ -1,6 +1,16 @@
 PORT=3000
 DATABASE_URL=postgres://postgres:password@localhost:5432/tollvakt
 
+# Sessions. Make a long random secret, e.g. with: openssl rand -hex 32
+JWT_SECRET=change_me
+JWT_EXPIRES_IN=1d
+
+# The admin account, created on startup if no admin exists yet
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=change_me
+ADMIN_FIRST_NAME=Admin
+ADMIN_LAST_NAME=User
+
 # Logs: "json" writes one JSON object per line (the default, for servers);
 # "pretty" writes readable, coloured lines (for development, needs the dev
 # dependencies). LOG_LEVEL is the lowest level written: trace, debug, info,
@@ -8,7 +18,12 @@ DATABASE_URL=postgres://postgres:password@localhost:5432/tollvakt
 LOG_FORMAT=pretty
 LOG_LEVEL=info
 
-# Rate limit: all API requests per address in 15 minutes
+# Rate limits (the defaults are shown). Failed logins are counted per account
+# and per address in 15 minutes, new accounts per address in an hour, and all
+# API requests per address in 15 minutes.
+LOGIN_FAILURES_PER_ACCOUNT=10
+LOGIN_FAILURES_PER_ADDRESS=30
+REGISTRATIONS_PER_ADDRESS=10
 REQUESTS_PER_ADDRESS=1500
 # Proxies whose X-Forwarded-For is trusted for the client's address. The default
 # trusts this machine and private networks (the web app, Docker).
