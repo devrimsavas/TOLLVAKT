@@ -11,6 +11,10 @@ const doc = {
   servers: [{ url: "/" }],
   tags: [
     { name: "Auth", description: "Registration, login and the current user" },
+    {
+      name: "Duty",
+      description: "Customs duty and VAT calculation with Tolletaten's rates",
+    },
     { name: "General", description: "API status" },
   ],
   components: {
