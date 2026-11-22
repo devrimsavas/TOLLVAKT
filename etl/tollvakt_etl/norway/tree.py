@@ -48,6 +48,10 @@ class TariffNode:
     # The texts of every node from the section down to this one, for search
     search_text_nb: str | None = None
     search_text_en: str | None = None
+    # The text embedded for semantic search: the node's own text first, then
+    # the levels above it up to the chapter (see _embedding_path)
+    embedding_text_nb: str | None = None
+    embedding_text_en: str | None = None
     references: list[str] = field(default_factory=list)
 
 
@@ -65,6 +69,22 @@ def _join_path(parent_text: str | None, own: str | None) -> str | None:
         own = own.rstrip(" :") or None
     parts = [part for part in (parent_text, own) if part]
     return " > ".join(parts) or None
+
+
+def _embedding_path(parent_text: str | None, own: str | None, depth: int) -> str | None:
+    """Own text first, then the levels above, nearest first, up to the chapter.
+
+    A code's own text is often short ("koffeinholdig", "ellers"); in a path
+    from the section down, the long general titles above it decide the
+    vector and the part that tells codes apart gets lost. Putting the own
+    text first and leaving out the section title keeps it in front.
+    """
+    if depth == 0:
+        return None  # section titles are left out
+    if own:
+        own = own.rstrip(" :") or None
+    parts = [part for part in (own, parent_text) if part]
+    return " < ".join(parts) or None
 
 
 def _where(path: str) -> str:
@@ -125,6 +145,12 @@ def build_tree(nb_root: dict[str, Any], en_root: dict[str, Any]) -> list[TariffN
         )
         node.search_text_nb = _join_path(parent.search_text_nb if parent else None, node.description_nb)
         node.search_text_en = _join_path(parent.search_text_en if parent else None, node.description_en)
+        node.embedding_text_nb = _embedding_path(
+            parent.embedding_text_nb if parent else None, node.description_nb, node.depth
+        )
+        node.embedding_text_en = _embedding_path(
+            parent.embedding_text_en if parent else None, node.description_en, node.depth
+        )
         nodes.append(node)
 
         nb_children = _children(nb, CHILD_KEYS_NB)

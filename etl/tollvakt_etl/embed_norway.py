@@ -20,7 +20,7 @@ from tollvakt_etl.norway.embed import embed_missing, missing_texts
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Embed the tariff's search texts")
+    parser = argparse.ArgumentParser(description="Embed the tariff texts for semantic search")
     parser.add_argument("--limit", type=int, help="embed at most this many texts (a trial run)")
     args = parser.parse_args(argv)
 

@@ -1,4 +1,5 @@
-"""Embeds the search texts of the commodity codes.
+"""Embeds the embedding texts of the commodity codes (own text first, then
+the levels above; see norway/tree.py).
 
 Only texts without a vector for the current model are sent to the model,
 so a re-import of an unchanged tariff costs nothing, and a stopped run
@@ -14,14 +15,14 @@ import psycopg
 
 from tollvakt_etl.embeddings import Embedder
 
-# The search texts of current commodity nodes, in both languages, with the
-# md5 hash PostgreSQL keeps for each (tariff_nodes.search_hash_*)
+# The embedding texts of current commodity nodes, in both languages, with
+# the md5 hash PostgreSQL keeps for each (tariff_nodes.embedding_hash_*)
 _TEXTS = """
-    SELECT search_hash_nb AS text_hash, search_text_nb AS text FROM tariff_nodes
-     WHERE node_type = 'commodity' AND search_text_nb IS NOT NULL
+    SELECT embedding_hash_nb AS text_hash, embedding_text_nb AS text FROM tariff_nodes
+     WHERE node_type = 'commodity' AND embedding_text_nb IS NOT NULL
     UNION
-    SELECT search_hash_en, search_text_en FROM tariff_nodes
-     WHERE node_type = 'commodity' AND search_text_en IS NOT NULL
+    SELECT embedding_hash_en, embedding_text_en FROM tariff_nodes
+     WHERE node_type = 'commodity' AND embedding_text_en IS NOT NULL
 """
 
 

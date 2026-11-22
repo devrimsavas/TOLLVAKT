@@ -304,14 +304,16 @@ Semantic search compares a vector of the user's description with vectors of the 
 
 Vectors are stored per **text**, not per tree node. Node ids change on every import, but most texts do not: the ETL (`python -m tollvakt_etl.embed_norway`) sends only texts without a vector for the current model, so re-importing an unchanged tariff costs nothing, and a stopped run continues where it stopped. Afterwards it removes the model's vectors whose text no node has any more.
 
-What is embedded: the search text (`search_text_nb`, `search_text_en`: the whole path from the section down to the code) of every commodity node, in both languages. A query is compared with both, and the nearer one counts.
+What is embedded: the embedding text (`embedding_text_nb`, `embedding_text_en`) of every commodity node, in both languages: the code's own text first, then the levels above it, nearest first, up to the chapter (`koffeinholdig < brent kaffe < Kaffe, også brent … < Kaffe, te, maté og krydderier`). Section titles are left out. A code's own text is often short ("koffeinholdig", "ellers"); with the path written from the section down, the long general titles decided the vector and close codes could not be told apart (migration 0014; 0013 embedded the search text). A query is compared with both languages, and the nearer one counts.
 
-### `tariff_nodes` (added by migration 0013)
+### `tariff_nodes` (added by migrations 0013 and 0014)
 
 | Column | Type | Notes |
 |---|---|---|
-| search_hash_nb | char(32) | generated: `md5(search_text_nb)`; links the node to its vector |
-| search_hash_en | char(32) | generated: `md5(search_text_en)` |
+| embedding_text_nb | text | own text first, then the levels above up to the chapter (ETL) |
+| embedding_text_en | text | |
+| embedding_hash_nb | char(32) | generated: `md5(embedding_text_nb)`; links the node to its vector |
+| embedding_hash_en | char(32) | generated: `md5(embedding_text_en)` |
 
 ### `text_embeddings`
 

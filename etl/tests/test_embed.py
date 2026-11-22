@@ -28,12 +28,12 @@ def imported(db, tmp_path):
 
 def commodity_texts(db):
     rows = db.execute(
-        "SELECT search_text_nb, search_text_en FROM tariff_nodes WHERE node_type = 'commodity'"
+        "SELECT embedding_text_nb, embedding_text_en FROM tariff_nodes WHERE node_type = 'commodity'"
     ).fetchall()
     return {text for row in rows for text in row if text}
 
 
-def test_embeds_the_search_texts_of_commodities_in_both_languages(db, tmp_path):
+def test_embeds_the_embedding_texts_of_commodities_in_both_languages(db, tmp_path):
     imported(db, tmp_path)
     embedder = FakeEmbedder()
 
@@ -67,7 +67,7 @@ def test_removes_vectors_of_texts_no_node_has_any_more(db, tmp_path):
     imported(db, tmp_path)
     embed_missing(db, FakeEmbedder())
     db.execute(
-        "UPDATE tariff_nodes SET search_text_en = search_text_en || ' (changed)' "
+        "UPDATE tariff_nodes SET embedding_text_en = embedding_text_en || ' (changed)' "
         "WHERE code = '01012100'"
     )
     db.commit()

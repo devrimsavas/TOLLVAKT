@@ -9,6 +9,12 @@
 // 10 and 20, and the mean reciprocal rank (1 for always first, 0 for never
 // found). The classification step will hand the LLM about 20 candidates, so
 // "top 20" is the number that matters most.
+//
+// It also records the first place of a code in the right subheading (same
+// first 6 digits) and heading (first 4). If the right area is among the
+// candidates but the exact code is not, search finds the area and the
+// choice between close codes is left; that is a different problem than
+// searching in the wrong place.
 import "dotenv/config";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -32,6 +38,20 @@ const RESULTS_DIR = path.join(process.cwd(), "eval", "results");
 
 // Place of the expected code (1 = first), or null if not among the results
 export type Places = Record<string, number | null>;
+
+// Levels of a match: the exact code, the same subheading, the same heading
+export const LEVELS = [
+  { name: "exact", digits: 8 },
+  { name: "6-digit", digits: 6 },
+  { name: "4-digit", digits: 4 },
+] as const;
+
+// First place (1 = first) of a code sharing the first `digits` digits, or null
+export function placeOf(codes: string[], expected: string, digits: number): number | null {
+  const prefix = expected.slice(0, digits);
+  const index = codes.findIndex((code) => code.startsWith(prefix));
+  return index === -1 ? null : index + 1;
+}
 
 export interface MethodSummary {
   method: string;
@@ -75,24 +95,25 @@ async function main(): Promise<void> {
     console.warn(`WARNING  ${c.id}: ${c.expected} is not a current commodity code`);
   }
 
-  const results: { case: EvalCase; places: Places }[] = [];
+  // places[level][method]
+  const results: { case: EvalCase; places: Record<string, Places> }[] = [];
   const unavailable = new Map<string, string>();
 
   for (const evalCase of cases) {
-    const places: Places = {};
+    const places: Record<string, Places> = Object.fromEntries(LEVELS.map((l) => [l.name, {}]));
     for (const method of METHODS) {
-      if (unavailable.has(method)) {
-        places[method] = null;
-        continue;
+      let codes: string[] = [];
+      if (!unavailable.has(method)) {
+        try {
+          const { hits } = await searchCommodities(evalCase.query, evalCase.lang, DEPTH, method);
+          codes = hits.map((hit) => hit.code);
+        } catch (error) {
+          // e.g. no embedding model set up: report it once, go on with the rest
+          unavailable.set(method, error instanceof Error ? error.message : String(error));
+        }
       }
-      try {
-        const { hits } = await searchCommodities(evalCase.query, evalCase.lang, DEPTH, method);
-        const index = hits.findIndex((hit) => hit.code === evalCase.expected);
-        places[method] = index === -1 ? null : index + 1;
-      } catch (error) {
-        // e.g. no embedding model set up: report it once, go on with the rest
-        unavailable.set(method, error instanceof Error ? error.message : String(error));
-        places[method] = null;
+      for (const level of LEVELS) {
+        places[level.name]![method] = placeOf(codes, evalCase.expected, level.digits);
       }
     }
     results.push({ case: evalCase, places });
@@ -102,12 +123,12 @@ async function main(): Promise<void> {
   console.log(`\n${"case".padEnd(24)}${"expected".padEnd(10)}${METHODS.map((m) => m.padStart(8)).join("")}  query`);
   for (const { case: c, places } of results) {
     console.log(
-      `${c.id.padEnd(24)}${c.expected.padEnd(10)}${METHODS.map((m) => place(places[m])).join("")}  ${c.query}`,
+      `${c.id.padEnd(24)}${c.expected.padEnd(10)}${METHODS.map((m) => place(places.exact![m])).join("")}  ${c.query}`,
     );
   }
 
   const active = METHODS.filter((m) => !unavailable.has(m));
-  const summaries = active.map((m) => summarize(m, results.map((r) => r.places[m] ?? null)));
+  const summaries = active.map((m) => summarize(m, results.map((r) => r.places.exact![m] ?? null)));
   console.log(`\nRight code found among the first N results (of ${cases.length} cases):\n`);
   console.log(`${"method".padEnd(10)}${CUTOFFS.map((n) => `top ${n}`.padEnd(13)).join("")}MRR`);
   for (const s of summaries) {
@@ -115,6 +136,18 @@ async function main(): Promise<void> {
       `${s.method.padEnd(10)}${CUTOFFS.map((n) => percent(s.hits[n] ?? 0, s.cases)).join("")}${s.meanReciprocalRank.toFixed(3)}`,
     );
   }
+  console.log(`\nRight code or area among the first 20 results:\n`);
+  console.log(`${"method".padEnd(10)}${LEVELS.map((l) => l.name.padEnd(13)).join("")}`);
+  const areaSummaries = active.map((m) => ({
+    method: m,
+    top20: Object.fromEntries(
+      LEVELS.map((l) => [l.name, summarize(m, results.map((r) => r.places[l.name]![m] ?? null)).hits[20] ?? 0]),
+    ),
+  }));
+  for (const a of areaSummaries) {
+    console.log(`${a.method.padEnd(10)}${LEVELS.map((l) => percent(a.top20[l.name] ?? 0, cases.length)).join("")}`);
+  }
+
   for (const [method, reason] of unavailable) {
     console.log(`\n${method}: not measured. ${reason}`);
   }
@@ -124,7 +157,11 @@ async function main(): Promise<void> {
     const file = path.join(RESULTS_DIR, `search-${new Date().toISOString().replace(/[:.]/g, "-")}.json`);
     await writeFile(
       file,
-      JSON.stringify({ ranAt: new Date().toISOString(), summaries, results, unavailable: Object.fromEntries(unavailable) }, null, 2),
+      JSON.stringify(
+        { ranAt: new Date().toISOString(), summaries, areaSummaries, results, unavailable: Object.fromEntries(unavailable) },
+        null,
+        2,
+      ),
     );
     console.log(`\nSaved ${file}`);
   }

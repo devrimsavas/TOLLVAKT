@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { fuseRankings, type SearchHit } from "../src/services/commodityService.js";
-import { summarize, type EvalCase } from "../src/eval/evalSearch.js";
+import { placeOf, summarize, type EvalCase } from "../src/eval/evalSearch.js";
 
 const hit = (code: string): SearchHit => ({
   code,
@@ -36,6 +36,15 @@ describe("search evaluation", () => {
 
     expect(summary.hits).toEqual({ 1: 1, 5: 2, 10: 2, 20: 3 });
     expect(summary.meanReciprocalRank).toBeCloseTo((1 + 1 / 3 + 1 / 12) / 4);
+  });
+
+  it("finds the first code in the same subheading or heading", () => {
+    // Expected: men's cotton trousers; found: t-shirts, a men's suit, men's cotton shorts
+    const codes = ["61091000", "62031100", "62034201"];
+
+    expect(placeOf(codes, "62034209", 8)).toBeNull();
+    expect(placeOf(codes, "62034209", 6)).toBe(3);
+    expect(placeOf(codes, "62034209", 4)).toBe(2);
   });
 
   it("has a well-formed test set", () => {

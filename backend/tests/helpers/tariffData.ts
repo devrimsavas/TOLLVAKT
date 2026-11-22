@@ -34,6 +34,19 @@ export async function seedTariffData(): Promise<void> {
       ('61091000', 3, 'KG', '1988-01-01', NULL, '0101', '1231'),
       ('61099000', 5, 'KG', '1988-01-01', '2020-12-31', '0101', '1231'),
       ('02011000', 4, 'KG', '1988-01-01', NULL, '0101', '1231');
+    -- Own text first, then the levels above up to the chapter (no section), as the ETL builds it
+    UPDATE tariff_nodes SET
+      embedding_text_nb = CASE id
+        WHEN 2 THEN 'T-skjorter, singleter og andre undertrøyer, av trikotasje.'
+        WHEN 3 THEN 'av bomull < T-skjorter, singleter og andre undertrøyer, av trikotasje.'
+        WHEN 5 THEN 'av andre tekstilmaterialer < T-skjorter, singleter og andre undertrøyer, av trikotasje.'
+        WHEN 4 THEN 'hele og halve skrotter' END,
+      embedding_text_en = CASE id
+        WHEN 2 THEN 'T-shirts, singlets and other vests, knitted or crocheted.'
+        WHEN 3 THEN 'Of cotton < T-shirts, singlets and other vests, knitted or crocheted.'
+        WHEN 5 THEN 'Of other textile materials < T-shirts, singlets and other vests, knitted or crocheted.'
+        WHEN 4 THEN 'Carcasses and half-carcasses' END
+    WHERE id IN (2, 3, 4, 5);
     INSERT INTO tariff_references (code, expression, definition_nb_html, definition_en_html) VALUES
       ('TKV 061', 'Trikotasje', '<p>Varer av trikotasje</p>', '<p>Knitted goods</p>');
     INSERT INTO tariff_node_references (node_id, reference_code) VALUES (2, 'TKV 061');
@@ -61,15 +74,15 @@ export async function seedTariffData(): Promise<void> {
   `);
 }
 
-// Stores a vector for each commodity's search texts, as the ETL does, with
-// the tests' fake model
+// Stores a vector for each commodity's embedding texts, as the ETL does,
+// with the tests' fake model
 export async function seedEmbeddings(): Promise<void> {
   const rows = await sequelize.query<{ hash: string; text: string }>(
-    `SELECT search_hash_nb AS hash, search_text_nb AS text FROM tariff_nodes
-      WHERE node_type = 'commodity' AND search_text_nb IS NOT NULL
+    `SELECT embedding_hash_nb AS hash, embedding_text_nb AS text FROM tariff_nodes
+      WHERE node_type = 'commodity' AND embedding_text_nb IS NOT NULL
      UNION
-     SELECT search_hash_en, search_text_en FROM tariff_nodes
-      WHERE node_type = 'commodity' AND search_text_en IS NOT NULL`,
+     SELECT embedding_hash_en, embedding_text_en FROM tariff_nodes
+      WHERE node_type = 'commodity' AND embedding_text_en IS NOT NULL`,
     { type: QueryTypes.SELECT },
   );
   for (const row of rows) {

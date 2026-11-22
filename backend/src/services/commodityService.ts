@@ -197,7 +197,7 @@ async function searchBySimilarity(
          FROM nearest e
          JOIN tariff_nodes n
            ON n.node_type = 'commodity'
-          AND (n.search_hash_nb = e.text_hash OR n.search_hash_en = e.text_hash)
+          AND (n.embedding_hash_nb = e.text_hash OR n.embedding_hash_en = e.text_hash)
          JOIN commodities c ON c.code = n.code
         WHERE c.valid_to IS NULL OR c.valid_to >= :today
         GROUP BY n.code, n.description_nb, n.description_en, ${contextColumn}

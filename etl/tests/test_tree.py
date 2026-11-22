@@ -71,3 +71,15 @@ def test_builds_search_texts_from_the_whole_path():
     # The node's own text keeps the tariff's colon
     horses = next(n for n in nodes if n.description_en == "Horses :")
     assert horses.search_text_en.endswith("> Horses")
+
+
+def test_builds_embedding_texts_from_the_own_text_up_to_the_chapter():
+    nodes = build_tree(NB_TREE, EN_TREE)
+    leaf = next(n for n in nodes if n.code == "01012902")
+
+    assert leaf.embedding_text_nb == (
+        "av vekt under 133 kg < andre < hester < Hester, esler, muldyr og mulesler, levende. < Levende dyr"
+    )
+    assert leaf.embedding_text_en.startswith("Of a weight less than 133 kg < Other < Horses < ")
+    # Section titles are left out
+    assert next(n for n in nodes if n.node_type == "section").embedding_text_nb is None
