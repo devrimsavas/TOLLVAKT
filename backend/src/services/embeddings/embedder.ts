@@ -6,6 +6,7 @@
 // EMBEDDING_PROVIDER=gemini   GEMINI_API_KEY, GEMINI_EMBEDDING_MODEL (production)
 // EMBEDDING_PROVIDER=fake     tests only: word-based vectors without a model
 
+import { providerSetupProblem } from "../../config/providerSettings.js";
 import { postJsonWithRetry } from "../http.js";
 
 // Fixed by the database column (vector(768))
@@ -40,7 +41,14 @@ function postJson(
   timeoutMs: number,
   who: string,
 ): Promise<unknown> {
-  return postJsonWithRetry(url, body, headers, timeoutMs, who, (message) => new EmbeddingError(message));
+  return postJsonWithRetry(
+    url,
+    body,
+    headers,
+    timeoutMs,
+    who,
+    (message) => new EmbeddingError(message),
+  );
 }
 
 export class OllamaEmbedder implements Embedder {
@@ -119,6 +127,17 @@ export class FakeEmbedder implements Embedder {
   }
 }
 
+// The settings each provider needs, besides EMBEDDING_PROVIDER itself
+const EMBEDDING_SETTINGS = {
+  ollama: ["OLLAMA_EMBEDDING_MODEL"],
+  gemini: ["GEMINI_API_KEY", "GEMINI_EMBEDDING_MODEL"],
+};
+
+// Why createEmbedder() returns null, for the error message
+export function embedderSetupProblem(): string {
+  return providerSetupProblem("EMBEDDING_PROVIDER", EMBEDDING_SETTINGS);
+}
+
 // The embedder chosen in the environment, or null when semantic search is
 // not configured. Read on every call, so tests can set their own values.
 export function createEmbedder(): Embedder | null {
@@ -136,7 +155,11 @@ export function createEmbedder(): Embedder | null {
       );
     case "gemini":
       if (!env.GEMINI_API_KEY || !env.GEMINI_EMBEDDING_MODEL) return null;
-      return new GeminiEmbedder(env.GEMINI_API_KEY, env.GEMINI_EMBEDDING_MODEL, timeoutMs);
+      return new GeminiEmbedder(
+        env.GEMINI_API_KEY,
+        env.GEMINI_EMBEDDING_MODEL,
+        timeoutMs,
+      );
     case "fake":
       return new FakeEmbedder();
     default:

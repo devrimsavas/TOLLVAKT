@@ -5,7 +5,7 @@
 // "leketøy som forestiller dyr", "videospillkonsoller", "bærbare automatiske
 // databehandlingsmaskiner". Neither word search nor the embedding model
 // bridges gaps that wide, so a language model translates first.
-import { createLlm, generateJsonWithRetry, type JsonSchema } from "./llm/llm.js";
+import { createLlm, generateJsonWithRetry, llmSetupProblem, type JsonSchema } from "./llm/llm.js";
 
 export interface RewrittenQuery {
   nb: string;
@@ -44,7 +44,7 @@ Answer only with JSON: {"nb": "...", "en": "..."}.`;
 export async function rewriteQuery(query: string): Promise<RewrittenQuery> {
   const llm = createLlm();
   if (!llm) {
-    throw new QueryRewriteUnavailableError("No language model is set up (LLM_PROVIDER in backend/.env)");
+    throw new QueryRewriteUnavailableError(`No language model is set up: ${llmSetupProblem()}`);
   }
   const answer = await generateJsonWithRetry(llm, {
     system: SYSTEM,

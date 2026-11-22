@@ -10,6 +10,7 @@
 // Answers are JSON, checked against a schema the caller gives: the model is
 // asked for exactly that shape (Ollama "format", Gemini "responseSchema").
 
+import { providerSetupProblem } from "../../config/providerSettings.js";
 import { postJsonWithRetry } from "../http.js";
 
 const DEFAULT_TIMEOUT_SECONDS = 60;
@@ -56,7 +57,11 @@ export function extractJsonObject(text: string): string {
 }
 
 // Checks a value against the schema; returns the path of the first problem
-function findProblem(value: unknown, schema: JsonSchemaNode, path: string): string | null {
+function findProblem(
+  value: unknown,
+  schema: JsonSchemaNode,
+  path: string,
+): string | null {
   switch (schema.type) {
     case "string":
       if (typeof value !== "string") return path;
@@ -69,11 +74,14 @@ function findProblem(value: unknown, schema: JsonSchemaNode, path: string): stri
       }
       return null;
     case "object": {
-      if (typeof value !== "object" || value === null || Array.isArray(value)) return path;
+      if (typeof value !== "object" || value === null || Array.isArray(value))
+        return path;
       const record = value as Record<string, unknown>;
       for (const key of schema.required) {
         const property = schema.properties[key];
-        const problem = property ? findProblem(record[key], property, path ? `${path}.${key}` : key) : null;
+        const problem = property
+          ? findProblem(record[key], property, path ? `${path}.${key}` : key)
+          : null;
         if (problem) return problem;
       }
       return null;
@@ -94,14 +102,18 @@ export function parseJsonAnswer(
   try {
     data = JSON.parse(extractJsonObject(text));
   } catch {
-    const why = stopReason && !["stop", "STOP"].includes(stopReason) ? ` (stopped: ${stopReason})` : "";
+    const why =
+      stopReason && !["stop", "STOP"].includes(stopReason)
+        ? ` (stopped: ${stopReason})`
+        : "";
     throw new LlmError(`${model} did not answer with JSON${why}`);
   }
   if (typeof data !== "object" || data === null || Array.isArray(data)) {
     throw new LlmError(`${model} did not answer with a JSON object`);
   }
   const problem = findProblem(data, schema, "");
-  if (problem) throw new LlmError(`${model} answered without a valid "${problem}"`);
+  if (problem)
+    throw new LlmError(`${model} answered without a valid "${problem}"`);
   return data as Record<string, unknown>;
 }
 
@@ -109,7 +121,10 @@ export function parseJsonAnswer(
 // something that is not the asked JSON; a second try usually works
 const ATTEMPTS = 2;
 
-export async function generateJsonWithRetry(llm: Llm, request: JsonRequest): Promise<Record<string, unknown>> {
+export async function generateJsonWithRetry(
+  llm: Llm,
+  request: JsonRequest,
+): Promise<Record<string, unknown>> {
   for (let attempt = 1; ; attempt++) {
     try {
       return await llm.generateJson(request);
@@ -126,7 +141,14 @@ function postJson(
   timeoutMs: number,
   who: string,
 ): Promise<unknown> {
-  return postJsonWithRetry(url, body, headers, timeoutMs, who, (message) => new LlmError(message));
+  return postJsonWithRetry(
+    url,
+    body,
+    headers,
+    timeoutMs,
+    who,
+    (message) => new LlmError(message),
+  );
 }
 
 export class OllamaLlm implements Llm {
@@ -141,7 +163,11 @@ export class OllamaLlm implements Llm {
     this.model = `ollama:${name}`;
   }
 
-  async generateJson({ system, prompt, schema }: JsonRequest): Promise<Record<string, unknown>> {
+  async generateJson({
+    system,
+    prompt,
+    schema,
+  }: JsonRequest): Promise<Record<string, unknown>> {
     const data = (await postJson(
       `${this.host.replace(/\/+$/, "")}/api/chat`,
       {
@@ -159,7 +185,12 @@ export class OllamaLlm implements Llm {
       this.timeoutMs,
       `Ollama at ${this.host}`,
     )) as { message?: { content?: string }; done_reason?: string };
-    return parseJsonAnswer(data.message?.content ?? "", schema, this.model, data.done_reason);
+    return parseJsonAnswer(
+      data.message?.content ?? "",
+      schema,
+      this.model,
+      data.done_reason,
+    );
   }
 }
 
@@ -177,7 +208,11 @@ export class GeminiLlm implements Llm {
     this.model = `gemini:${name}`;
   }
 
-  async generateJson({ system, prompt, schema }: JsonRequest): Promise<Record<string, unknown>> {
+  async generateJson({
+    system,
+    prompt,
+    schema,
+  }: JsonRequest): Promise<Record<string, unknown>> {
     const data = (await postJson(
       `${GEMINI_BASE_URL}/models/${encodeURIComponent(this.name)}:generateContent`,
       {
@@ -187,15 +222,24 @@ export class GeminiLlm implements Llm {
           responseMimeType: "application/json",
           responseSchema: schema,
           temperature: 0,
-          ...(this.thinkingLevel ? { thinkingConfig: { thinkingLevel: this.thinkingLevel } } : {}),
+          ...(this.thinkingLevel
+            ? { thinkingConfig: { thinkingLevel: this.thinkingLevel } }
+            : {}),
         },
       },
       { "x-goog-api-key": this.apiKey },
       this.timeoutMs,
       "Gemini",
-    )) as { candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[] };
+    )) as {
+      candidates?: {
+        content?: { parts?: { text?: string }[] };
+        finishReason?: string;
+      }[];
+    };
     const candidate = data.candidates?.[0];
-    const text = (candidate?.content?.parts ?? []).map((part) => part.text ?? "").join("");
+    const text = (candidate?.content?.parts ?? [])
+      .map((part) => part.text ?? "")
+      .join("");
     return parseJsonAnswer(text, schema, this.model, candidate?.finishReason);
   }
 }
@@ -206,15 +250,31 @@ export class FakeLlm implements Llm {
   static answer: (request: JsonRequest) => Record<string, unknown> = () => ({});
 
   async generateJson(request: JsonRequest): Promise<Record<string, unknown>> {
-    return parseJsonAnswer(JSON.stringify(FakeLlm.answer(request)), request.schema, this.model);
+    return parseJsonAnswer(
+      JSON.stringify(FakeLlm.answer(request)),
+      request.schema,
+      this.model,
+    );
   }
+}
+
+// The settings each provider needs, besides LLM_PROVIDER itself
+const LLM_SETTINGS = {
+  ollama: ["OLLAMA_LLM_MODEL"],
+  gemini: ["GEMINI_API_KEY", "GEMINI_LLM_MODEL"],
+};
+
+// Why createLlm() returns null, for the error message
+export function llmSetupProblem(): string {
+  return providerSetupProblem("LLM_PROVIDER", LLM_SETTINGS);
 }
 
 // The model chosen in the environment, or null when none is set up. Read on
 // every call, so tests can set their own values.
 export function createLlm(): Llm | null {
   const env = process.env;
-  const timeoutMs = Number(env.LLM_TIMEOUT_SECONDS ?? DEFAULT_TIMEOUT_SECONDS) * 1000;
+  const timeoutMs =
+    Number(env.LLM_TIMEOUT_SECONDS ?? DEFAULT_TIMEOUT_SECONDS) * 1000;
 
   switch (env.LLM_PROVIDER?.trim()) {
     case "ollama":

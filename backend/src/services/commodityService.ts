@@ -1,7 +1,7 @@
 // Search in the tariff tree and details of one commodity code.
 import { QueryTypes } from "sequelize";
 import { sequelize } from "../config/database.js";
-import { createEmbedder } from "./embeddings/embedder.js";
+import { createEmbedder, embedderSetupProblem } from "./embeddings/embedder.js";
 import { rewriteQuery, type RewrittenQuery } from "./queryRewriter.js";
 
 export type SearchLanguage = "nb" | "en";
@@ -51,7 +51,8 @@ export interface SearchResult {
 // The words of a search, safe to put into to_tsquery: letters, digits and
 // inner hyphens only (e.g. "t-skjorte")
 export function searchWords(query: string): string[] {
-  const words = query.toLowerCase().match(/[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*/gu) ?? [];
+  const words =
+    query.toLowerCase().match(/[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*/gu) ?? [];
   return [...new Set(words)].slice(0, MAX_SEARCH_WORDS);
 }
 
@@ -62,7 +63,9 @@ export function toTsQuery(words: string[], operator: "&" | "|"): string {
 }
 
 const today = () =>
-  new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Oslo" }).format(new Date());
+  new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Oslo" }).format(
+    new Date(),
+  );
 
 async function searchByText(
   words: string[],
@@ -78,8 +81,11 @@ async function searchByText(
   const matchedWords = wordQueries
     .map((q) => `(n.${vector} @@ ${q})::int`)
     .join(" + ");
-  const wordReplacements = Object.fromEntries(words.map((w, i) => [`word${i}`, `${w}:*`]));
-  const contextColumn = contextLanguage === "nb" ? "n.search_text_nb" : "n.search_text_en";
+  const wordReplacements = Object.fromEntries(
+    words.map((w, i) => [`word${i}`, `${w}:*`]),
+  );
+  const contextColumn =
+    contextLanguage === "nb" ? "n.search_text_nb" : "n.search_text_en";
   const rows = await sequelize.query<{
     code: string;
     description_nb: string | null;
@@ -123,7 +129,8 @@ async function searchByCode(
   language: SearchLanguage,
   limit: number,
 ): Promise<SearchHit[]> {
-  const contextColumn = language === "nb" ? "n.search_text_nb" : "n.search_text_en";
+  const contextColumn =
+    language === "nb" ? "n.search_text_nb" : "n.search_text_en";
   const rows = await sequelize.query<{
     code: string;
     description_nb: string | null;
@@ -162,9 +169,12 @@ export function supportsIterativeScan(version: string): boolean {
 
 function hasIterativeScan(): Promise<boolean> {
   iterativeScan ??= sequelize
-    .query<{ extversion: string }>("SELECT extversion FROM pg_extension WHERE extname = 'vector'", {
-      type: QueryTypes.SELECT,
-    })
+    .query<{ extversion: string }>(
+      "SELECT extversion FROM pg_extension WHERE extname = 'vector'",
+      {
+        type: QueryTypes.SELECT,
+      },
+    )
     .then(([row]) => (row ? supportsIterativeScan(row.extversion) : false));
   return iterativeScan;
 }
@@ -177,7 +187,7 @@ async function searchBySimilarity(
   const embedder = createEmbedder();
   if (!embedder) {
     throw new SemanticSearchUnavailableError(
-      "Semantic search is not set up (EMBEDDING_PROVIDER in backend/.env)",
+      `Semantic search is not set up: ${embedderSetupProblem()}`,
     );
   }
   const [stored] = await sequelize.query(
@@ -191,7 +201,8 @@ async function searchBySimilarity(
   }
 
   const vector = `[${(await embedder.embedQuery(query)).join(",")}]`;
-  const contextColumn = language === "nb" ? "n.search_text_nb" : "n.search_text_en";
+  const contextColumn =
+    language === "nb" ? "n.search_text_nb" : "n.search_text_en";
   // Every code has a vector per language; the nearest of the two counts.
   // More vectors than codes are fetched, since two may belong to one code
   // and expired codes are left out afterwards.
@@ -200,13 +211,17 @@ async function searchBySimilarity(
   const rows = await sequelize.transaction(async (transaction) => {
     // The index looks at this many candidates (default 40); it must be at
     // least as many as are asked for
-    await sequelize.query(`SET LOCAL hnsw.ef_search = ${candidates}`, { transaction });
+    await sequelize.query(`SET LOCAL hnsw.ef_search = ${candidates}`, {
+      transaction,
+    });
     // With vectors from more than one model in the table, the index finds
     // the nearest of all models and the model filter then drops some. From
     // pgvector 0.8 the index can keep scanning until enough rows pass the
     // filter; the outer query sorts them by distance again.
     if (await hasIterativeScan()) {
-      await sequelize.query("SET LOCAL hnsw.iterative_scan = relaxed_order", { transaction });
+      await sequelize.query("SET LOCAL hnsw.iterative_scan = relaxed_order", {
+        transaction,
+      });
     }
     return sequelize.query<{
       code: string;
@@ -236,7 +251,13 @@ async function searchBySimilarity(
       {
         type: QueryTypes.SELECT,
         transaction,
-        replacements: { vector, model: embedder.model, candidates, today: today(), limit },
+        replacements: {
+          vector,
+          model: embedder.model,
+          candidates,
+          today: today(),
+          limit,
+        },
       },
     );
   });
@@ -259,7 +280,11 @@ export interface RankedList {
   weight: number;
 }
 
-export function fuseRankings(lists: RankedList[], limit: number, k = RRF_K): SearchHit[] {
+export function fuseRankings(
+  lists: RankedList[],
+  limit: number,
+  k = RRF_K,
+): SearchHit[] {
   const fused = new Map<string, SearchHit>();
   for (const { hits, weight } of lists) {
     hits.forEach((hit, index) => {
@@ -285,8 +310,12 @@ async function searchText(
   const words = searchWords(query);
   if (words.length === 0) return { matched: "all", hits: [] };
   const all = await searchByText(words, "&", language, limit, contextLanguage);
-  if (all.length > 0 || words.length === 1) return { matched: "all", hits: all };
-  return { matched: "any", hits: await searchByText(words, "|", language, limit, contextLanguage) };
+  if (all.length > 0 || words.length === 1)
+    return { matched: "all", hits: all };
+  return {
+    matched: "any",
+    hits: await searchByText(words, "|", language, limit, contextLanguage),
+  };
 }
 
 // A query of digits (dots and spaces allowed, e.g. "6109.10") searches codes
@@ -302,7 +331,11 @@ export async function searchCommodities(
   const trimmed = query.trim();
   if (/^[\d.\s]+$/.test(trimmed)) {
     const digits = trimmed.replace(/[.\s]/g, "");
-    return { query: trimmed, matched: "code", hits: await searchByCode(digits, language, limit) };
+    return {
+      query: trimmed,
+      matched: "code",
+      hits: await searchByCode(digits, language, limit),
+    };
   }
 
   if (mode === "semantic") {
@@ -335,16 +368,17 @@ export async function searchCommodities(
   if (mode === "expanded") {
     const rewritten = await rewriteQuery(trimmed);
     const other: SearchLanguage = language === "nb" ? "en" : "nb";
-    const [original, inLanguage, inOther, semantic, semanticNb, semanticEn] = await Promise.all([
-      searchText(trimmed, language, HYBRID_CANDIDATES),
-      searchText(rewritten[language], language, HYBRID_CANDIDATES),
-      // The other language's tariff text, with the context still in the
-      // asked language
-      searchText(rewritten[other], other, HYBRID_CANDIDATES, language),
-      searchBySimilarity(trimmed, language, HYBRID_CANDIDATES),
-      searchBySimilarity(rewritten.nb, language, HYBRID_CANDIDATES),
-      searchBySimilarity(rewritten.en, language, HYBRID_CANDIDATES),
-    ]);
+    const [original, inLanguage, inOther, semantic, semanticNb, semanticEn] =
+      await Promise.all([
+        searchText(trimmed, language, HYBRID_CANDIDATES),
+        searchText(rewritten[language], language, HYBRID_CANDIDATES),
+        // The other language's tariff text, with the context still in the
+        // asked language
+        searchText(rewritten[other], other, HYBRID_CANDIDATES, language),
+        searchBySimilarity(trimmed, language, HYBRID_CANDIDATES),
+        searchBySimilarity(rewritten.nb, language, HYBRID_CANDIDATES),
+        searchBySimilarity(rewritten.en, language, HYBRID_CANDIDATES),
+      ]);
     return {
       query: trimmed,
       matched: "expanded",
@@ -397,7 +431,9 @@ export interface CommodityDetails {
   references: CommodityReference[];
 }
 
-export async function getCommodity(code: string): Promise<CommodityDetails | null> {
+export async function getCommodity(
+  code: string,
+): Promise<CommodityDetails | null> {
   const [row] = await sequelize.query<{
     code: string;
     node_id: number | null;
@@ -461,7 +497,10 @@ export async function getCommodity(code: string): Promise<CommodityDetails | nul
       )
     : [];
 
-  const classifications = await sequelize.query<{ code: string; description: string | null }>(
+  const classifications = await sequelize.query<{
+    code: string;
+    description: string | null;
+  }>(
     `SELECT code, description FROM commodity_classifications
       WHERE commodity_code = :code AND (valid_to IS NULL OR valid_to >= :today)
       ORDER BY code`,

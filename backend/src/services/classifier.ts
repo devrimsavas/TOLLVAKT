@@ -12,7 +12,12 @@
 import { QueryTypes } from "sequelize";
 import { sequelize } from "../config/database.js";
 import { searchCommodities, type SearchLanguage } from "./commodityService.js";
-import { createLlm, generateJsonWithRetry, type JsonSchema } from "./llm/llm.js";
+import {
+  createLlm,
+  generateJsonWithRetry,
+  llmSetupProblem,
+  type JsonSchema,
+} from "./llm/llm.js";
 import type { RewrittenQuery } from "./queryRewriter.js";
 
 export const CANDIDATES = 20;
@@ -64,7 +69,10 @@ const SCHEMA: JsonSchema = {
   required: ["suggestions", "missingInformation"],
 };
 
-const LANGUAGE_NAMES: Record<SearchLanguage, string> = { nb: "Norwegian (bokmål)", en: "English" };
+const LANGUAGE_NAMES: Record<SearchLanguage, string> = {
+  nb: "Norwegian (bokmål)",
+  en: "English",
+};
 
 function systemPrompt(language: SearchLanguage): string {
   return `You are an expert in classifying goods in the Norwegian customs tariff (Tolltariffen, based on the Harmonized System).
@@ -93,7 +101,10 @@ interface CandidateRow {
   path_en: string | null;
 }
 
-async function candidateDetails(codes: string[], language: SearchLanguage): Promise<Map<string, CandidateRow>> {
+async function candidateDetails(
+  codes: string[],
+  language: SearchLanguage,
+): Promise<Map<string, CandidateRow>> {
   if (codes.length === 0) return new Map();
   const contextColumn = language === "nb" ? "search_text_nb" : "search_text_en";
   const rows = await sequelize.query<CandidateRow>(
@@ -111,13 +122,23 @@ export function withoutSection(path: string): string {
   return cut === -1 ? path : path.slice(cut + 3);
 }
 
-export async function classify(description: string, language: SearchLanguage): Promise<Classification> {
+export async function classify(
+  description: string,
+  language: SearchLanguage,
+): Promise<Classification> {
   const llm = createLlm();
   if (!llm) {
-    throw new ClassificationUnavailableError("No language model is set up (LLM_PROVIDER in backend/.env)");
+    throw new ClassificationUnavailableError(
+      `No language model is set up: ${llmSetupProblem()}`,
+    );
   }
 
-  const search = await searchCommodities(description, language, CANDIDATES, "expanded");
+  const search = await searchCommodities(
+    description,
+    language,
+    CANDIDATES,
+    "expanded",
+  );
   const candidates = search.hits.map((hit) => hit.code);
   const details = await candidateDetails(candidates, language);
 
@@ -137,7 +158,8 @@ export async function classify(description: string, language: SearchLanguage): P
   // title is left out: long, and of no help to tell candidates apart.
   const list = candidates
     .map((code, index) => {
-      const path = details.get(code)?.path_en ?? search.hits[index]?.context ?? "";
+      const path =
+        details.get(code)?.path_en ?? search.hits[index]?.context ?? "";
       return `${index + 1}. ${code}: ${withoutSection(path)}`;
     })
     .join("\n");
@@ -150,10 +172,19 @@ export async function classify(description: string, language: SearchLanguage): P
   const allowed = new Set(candidates);
   const seen = new Set<string>();
   const suggestions: Suggestion[] = [];
-  for (const item of answer.suggestions as { code: string; reason: string; confidence: Confidence }[]) {
+  for (const item of answer.suggestions as {
+    code: string;
+    reason: string;
+    confidence: Confidence;
+  }[]) {
     // Models sometimes write codes with dots ("6109.1000")
     const code = item.code.replace(/[.\s]/g, "");
-    if (!allowed.has(code) || seen.has(code) || suggestions.length >= MAX_SUGGESTIONS) continue;
+    if (
+      !allowed.has(code) ||
+      seen.has(code) ||
+      suggestions.length >= MAX_SUGGESTIONS
+    )
+      continue;
     seen.add(code);
     const row = details.get(code);
     suggestions.push({
@@ -170,7 +201,9 @@ export async function classify(description: string, language: SearchLanguage): P
     description,
     rewritten: search.rewritten ?? null,
     suggestions,
-    missingInformation: (answer.missingInformation as string[]).map((q) => q.trim()).filter(Boolean),
+    missingInformation: (answer.missingInformation as string[])
+      .map((q) => q.trim())
+      .filter(Boolean),
     candidates,
     model: llm.model,
   };
