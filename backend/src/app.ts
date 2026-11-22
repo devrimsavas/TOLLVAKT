@@ -16,6 +16,7 @@ import authRouter from "./routes/auth.js";
 import dutyRouter from "./routes/duty.js";
 import commoditiesRouter from "./routes/commodities.js";
 import countriesRouter from "./routes/countries.js";
+import classifyRouter from "./routes/classify.js";
 
 const app = express();
 
@@ -60,6 +61,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/duty", dutyRouter);
 app.use("/api/commodities", commoditiesRouter);
 app.use("/api/countries", countriesRouter);
+app.use("/api/classify", classifyRouter);
 
 const swaggerPath = path.join(process.cwd(), "swagger_output.json");
 

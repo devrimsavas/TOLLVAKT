@@ -16,6 +16,7 @@ const doc = {
       description: "Search in the Norwegian customs tariff and details of a code",
     },
     { name: "Countries", description: "Origin countries" },
+    { name: "Classification", description: "AI-assisted commodity code suggestions" },
     {
       name: "Duty",
       description: "Customs duty and VAT calculation with Tolletaten's rates",

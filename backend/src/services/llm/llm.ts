@@ -1,7 +1,8 @@
 // Language models, for rewriting searches into the tariff's wording and,
 // later, for choosing codes. Locally Ollama, in production the Gemini API.
 //
-// LLM_PROVIDER=ollama   OLLAMA_HOST, OLLAMA_LLM_MODEL (e.g. gemma4:12b)
+// LLM_PROVIDER=ollama   OLLAMA_HOST, OLLAMA_LLM_MODEL (e.g. gemma4:12b),
+//                       OLLAMA_NUM_CTX (context window in tokens, default 16384)
 // LLM_PROVIDER=gemini   GEMINI_API_KEY, GEMINI_LLM_MODEL
 // LLM_PROVIDER=fake     tests only: answers from a function the test sets
 //
@@ -9,13 +10,22 @@
 // asked for exactly that shape (Ollama "format", Gemini "responseSchema").
 
 const DEFAULT_TIMEOUT_SECONDS = 60;
+// Ollama gives a model only 4096 tokens of context unless asked for more;
+// a classification prompt with 20 tariff paths and the answer need more,
+// and a cut prompt or answer comes back as broken JSON
+const DEFAULT_OLLAMA_NUM_CTX = 16384;
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
 
-// A JSON schema in the subset both providers accept: objects with required
-// string or string-array properties
+// A JSON schema in the subset both providers accept: objects, arrays,
+// strings (optionally from a fixed list) and nesting of these
+export type JsonSchemaNode =
+  | { type: "string"; enum?: string[] }
+  | { type: "array"; items: JsonSchemaNode }
+  | JsonSchema;
+
 export interface JsonSchema {
   type: "object";
-  properties: Record<string, { type: "string" } | { type: "array"; items: { type: "string" } }>;
+  properties: Record<string, JsonSchemaNode>;
   required: string[];
 }
 
@@ -42,29 +52,68 @@ export function extractJsonObject(text: string): string {
   return start !== -1 && end > start ? text.slice(start, end + 1) : text;
 }
 
-// Parses the model's text and checks the required properties are there with
-// the right types
-export function parseJsonAnswer(text: string, schema: JsonSchema, model: string): Record<string, unknown> {
+// Checks a value against the schema; returns the path of the first problem
+function findProblem(value: unknown, schema: JsonSchemaNode, path: string): string | null {
+  switch (schema.type) {
+    case "string":
+      if (typeof value !== "string") return path;
+      return schema.enum && !schema.enum.includes(value) ? path : null;
+    case "array":
+      if (!Array.isArray(value)) return path;
+      for (const [index, item] of value.entries()) {
+        const problem = findProblem(item, schema.items, `${path}[${index}]`);
+        if (problem) return problem;
+      }
+      return null;
+    case "object": {
+      if (typeof value !== "object" || value === null || Array.isArray(value)) return path;
+      const record = value as Record<string, unknown>;
+      for (const key of schema.required) {
+        const property = schema.properties[key];
+        const problem = property ? findProblem(record[key], property, path ? `${path}.${key}` : key) : null;
+        if (problem) return problem;
+      }
+      return null;
+    }
+  }
+}
+
+// Parses the model's text and checks it against the schema
+export function parseJsonAnswer(
+  text: string,
+  schema: JsonSchema,
+  model: string,
+  // Why the model stopped, as the provider reports it ("length" when the
+  // answer was cut off)
+  stopReason?: string,
+): Record<string, unknown> {
   let data: unknown;
   try {
     data = JSON.parse(extractJsonObject(text));
   } catch {
-    throw new LlmError(`${model} did not answer with JSON`);
+    const why = stopReason && !["stop", "STOP"].includes(stopReason) ? ` (stopped: ${stopReason})` : "";
+    throw new LlmError(`${model} did not answer with JSON${why}`);
   }
   if (typeof data !== "object" || data === null || Array.isArray(data)) {
     throw new LlmError(`${model} did not answer with a JSON object`);
   }
-  const answer = data as Record<string, unknown>;
-  for (const key of schema.required) {
-    const expected = schema.properties[key]?.type;
-    const value = answer[key];
-    const ok =
-      expected === "array"
-        ? Array.isArray(value) && value.every((v) => typeof v === "string")
-        : typeof value === "string";
-    if (!ok) throw new LlmError(`${model} answered without a valid "${key}"`);
+  const problem = findProblem(data, schema, "");
+  if (problem) throw new LlmError(`${model} answered without a valid "${problem}"`);
+  return data as Record<string, unknown>;
+}
+
+// Attempts per request: a small local model now and then answers with
+// something that is not the asked JSON; a second try usually works
+const ATTEMPTS = 2;
+
+export async function generateJsonWithRetry(llm: Llm, request: JsonRequest): Promise<Record<string, unknown>> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await llm.generateJson(request);
+    } catch (error) {
+      if (!(error instanceof LlmError) || attempt >= ATTEMPTS) throw error;
+    }
   }
-  return answer;
 }
 
 async function postJson(
@@ -102,6 +151,7 @@ export class OllamaLlm implements Llm {
     private readonly host: string,
     private readonly name: string,
     private readonly timeoutMs: number,
+    private readonly numCtx: number = DEFAULT_OLLAMA_NUM_CTX,
   ) {
     this.model = `ollama:${name}`;
   }
@@ -117,14 +167,14 @@ export class OllamaLlm implements Llm {
         ],
         format: schema,
         stream: false,
-        // The same search should give the same rewrite
-        options: { temperature: 0 },
+        // The same request should give the same answer
+        options: { temperature: 0, num_ctx: this.numCtx },
       },
       {},
       this.timeoutMs,
       `Ollama at ${this.host}`,
-    )) as { message?: { content?: string } };
-    return parseJsonAnswer(data.message?.content ?? "", schema, this.model);
+    )) as { message?: { content?: string }; done_reason?: string };
+    return parseJsonAnswer(data.message?.content ?? "", schema, this.model, data.done_reason);
   }
 }
 
@@ -154,9 +204,10 @@ export class GeminiLlm implements Llm {
       { "x-goog-api-key": this.apiKey },
       this.timeoutMs,
       "Gemini",
-    )) as { candidates?: { content?: { parts?: { text?: string }[] } }[] };
-    const text = (data.candidates?.[0]?.content?.parts ?? []).map((part) => part.text ?? "").join("");
-    return parseJsonAnswer(text, schema, this.model);
+    )) as { candidates?: { content?: { parts?: { text?: string }[] }; finishReason?: string }[] };
+    const candidate = data.candidates?.[0];
+    const text = (candidate?.content?.parts ?? []).map((part) => part.text ?? "").join("");
+    return parseJsonAnswer(text, schema, this.model, candidate?.finishReason);
   }
 }
 
@@ -179,7 +230,12 @@ export function createLlm(): Llm | null {
   switch (env.LLM_PROVIDER?.trim()) {
     case "ollama":
       if (!env.OLLAMA_LLM_MODEL) return null;
-      return new OllamaLlm(env.OLLAMA_HOST || "http://localhost:11434", env.OLLAMA_LLM_MODEL, timeoutMs);
+      return new OllamaLlm(
+        env.OLLAMA_HOST || "http://localhost:11434",
+        env.OLLAMA_LLM_MODEL,
+        timeoutMs,
+        Number(env.OLLAMA_NUM_CTX) || DEFAULT_OLLAMA_NUM_CTX,
+      );
     case "gemini":
       if (!env.GEMINI_API_KEY || !env.GEMINI_LLM_MODEL) return null;
       return new GeminiLlm(env.GEMINI_API_KEY, env.GEMINI_LLM_MODEL, timeoutMs);

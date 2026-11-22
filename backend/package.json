@@ -13,6 +13,7 @@
     "swagger": "node dist/swagger.js",
     "migrate": "node dist/migrate.js",
     "eval:search": "node dist/eval/evalSearch.js",
+    "eval:classify": "node dist/eval/evalClassify.js",
     "pretest": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",

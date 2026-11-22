@@ -108,7 +108,13 @@ describe("language models", () => {
     const [url, init] = fetchMock.mock.calls[0]!;
     expect(url).toBe("http://localhost:11434/api/chat");
     const body = JSON.parse(init.body);
-    expect(body).toMatchObject({ model: "gemma4:12b", format: schema, stream: false, options: { temperature: 0 } });
+    expect(body).toMatchObject({
+      model: "gemma4:12b",
+      format: schema,
+      stream: false,
+      // A context window large enough for a classification prompt
+      options: { temperature: 0, num_ctx: 16384 },
+    });
     expect(body.messages).toEqual([
       { role: "system", content: "sys" },
       { role: "user", content: "q" },
@@ -137,6 +143,14 @@ describe("language models", () => {
     expect(() => parseJsonAnswer('{"nb":"a","en":3}', schema, "m")).toThrow('"en"');
   });
 
+  it("says when the model stopped because the answer was too long", async () => {
+    answer(200, { message: { content: '{"nb":"cut of' }, done_reason: "length" });
+
+    await expect(
+      new OllamaLlm("http://x", "m", 1000).generateJson({ system: "", prompt: "", schema }),
+    ).rejects.toThrow("did not answer with JSON (stopped: length)");
+  });
+
   it("accepts JSON wrapped in a code fence or a sentence", () => {
     expect(parseJsonAnswer('```json\n{"nb":"a","en":"b"}\n```', schema, "m")).toEqual({ nb: "a", en: "b" });
     expect(parseJsonAnswer('Here it is: {"nb":"a","en":"b"}', schema, "m")).toEqual({ nb: "a", en: "b" });
@@ -157,6 +171,7 @@ describe("language models", () => {
   it("is chosen from the environment", () => {
     vi.stubEnv("LLM_PROVIDER", "ollama");
     vi.stubEnv("OLLAMA_LLM_MODEL", "gemma4:12b");
+    vi.stubEnv("OLLAMA_NUM_CTX", "8192");
     expect(createLlm()?.model).toBe("ollama:gemma4:12b");
 
     vi.stubEnv("LLM_PROVIDER", "gemini");

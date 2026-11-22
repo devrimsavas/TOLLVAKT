@@ -5,7 +5,7 @@
 // "leketøy som forestiller dyr", "videospillkonsoller", "bærbare automatiske
 // databehandlingsmaskiner". Neither word search nor the embedding model
 // bridges gaps that wide, so a language model translates first.
-import { createLlm, LlmError, type JsonSchema } from "./llm/llm.js";
+import { createLlm, generateJsonWithRetry, type JsonSchema } from "./llm/llm.js";
 
 export interface RewrittenQuery {
   nb: string;
@@ -39,28 +39,16 @@ Examples:
 
 Answer only with JSON: {"nb": "...", "en": "..."}.`;
 
-// Attempts per rewrite: a small local model now and then answers with
-// something that is not the asked JSON; a second try usually works
-const ATTEMPTS = 2;
-
 export async function rewriteQuery(query: string): Promise<RewrittenQuery> {
   const llm = createLlm();
   if (!llm) {
     throw new QueryRewriteUnavailableError("No language model is set up (LLM_PROVIDER in backend/.env)");
   }
-  const request = {
+  const answer = await generateJsonWithRetry(llm, {
     system: SYSTEM,
     prompt: `Importer's description: ${JSON.stringify(query)}`,
     schema: SCHEMA,
-  };
-  let answer: Record<string, unknown> | undefined;
-  for (let attempt = 1; !answer; attempt++) {
-    try {
-      answer = await llm.generateJson(request);
-    } catch (error) {
-      if (!(error instanceof LlmError) || attempt >= ATTEMPTS) throw error;
-    }
-  }
+  });
   // Fall back to the original wording if the model returns empty text
   const nb = String(answer.nb).trim() || query;
   const en = String(answer.en).trim() || query;
