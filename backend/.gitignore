@@ -19,3 +19,6 @@ tsconfig.tsbuildinfo
 
 # Generated API docs
 swagger_output.json
+
+# Search evaluation output (npm run eval:search -- --save)
+eval/results/

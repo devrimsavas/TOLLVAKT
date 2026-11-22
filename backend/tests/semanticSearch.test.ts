@@ -141,3 +141,23 @@ describe("embedders", () => {
     expect(createEmbedder()).toBeNull();
   });
 });
+
+describe("GET /api/commodities/search?mode=hybrid", () => {
+  beforeEach(async () => {
+    await seedTariffData();
+    await seedEmbeddings();
+  });
+
+  it("merges text and semantic results", async () => {
+    const res = await request(app).get("/api/commodities/search").query({ q: "bomull", mode: "hybrid" });
+
+    expect(res.status).toBe(200);
+    expect(res.body.matched).toBe("hybrid");
+    expect(codes(res)[0]).toBe("61091000");
+  });
+
+  it("still searches codes for digits", async () => {
+    const res = await request(app).get("/api/commodities/search").query({ q: "6109", mode: "hybrid" });
+    expect(res.body.matched).toBe("code");
+  });
+});

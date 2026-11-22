@@ -12,6 +12,7 @@
     "dev": "concurrently \"tsc -w --preserveWatchOutput\" \"node --watch --watch-preserve-output dist/server.js\"",
     "swagger": "node dist/swagger.js",
     "migrate": "node dist/migrate.js",
+    "eval:search": "node dist/eval/evalSearch.js",
     "pretest": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",

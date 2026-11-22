@@ -12,15 +12,15 @@ const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 const MAX_QUERY_LENGTH = 200;
 
-// GET /api/commodities/search?q=...&lang=nb|en&limit=20&mode=text|semantic
+// GET /api/commodities/search?q=...&lang=nb|en&limit=20&mode=text|semantic|hybrid
 export const search = async (req: Request, res: Response) => {
   // #swagger.tags = ["Commodities"]
   /* #swagger.summary = "Search commodity codes by text or code"
-     #swagger.description = "Full-text search in the Norwegian (nb, default) or English (en) tariff texts, including the texts above each code. Every word matches as a prefix; if no code matches all words, codes matching some of them are returned (matched: any). A query of digits searches codes (e.g. 6109 or 6109.10). mode=semantic searches by meaning with the embedding model instead (matched: semantic; rank is the similarity, 0 to 1)."
+     #swagger.description = "Full-text search in the Norwegian (nb, default) or English (en) tariff texts, including the texts above each code. Every word matches as a prefix; if no code matches all words, codes matching some of them are returned (matched: any). A query of digits searches codes (e.g. 6109 or 6109.10). mode=semantic searches by meaning with the embedding model instead (matched: semantic; rank is the similarity, 0 to 1). mode=hybrid runs both and merges the results by reciprocal rank fusion (matched: hybrid)."
      #swagger.parameters["q"] = { in: "query", required: true, type: "string", example: "t-skjorte bomull" }
      #swagger.parameters["lang"] = { in: "query", type: "string", enum: ["nb", "en"] }
      #swagger.parameters["limit"] = { in: "query", type: "integer", example: 20 }
-     #swagger.parameters["mode"] = { in: "query", type: "string", enum: ["text", "semantic"] } */
+     #swagger.parameters["mode"] = { in: "query", type: "string", enum: ["text", "semantic", "hybrid"] } */
   const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
   if (!q || q.length > MAX_QUERY_LENGTH) {
     res.status(400).json({ error: `q is required (max ${MAX_QUERY_LENGTH} characters)` });
@@ -38,8 +38,8 @@ export const search = async (req: Request, res: Response) => {
   }
 
   const mode = req.query.mode ?? "text";
-  if (mode !== "text" && mode !== "semantic") {
-    res.status(400).json({ error: "mode must be text or semantic" });
+  if (mode !== "text" && mode !== "semantic" && mode !== "hybrid") {
+    res.status(400).json({ error: "mode must be text, semantic or hybrid" });
     return;
   }
 

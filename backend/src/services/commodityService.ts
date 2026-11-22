@@ -12,7 +12,13 @@ const CONFIG: Record<SearchLanguage, { vector: string; config: string }> = {
   en: { vector: "search_vector_en", config: "english" },
 };
 
-export type SearchMode = "text" | "semantic";
+export type SearchMode = "text" | "semantic" | "hybrid";
+
+// Candidates each method contributes to a hybrid search
+const HYBRID_CANDIDATES = 50;
+// Reciprocal rank fusion constant; 60 is the usual choice. A larger value
+// flattens the difference between first and later places.
+const RRF_K = 60;
 
 // Semantic search cannot run: no embedding model is set up, or the ETL has
 // not created vectors with it yet
@@ -31,8 +37,9 @@ export interface SearchResult {
   query: string;
   // "all": every word matched; "any": nothing matched all words, so codes
   // matching some of them are shown; "code": digits matched the start of
-  // codes; "semantic": nearest in meaning (rank is the cosine similarity)
-  matched: "all" | "any" | "code" | "semantic";
+  // codes; "semantic": nearest in meaning (rank is the cosine similarity);
+  // "hybrid": text and semantic results merged (rank is the fused score)
+  matched: "all" | "any" | "code" | "semantic" | "hybrid";
   hits: SearchHit[];
 }
 
@@ -213,8 +220,28 @@ async function searchBySimilarity(
   }));
 }
 
-// mode "semantic" searches by meaning. Otherwise a query of digits (dots and
-// spaces allowed, e.g. "6109.10") searches codes, and anything else the texts.
+// Reciprocal rank fusion: a code scores 1 / (k + place) in each list it is
+// in, and the scores add up. Codes found by both methods rise; a code only
+// one method finds still gets in. Places count, not the methods' own
+// scores, which are not comparable.
+export function fuseRankings(lists: SearchHit[][], limit: number, k = RRF_K): SearchHit[] {
+  const fused = new Map<string, SearchHit>();
+  for (const list of lists) {
+    list.forEach((hit, index) => {
+      const score = 1 / (k + index + 1);
+      const seen = fused.get(hit.code);
+      if (seen) seen.rank += score;
+      else fused.set(hit.code, { ...hit, rank: score });
+    });
+  }
+  return [...fused.values()]
+    .sort((a, b) => b.rank - a.rank || a.code.localeCompare(b.code))
+    .slice(0, limit);
+}
+
+// A query of digits (dots and spaces allowed, e.g. "6109.10") searches codes
+// in every mode. Otherwise mode "text" searches the texts, "semantic" by
+// meaning, and "hybrid" both, with the results merged.
 export async function searchCommodities(
   query: string,
   language: SearchLanguage,
@@ -222,6 +249,11 @@ export async function searchCommodities(
   mode: SearchMode = "text",
 ): Promise<SearchResult> {
   const trimmed = query.trim();
+  if (/^[\d.\s]+$/.test(trimmed)) {
+    const digits = trimmed.replace(/[.\s]/g, "");
+    return { query: trimmed, matched: "code", hits: await searchByCode(digits, language, limit) };
+  }
+
   if (mode === "semantic") {
     return {
       query: trimmed,
@@ -229,9 +261,12 @@ export async function searchCommodities(
       hits: await searchBySimilarity(trimmed, language, limit),
     };
   }
-  if (/^[\d.\s]+$/.test(trimmed)) {
-    const digits = trimmed.replace(/[.\s]/g, "");
-    return { query: trimmed, matched: "code", hits: await searchByCode(digits, language, limit) };
+  if (mode === "hybrid") {
+    const [text, semantic] = await Promise.all([
+      searchCommodities(trimmed, language, HYBRID_CANDIDATES, "text"),
+      searchBySimilarity(trimmed, language, HYBRID_CANDIDATES),
+    ]);
+    return { query: trimmed, matched: "hybrid", hits: fuseRankings([text.hits, semantic], limit) };
   }
 
   const words = searchWords(trimmed);

@@ -1,0 +1,252 @@
+{
+  "description": "Products with a known correct commodity code, described the way an importer would. Codes 1-33 are among Norway's most imported in chapters small importers use (SSB table 08801, 2025); the rest are harder cases with close neighbours. Used by npm run eval:search.",
+  "cases": [
+    {
+      "id": "coffee-green",
+      "query": "Grønne kaffebønner, ubrente, fra Brasil",
+      "lang": "nb",
+      "expected": "09011100"
+    },
+    {
+      "id": "coffee-roasted",
+      "query": "Brente kaffebønner, hele, 1 kg pose",
+      "lang": "nb",
+      "expected": "09012100"
+    },
+    {
+      "id": "tea-black",
+      "query": "Svart te i teposer",
+      "lang": "nb",
+      "expected": "09023000"
+    },
+    {
+      "id": "nuts-mixed",
+      "query": "Saltede nøtteblandinger i pose",
+      "lang": "nb",
+      "expected": "20081900"
+    },
+    {
+      "id": "sweetcorn-canned",
+      "query": "Hermetisk sukkermais på boks",
+      "lang": "nb",
+      "expected": "20058090"
+    },
+    {
+      "id": "orange-juice",
+      "query": "Appelsinjuice i kartong, ikke frossen",
+      "lang": "nb",
+      "expected": "20091200"
+    },
+    {
+      "id": "curry-paste",
+      "query": "Rød karripasta på glass",
+      "lang": "nb",
+      "expected": "21039099"
+    },
+    {
+      "id": "face-cream",
+      "query": "Fuktighetskrem til ansiktet",
+      "lang": "nb",
+      "expected": "33049910"
+    },
+    {
+      "id": "foundation",
+      "query": "Flytende foundation (sminke)",
+      "lang": "nb",
+      "expected": "33049990"
+    },
+    {
+      "id": "sweater-polyester",
+      "query": "Strikket genser i polyester til dame",
+      "lang": "nb",
+      "expected": "61103000"
+    },
+    {
+      "id": "cardigan-cotton",
+      "query": "Strikket cardigan i bomull",
+      "lang": "nb",
+      "expected": "61102000"
+    },
+    {
+      "id": "tshirt-cotton",
+      "query": "T-skjorte i 100 % bomull, herre",
+      "lang": "nb",
+      "expected": "61091000"
+    },
+    {
+      "id": "chinos",
+      "query": "Chinos til herre i bomull",
+      "lang": "nb",
+      "expected": "62034209"
+    },
+    {
+      "id": "jeans-women",
+      "query": "Jeans til dame",
+      "lang": "nb",
+      "expected": "62046209"
+    },
+    {
+      "id": "ski-jacket",
+      "query": "Skijakke til dame i polyester",
+      "lang": "nb",
+      "expected": "62024000"
+    },
+    {
+      "id": "running-shoes",
+      "query": "Løpesko med tekstiloverdel og gummisåle",
+      "lang": "nb",
+      "expected": "64041100"
+    },
+    {
+      "id": "canvas-sneakers",
+      "query": "Canvas-sneakers med gummisåle",
+      "lang": "nb",
+      "expected": "64041900"
+    },
+    {
+      "id": "leather-shoes",
+      "query": "Lave herresko i skinn med gummisåle",
+      "lang": "nb",
+      "expected": "64039900"
+    },
+    {
+      "id": "porcelain-tiles",
+      "query": "Porselensfliser til gulv, 60x60",
+      "lang": "nb",
+      "expected": "69072100"
+    },
+    {
+      "id": "porcelain-plates",
+      "query": "Middagstallerkener i porselen",
+      "lang": "nb",
+      "expected": "69111000"
+    },
+    {
+      "id": "stoneware-cups",
+      "query": "Kaffekopper i steintøy",
+      "lang": "nb",
+      "expected": "69120090"
+    },
+    {
+      "id": "insulating-glass",
+      "query": "Isolerglassruter til vinduer",
+      "lang": "nb",
+      "expected": "70080000"
+    },
+    {
+      "id": "laptop",
+      "query": "Bærbar PC, 14 tommer",
+      "lang": "nb",
+      "expected": "84713009"
+    },
+    {
+      "id": "desktop-pc",
+      "query": "Stasjonær PC uten skjerm og tastatur",
+      "lang": "nb",
+      "expected": "84715000"
+    },
+    {
+      "id": "smartphone",
+      "query": "Mobiltelefon med Android",
+      "lang": "nb",
+      "expected": "85171300"
+    },
+    {
+      "id": "wifi-router",
+      "query": "Wifi-ruter",
+      "lang": "nb",
+      "expected": "85176208"
+    },
+    {
+      "id": "electric-car",
+      "query": "Ny elbil (personbil)",
+      "lang": "nb",
+      "expected": "87038001"
+    },
+    {
+      "id": "diesel-van",
+      "query": "Ny varebil med dieselmotor, 3,5 tonn",
+      "lang": "nb",
+      "expected": "87042102"
+    },
+    {
+      "id": "led-ceiling-lamp",
+      "query": "LED-taklampe",
+      "lang": "nb",
+      "expected": "94051100"
+    },
+    {
+      "id": "dining-table-oak",
+      "query": "Spisebord i eik",
+      "lang": "nb",
+      "expected": "94036099"
+    },
+    {
+      "id": "kitchen-cabinet",
+      "query": "Kjøkkenskap i bjørk",
+      "lang": "nb",
+      "expected": "94034009"
+    },
+    {
+      "id": "game-console",
+      "query": "Spillkonsoll",
+      "lang": "nb",
+      "expected": "95045000"
+    },
+    {
+      "id": "dumbbells",
+      "query": "Manualer og vektskiver til trening",
+      "lang": "nb",
+      "expected": "95069109"
+    },
+    {
+      "id": "e-bike",
+      "query": "Elsykkel med 250 W motor",
+      "lang": "nb",
+      "expected": "87116003",
+      "note": "Semantic search missed it in the first manual check"
+    },
+    {
+      "id": "tablet",
+      "query": "Nettbrett, 11 tommer",
+      "lang": "nb",
+      "expected": "84713001",
+      "note": "Same heading as laptops (84.71.30)"
+    },
+    {
+      "id": "bookshelf-pine",
+      "query": "Bokhylle i furu",
+      "lang": "nb",
+      "expected": "94036030",
+      "note": "Own code, apart from other wooden furniture"
+    },
+    {
+      "id": "plush-toy",
+      "query": "Kosebamse (plysjdyr)",
+      "lang": "nb",
+      "expected": "95030040",
+      "note": "Toys representing animals, not 'other toys'"
+    },
+    {
+      "id": "salmon-fillets-frozen",
+      "query": "Frozen salmon fillets",
+      "lang": "en",
+      "expected": "03048100",
+      "note": "Fresh fillets (03044100) are very close"
+    },
+    {
+      "id": "tshirt-cotton-en",
+      "query": "Men's cotton t-shirt",
+      "lang": "en",
+      "expected": "61091000",
+      "note": "English query"
+    },
+    {
+      "id": "laptop-en",
+      "query": "Laptop computer",
+      "lang": "en",
+      "expected": "84713009",
+      "note": "English query"
+    }
+  ]
+}
