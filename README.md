@@ -6,7 +6,7 @@
 
 Tollvakt helps small Norwegian businesses find the right commodity code (varenummer), estimate customs duty and VAT, and check whether a free trade agreement can lower the duty, before the goods reach the border.
 
-> Status: in development. Norwegian data import, duty calculation API and commodity search are working; AI classification is in progress.
+> Status: in development. Norwegian data import, duty calculation, commodity search and AI classification are working in the backend, with accounts, daily quotas and saved classifications. The frontend is next.
 
 ---
 
@@ -81,7 +81,7 @@ Later candidates: other destination countries only when customers ask for them.
 - **backend/**: Express + TypeScript (ESM), sequelize-typescript models, umzug migrations, JWT auth, Swagger. Same conventions as Leverandørvakt and Regelvakt.
 - **etl/**: Python microservice with pandas. One importer per source, all writing to the common tariff model. Scheduled updates and validation against known reference products.
 - **frontend/**: Next.js, Digdir Designsystemet, dark mode, Norwegian / English.
-- **LLM**: provider-agnostic; Gemini free tier during the pilot.
+- **LLM**: provider-agnostic; Ollama locally, Gemini in production. Model-backed calls have daily quotas (guests, members and a global cap), so the cost of a day has a ceiling.
 - **Hosting**: netcup VPS + Docker Compose + Cloudflare Tunnel (`tollvakt.devrimdev.no`).
 
 ## Classification flow
@@ -116,9 +116,16 @@ Later candidates: other destination countries only when customers ask for them.
 - [ ] Proof-of-origin guidance
 - [x] Commodity search: full-text (nb/en) and code search
 - [x] Semantic search (pgvector; Ollama locally, Gemini in production)
-- [ ] Accuracy test set (products with known correct codes)
-- [ ] Classification flow (retrieval + LLM + reasoning, top 3 codes)
+- [x] Query rewriting into the tariff's wording (LLM) and hybrid search (full-text + semantic, rank fusion)
+- [x] Accuracy test sets: a tuning set and a held-out set of products with known correct codes
+- [x] Classification flow (retrieval + LLM + reasoning, top 3 codes, confidence, questions to the user)
 - [ ] Section and chapter notes extracted from the tariff PDF
+
+### Phase 1b: Accounts and usage
+- [x] Daily quotas for model-backed calls: guests (by hashed IP), members, global cap
+- [x] Saved classifications: members see, print and delete their own
+- [x] Admin endpoints: users, daily limits, closing accounts, usage statistics
+- [x] Account: change password, delete account, data export (GDPR), language, password reset by email
 
 ### Phase 2: Export destinations
 - [ ] ETL: EU TARIC
