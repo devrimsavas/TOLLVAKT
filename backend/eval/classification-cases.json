@@ -247,6 +247,13 @@
       "lang": "en",
       "expected": "84713009",
       "note": "English query"
+    },
+    {
+      "id": "yoga-mat",
+      "query": "Yogamatte i gummi",
+      "lang": "nb",
+      "expected": "95069109",
+      "note": "Finished article, not rubber sheet (40.08). US CBP rulings place yoga mats of PVC, TPE and rubber in 9506.91; Norwegian/EU practice not confirmed. First failed in a manual check (Swagger, 22 Nov 2026)."
     }
   ]
 }

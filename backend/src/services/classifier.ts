@@ -76,10 +76,11 @@ Choose the codes that fit the product best, most likely first, at most ${MAX_SUG
 - Decide by the wording of the headings and subheadings in the path, as the General Interpretative Rules say: titles of sections and chapters are only a guide.
 - Check every level of the path against the product: material, knitted or not, fresh/chilled/frozen, prepared or not, use, power source, for men/women/children, size or weight limits.
 - "Other" ("andre", "ellers") at a level covers what the levels beside it do not.
+- A finished article is classified as that kind of article, not as the raw material or semi-finished form it is made of (plates, sheets, strip, bars, granules, primary forms). If the product is a finished article and the candidates are only such materials, none of them fits.
 - Give fewer than ${MAX_SUGGESTIONS} codes if fewer fit; give none if no candidate fits.
 
 For each code give a short reason that refers to the path, and your confidence: "high" if the description clearly fits and no other candidate does, "medium" if it fits but a detail is unknown, "low" if it is a guess.
-In "missingInformation", list short questions to the importer whose answers would decide between the codes (e.g. the material, whether it is knitted). Leave it empty if nothing is missing.
+In "missingInformation", list short questions to the importer whose answers would decide between the codes (e.g. the material, whether it is knitted). Leave it empty if nothing is missing. If no candidate fits, say there what kind of heading the product belongs to instead.
 
 Write the reasons and questions in ${LANGUAGE_NAMES[language]}. Answer only with JSON.`;
 }

@@ -28,6 +28,7 @@ const SYSTEM = `You help importers find goods in the Norwegian customs tariff (T
 Rewrite the importer's description of a product the way the tariff would describe it:
 - Use the tariff's terms for the kind of product, not brand names, marketing words or everyday names.
 - Keep the specific product, species, fruit, plant or material by name (the tariff often names them); do not replace it with a broader category.
+- Say what the product is and what it is used for, not only what it is made of: the tariff puts a finished article under its kind of article, and its material alone leads to raw materials and sheets.
 - Keep every detail that decides classification: material, whether knitted or woven, fresh/chilled/frozen, prepared or not, use, power source, for men/women/children.
 - Leave out details that do not matter for classification, such as country of origin, package size and colour.
 - Write one short phrase in Norwegian (bokmål), as in the Norwegian tariff, and one in English, as in the English tariff.
@@ -36,6 +37,7 @@ Examples:
 "Trådløse ørepropper med mikrofon" -> {"nb": "høretelefoner kombinert med mikrofon, trådløse", "en": "earphones combined with a microphone, wireless"}
 "Vannkoker i rustfritt stål, 1,7 l" -> {"nb": "elektriske varmtvannskokere til husholdningsbruk", "en": "electric kettles for domestic use"}
 "Frosne reker, kokte og pillede" -> {"nb": "reker, kokte og pillede, fryste", "en": "shrimps and prawns, cooked and peeled, frozen"}
+"Tursekk i nylon, 40 liter" -> {"nb": "ryggsekker til tur, av nylon", "en": "rucksacks for hiking, of nylon"}
 
 Answer only with JSON: {"nb": "...", "en": "..."}.`;
 
