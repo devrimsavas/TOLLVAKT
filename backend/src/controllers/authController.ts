@@ -3,6 +3,7 @@ import {
   registerUser,
   loginUser,
   getUserByPublicId,
+  AccountClosedError,
   EmailTakenError,
   InvalidCredentialsError,
 } from "../services/authService.js";
@@ -85,6 +86,10 @@ export const login = async (req: Request, res: Response) => {
   } catch (error) {
     if (error instanceof InvalidCredentialsError) {
       res.status(401).json({ error: error.message });
+      return;
+    }
+    if (error instanceof AccountClosedError) {
+      res.status(403).json({ error: error.message });
       return;
     }
     req.log.error({ err: error }, "Request failed");

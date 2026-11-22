@@ -8,6 +8,8 @@ export const SALT_ROUNDS = 10;
 
 export class EmailTakenError extends Error {}
 export class InvalidCredentialsError extends Error {}
+// An admin has closed the account
+export class AccountClosedError extends Error {}
 
 // User data that is safe to send to clients.
 // "userId" is the public user number; the internal database id is never exposed.
@@ -101,6 +103,12 @@ export async function loginUser(
   const passwordMatches = await bcrypt.compare(password, user.passwordHash);
   if (!passwordMatches) {
     throw new InvalidCredentialsError("Invalid email or password");
+  }
+
+  // Only after the password check, so a stranger cannot find out which
+  // closed accounts exist
+  if (!user.isActive) {
+    throw new AccountClosedError("This account has been closed");
   }
 
   user.lastLoginAt = new Date();

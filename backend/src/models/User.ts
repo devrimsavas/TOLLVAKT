@@ -58,6 +58,16 @@ export class User extends Model {
   @Column({ type: DataType.DATE, allowNull: true })
   declare passwordChangedAt: Date | null;
 
+  // Classifications and model-backed searches per day; null means the
+  // default (USER_DAILY_LIMIT)
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  declare dailyLimit: number | null;
+
+  // An admin can close an account; a closed account cannot log in or use
+  // its token
+  @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: true })
+  declare isActive: boolean;
+
   declare createdAt: Date;
   declare updatedAt: Date;
 }

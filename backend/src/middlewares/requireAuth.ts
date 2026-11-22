@@ -21,15 +21,14 @@ function isTokenPayload(value: unknown): value is TokenPayload {
   );
 }
 
-// Lets the request through only with a valid "Authorization: Bearer <token>" header.
-// On success, req.auth holds the user's public id and role.
+// Checks the "Authorization: Bearer <token>" header. On success, req.auth
+// holds the user's public id and role and next() is called; otherwise the
+// request is answered with 401, 403 or 500.
+//
 // A token from before the user's last password change is refused, so a
-// password change ends every other session.
-export async function requireAuth(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+// password change ends every other session. A closed account is refused
+// even with a token that has not expired.
+async function authenticate(req: Request, res: Response, next: NextFunction) {
   const header = req.headers.authorization;
 
   if (!header || !header.startsWith("Bearer ")) {
@@ -56,7 +55,7 @@ export async function requireAuth(
   try {
     const user = await User.findOne({
       where: { publicId: payload.sub },
-      attributes: ["passwordChangedAt"],
+      attributes: ["passwordChangedAt", "isActive"],
     });
     // A deleted user is left to the route, which answers 404
     const changedAt = user?.passwordChangedAt;
@@ -70,6 +69,10 @@ export async function requireAuth(
         .json({ error: "The password has changed. Log in again." });
       return;
     }
+    if (user && !user.isActive) {
+      res.status(403).json({ error: "This account has been closed" });
+      return;
+    }
   } catch (error) {
     req.log.error({ err: error }, "Request failed");
     res.status(500).json({ error: "Could not check the session" });
@@ -78,4 +81,21 @@ export async function requireAuth(
 
   req.auth = { userId: payload.sub, role: payload.role };
   next();
+}
+
+// Lets the request through only with a valid token
+export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  return authenticate(req, res, next);
+}
+
+// For routes open to guests too: without an Authorization header the
+// request goes on as a guest (req.auth stays empty). A header that is sent
+// must be valid: a broken or expired token is refused, not quietly treated
+// as a guest, so the client learns it has to log in again.
+export function optionalAuth(req: Request, res: Response, next: NextFunction) {
+  if (!req.headers.authorization) {
+    next();
+    return;
+  }
+  return authenticate(req, res, next);
 }

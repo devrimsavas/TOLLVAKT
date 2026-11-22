@@ -25,6 +25,15 @@ LOGIN_FAILURES_PER_ACCOUNT=10
 LOGIN_FAILURES_PER_ADDRESS=30
 REGISTRATIONS_PER_ADDRESS=10
 REQUESTS_PER_ADDRESS=1500
+# Daily quotas for the calls that use a model (classification and search
+# with mode=semantic, hybrid or expanded), counted from midnight in Norway.
+# Guests are counted per address, members per account (an admin can give a
+# member another limit), and the global limit caps everyone together, so a
+# day's model cost has a ceiling even if someone opens many accounts.
+# 0 turns the calls off for that group. Admins have no limit of their own.
+GUEST_DAILY_LIMIT=1
+USER_DAILY_LIMIT=10
+GLOBAL_DAILY_LIMIT=200
 # Proxies whose X-Forwarded-For is trusted for the client's address. The default
 # trusts this machine and private networks (the web app, Docker).
 TRUST_PROXY=loopback, linklocal, uniquelocal

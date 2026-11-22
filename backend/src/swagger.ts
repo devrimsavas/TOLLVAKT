@@ -17,6 +17,9 @@ const doc = {
     },
     { name: "Countries", description: "Origin countries" },
     { name: "Classification", description: "AI-assisted commodity code suggestions" },
+    { name: "Saved classifications", description: "A member's classifications, to see again and print" },
+    { name: "Usage", description: "Today's quota for the model-backed calls" },
+    { name: "Admin", description: "Accounts, limits and use of the models (admins only)" },
     {
       name: "Duty",
       description: "Customs duty and VAT calculation with Tolletaten's rates",

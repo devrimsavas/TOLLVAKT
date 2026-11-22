@@ -17,6 +17,9 @@ import dutyRouter from "./routes/duty.js";
 import commoditiesRouter from "./routes/commodities.js";
 import countriesRouter from "./routes/countries.js";
 import classifyRouter from "./routes/classify.js";
+import classificationsRouter from "./routes/classifications.js";
+import usageRouter from "./routes/usage.js";
+import adminRouter from "./routes/admin.js";
 
 const app = express();
 
@@ -62,6 +65,9 @@ app.use("/api/duty", dutyRouter);
 app.use("/api/commodities", commoditiesRouter);
 app.use("/api/countries", countriesRouter);
 app.use("/api/classify", classifyRouter);
+app.use("/api/classifications", classificationsRouter);
+app.use("/api/usage", usageRouter);
+app.use("/api/admin", adminRouter);
 
 const swaggerPath = path.join(process.cwd(), "swagger_output.json");
 

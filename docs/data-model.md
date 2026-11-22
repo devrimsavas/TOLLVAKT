@@ -363,6 +363,49 @@ The same table will hold vectors for BKU rulings (keyed by the hash of their tex
 
 ---
 
+## 11. Accounts, quotas and saved classifications
+
+### `users` (added by migration 0015)
+
+| Column | Type | Notes |
+|---|---|---|
+| daily_limit | integer NULL | the member's own daily limit; NULL means `USER_DAILY_LIMIT` |
+| is_active | boolean | false: closed by an admin, no login, tokens refused |
+
+### `usage_events`
+
+One row per call that uses a model: classification, and search with `mode=semantic`, `hybrid` or `expanded`. The daily quotas count today's rows (from midnight in Norway); the admin statistics read the older ones.
+
+| Column | Type | Notes |
+|---|---|---|
+| id | bigserial PK | |
+| user_id | integer NULL | FK users, `ON DELETE SET NULL`; NULL for a guest |
+| client_hash | char(64) NULL | guests: HMAC-SHA256 of the IP address, keyed with `JWT_SECRET`; the address itself is never stored |
+| kind | varchar(20) | `classify` or `search` |
+| created_at | timestamptz | indexed alone, with user_id and with client_hash |
+
+Limits: `GUEST_DAILY_LIMIT` (default 1) per guest, `USER_DAILY_LIMIT` (default 10) per member, `GLOBAL_DAILY_LIMIT` (default 200) for everyone together. Admins have no limit of their own but count towards the global one. A place is taken before the model is called, under an advisory lock so two requests at once cannot both take the last one, and given back if the call fails on our side.
+
+### `classifications`
+
+A member's classifications, saved as they were answered, so they can be seen again and printed even after the tariff or the model changes. Guests' classifications are not saved.
+
+| Column | Type | Notes |
+|---|---|---|
+| id | serial PK | internal |
+| public_id | uuid UNIQUE | the id in the API |
+| user_id | integer | FK users, `ON DELETE CASCADE` |
+| description | text | the member's description |
+| lang | varchar(2) | `nb` or `en` |
+| model | varchar(100) | the language model that answered |
+| rewritten | jsonb NULL | the query rewritten into the tariff's wording |
+| suggestions | jsonb | codes with tariff texts, reasons and confidence |
+| missing_information | jsonb | questions to the member |
+| candidates | jsonb | the codes the model chose from |
+| created_at | timestamptz | index (user_id, created_at DESC) |
+
+---
+
 ## Validation rules (run before any write)
 
 1. Norwegian and English trees have identical shape.
