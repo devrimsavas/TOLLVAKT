@@ -15,8 +15,8 @@ describe("fuseRankings", () => {
   it("puts codes both lists found first, and keeps codes only one found", () => {
     const fused = fuseRankings(
       [
-        [hit("A"), hit("B"), hit("C")],
-        [hit("D"), hit("B"), hit("A")],
+        { hits: [hit("A"), hit("B"), hit("C")], weight: 1 },
+        { hits: [hit("D"), hit("B"), hit("A")], weight: 1 },
       ],
       10,
     );
@@ -26,7 +26,26 @@ describe("fuseRankings", () => {
   });
 
   it("returns at most the limit", () => {
-    expect(fuseRankings([[hit("A"), hit("B")], [hit("C")]], 2)).toHaveLength(2);
+    expect(
+      fuseRankings(
+        [
+          { hits: [hit("A"), hit("B")], weight: 1 },
+          { hits: [hit("C")], weight: 1 },
+        ],
+        2,
+      ),
+    ).toHaveLength(2);
+  });
+
+  it("lets a list with a lower weight count less", () => {
+    const fused = fuseRankings(
+      [
+        { hits: [hit("noise")], weight: 0.5 },
+        { hits: [hit("right")], weight: 1 },
+      ],
+      10,
+    );
+    expect(fused.map((h) => h.code)).toEqual(["right", "noise"]);
   });
 });
 

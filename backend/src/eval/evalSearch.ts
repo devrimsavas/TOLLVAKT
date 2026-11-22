@@ -3,6 +3,7 @@
 //
 //   npm run eval:search                  all methods
 //   npm run eval:search -- --save        also write eval/results/search-<time>.json
+//   npm run eval:search -- --verbose     also print the language model's rewrites
 //
 // For each case and method it records the place of the right code among the
 // first 50 results. The summary shows how often it is first, in the first 5,
@@ -20,7 +21,13 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { QueryTypes } from "sequelize";
 import { sequelize } from "../config/database.js";
-import { searchCommodities, type SearchLanguage, type SearchMode } from "../services/commodityService.js";
+import {
+  searchCommodities,
+  SemanticSearchUnavailableError,
+  type SearchLanguage,
+  type SearchMode,
+} from "../services/commodityService.js";
+import { QueryRewriteUnavailableError, type RewrittenQuery } from "../services/queryRewriter.js";
 
 export interface EvalCase {
   id: string;
@@ -30,7 +37,7 @@ export interface EvalCase {
   note?: string;
 }
 
-const METHODS: SearchMode[] = ["text", "semantic", "hybrid"];
+const METHODS: SearchMode[] = ["text", "semantic", "hybrid", "expanded"];
 const DEPTH = 50;
 const CUTOFFS = [1, 5, 10, 20];
 const CASES_FILE = path.join(process.cwd(), "eval", "classification-cases.json");
@@ -88,6 +95,7 @@ async function currentCodes(codes: string[]): Promise<Set<string>> {
 
 async function main(): Promise<void> {
   const save = process.argv.includes("--save");
+  const verbose = process.argv.includes("--verbose");
   const { cases } = JSON.parse(await readFile(CASES_FILE, "utf8")) as { cases: EvalCase[] };
 
   const known = await currentCodes(cases.map((c) => c.expected));
@@ -96,35 +104,52 @@ async function main(): Promise<void> {
   }
 
   // places[level][method]
-  const results: { case: EvalCase; places: Record<string, Places> }[] = [];
+  const results: { case: EvalCase; places: Record<string, Places>; rewritten?: RewrittenQuery }[] = [];
   const unavailable = new Map<string, string>();
+  const failures: { case: string; method: string; message: string }[] = [];
 
   for (const evalCase of cases) {
     const places: Record<string, Places> = Object.fromEntries(LEVELS.map((l) => [l.name, {}]));
+    let rewritten: RewrittenQuery | undefined;
     for (const method of METHODS) {
       let codes: string[] = [];
       if (!unavailable.has(method)) {
         try {
-          const { hits } = await searchCommodities(evalCase.query, evalCase.lang, DEPTH, method);
-          codes = hits.map((hit) => hit.code);
+          const result = await searchCommodities(evalCase.query, evalCase.lang, DEPTH, method);
+          codes = result.hits.map((hit) => hit.code);
+          rewritten ??= result.rewritten;
         } catch (error) {
-          // e.g. no embedding model set up: report it once, go on with the rest
-          unavailable.set(method, error instanceof Error ? error.message : String(error));
+          const message = error instanceof Error ? error.message : String(error);
+          if (error instanceof SemanticSearchUnavailableError || error instanceof QueryRewriteUnavailableError) {
+            // Not set up: report it once, go on with the other methods
+            unavailable.set(method, message);
+          } else {
+            // A failure for this case only (e.g. an unusable model answer):
+            // it counts as not found, and the next case is tried
+            failures.push({ case: evalCase.id, method, message });
+          }
         }
       }
       for (const level of LEVELS) {
         places[level.name]![method] = placeOf(codes, evalCase.expected, level.digits);
       }
     }
-    results.push({ case: evalCase, places });
+    results.push(rewritten ? { case: evalCase, places, rewritten } : { case: evalCase, places });
   }
 
-  const place = (value: number | null | undefined) => (value ? String(value) : "-").padStart(8);
-  console.log(`\n${"case".padEnd(24)}${"expected".padEnd(10)}${METHODS.map((m) => m.padStart(8)).join("")}  query`);
+  const place = (value: number | null | undefined) => (value ? String(value) : "-").padStart(9);
+  console.log(`\n${"case".padEnd(24)}${"expected".padEnd(10)}${METHODS.map((m) => m.padStart(9)).join("")}  query`);
   for (const { case: c, places } of results) {
     console.log(
       `${c.id.padEnd(24)}${c.expected.padEnd(10)}${METHODS.map((m) => place(places.exact![m])).join("")}  ${c.query}`,
     );
+  }
+
+  if (verbose) {
+    console.log("\nRewrites by the language model:\n");
+    for (const r of results.filter((r) => r.rewritten)) {
+      console.log(`${r.case.id.padEnd(24)}nb: ${r.rewritten!.nb}\n${"".padEnd(24)}en: ${r.rewritten!.en}`);
+    }
   }
 
   const active = METHODS.filter((m) => !unavailable.has(m));
@@ -148,6 +173,10 @@ async function main(): Promise<void> {
     console.log(`${a.method.padEnd(10)}${LEVELS.map((l) => percent(a.top20[l.name] ?? 0, cases.length)).join("")}`);
   }
 
+  if (failures.length) {
+    console.log(`\nFailed searches (counted as not found):`);
+    for (const f of failures) console.log(`  ${f.case} (${f.method}): ${f.message}`);
+  }
   for (const [method, reason] of unavailable) {
     console.log(`\n${method}: not measured. ${reason}`);
   }
@@ -158,7 +187,14 @@ async function main(): Promise<void> {
     await writeFile(
       file,
       JSON.stringify(
-        { ranAt: new Date().toISOString(), summaries, areaSummaries, results, unavailable: Object.fromEntries(unavailable) },
+        {
+          ranAt: new Date().toISOString(),
+          summaries,
+          areaSummaries,
+          results,
+          failures,
+          unavailable: Object.fromEntries(unavailable),
+        },
         null,
         2,
       ),

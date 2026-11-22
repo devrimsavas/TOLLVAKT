@@ -2,6 +2,7 @@
 import { QueryTypes } from "sequelize";
 import { sequelize } from "../config/database.js";
 import { createEmbedder } from "./embeddings/embedder.js";
+import { rewriteQuery, type RewrittenQuery } from "./queryRewriter.js";
 
 export type SearchLanguage = "nb" | "en";
 
@@ -12,9 +13,9 @@ const CONFIG: Record<SearchLanguage, { vector: string; config: string }> = {
   en: { vector: "search_vector_en", config: "english" },
 };
 
-export type SearchMode = "text" | "semantic" | "hybrid";
+export type SearchMode = "text" | "semantic" | "hybrid" | "expanded";
 
-// Candidates each method contributes to a hybrid search
+// Candidates each method contributes to a hybrid or expanded search
 const HYBRID_CANDIDATES = 50;
 // Reciprocal rank fusion constant; 60 is the usual choice. A larger value
 // flattens the difference between first and later places.
@@ -38,9 +39,13 @@ export interface SearchResult {
   // "all": every word matched; "any": nothing matched all words, so codes
   // matching some of them are shown; "code": digits matched the start of
   // codes; "semantic": nearest in meaning (rank is the cosine similarity);
-  // "hybrid": text and semantic results merged (rank is the fused score)
-  matched: "all" | "any" | "code" | "semantic" | "hybrid";
+  // "hybrid": text and semantic results merged (rank is the fused score);
+  // "expanded": like hybrid, also with the query rewritten into the tariff's
+  // wording by a language model
+  matched: "all" | "any" | "code" | "semantic" | "hybrid" | "expanded";
   hits: SearchHit[];
+  // The rewritten query (mode "expanded" only)
+  rewritten?: RewrittenQuery;
 }
 
 // The words of a search, safe to put into to_tsquery: letters, digits and
@@ -64,6 +69,7 @@ async function searchByText(
   operator: "&" | "|",
   language: SearchLanguage,
   limit: number,
+  contextLanguage: SearchLanguage = language,
 ): Promise<SearchHit[]> {
   const { vector, config } = CONFIG[language];
   // With "|", codes matching more of the words come first; the text rank
@@ -73,7 +79,7 @@ async function searchByText(
     .map((q) => `(n.${vector} @@ ${q})::int`)
     .join(" + ");
   const wordReplacements = Object.fromEntries(words.map((w, i) => [`word${i}`, `${w}:*`]));
-  const contextColumn = language === "nb" ? "n.search_text_nb" : "n.search_text_en";
+  const contextColumn = contextLanguage === "nb" ? "n.search_text_nb" : "n.search_text_en";
   const rows = await sequelize.query<{
     code: string;
     description_nb: string | null;
@@ -220,15 +226,20 @@ async function searchBySimilarity(
   }));
 }
 
-// Reciprocal rank fusion: a code scores 1 / (k + place) in each list it is
-// in, and the scores add up. Codes found by both methods rise; a code only
-// one method finds still gets in. Places count, not the methods' own
+// Reciprocal rank fusion: a code scores weight / (k + place) in each list it
+// is in, and the scores add up. Codes found by several methods rise; a code
+// only one method finds still gets in. Places count, not the methods' own
 // scores, which are not comparable.
-export function fuseRankings(lists: SearchHit[][], limit: number, k = RRF_K): SearchHit[] {
+export interface RankedList {
+  hits: SearchHit[];
+  weight: number;
+}
+
+export function fuseRankings(lists: RankedList[], limit: number, k = RRF_K): SearchHit[] {
   const fused = new Map<string, SearchHit>();
-  for (const list of lists) {
-    list.forEach((hit, index) => {
-      const score = 1 / (k + index + 1);
+  for (const { hits, weight } of lists) {
+    hits.forEach((hit, index) => {
+      const score = weight / (k + index + 1);
       const seen = fused.get(hit.code);
       if (seen) seen.rank += score;
       else fused.set(hit.code, { ...hit, rank: score });
@@ -239,9 +250,25 @@ export function fuseRankings(lists: SearchHit[][], limit: number, k = RRF_K): Se
     .slice(0, limit);
 }
 
+// Text search: every word must match; if no code has them all, codes with
+// some of them ("any")
+async function searchText(
+  query: string,
+  language: SearchLanguage,
+  limit: number,
+  contextLanguage: SearchLanguage = language,
+): Promise<{ matched: "all" | "any"; hits: SearchHit[] }> {
+  const words = searchWords(query);
+  if (words.length === 0) return { matched: "all", hits: [] };
+  const all = await searchByText(words, "&", language, limit, contextLanguage);
+  if (all.length > 0 || words.length === 1) return { matched: "all", hits: all };
+  return { matched: "any", hits: await searchByText(words, "|", language, limit, contextLanguage) };
+}
+
 // A query of digits (dots and spaces allowed, e.g. "6109.10") searches codes
 // in every mode. Otherwise mode "text" searches the texts, "semantic" by
-// meaning, and "hybrid" both, with the results merged.
+// meaning, "hybrid" both with the results merged, and "expanded" both for the
+// query as written and as rewritten into the tariff's wording.
 export async function searchCommodities(
   query: string,
   language: SearchLanguage,
@@ -263,20 +290,57 @@ export async function searchCommodities(
   }
   if (mode === "hybrid") {
     const [text, semantic] = await Promise.all([
-      searchCommodities(trimmed, language, HYBRID_CANDIDATES, "text"),
+      searchText(trimmed, language, HYBRID_CANDIDATES),
       searchBySimilarity(trimmed, language, HYBRID_CANDIDATES),
     ]);
-    return { query: trimmed, matched: "hybrid", hits: fuseRankings([text.hits, semantic], limit) };
+    return {
+      query: trimmed,
+      matched: "hybrid",
+      hits: fuseRankings(
+        [
+          // A text search that matched only some of the words still counts
+          // fully: measured, giving it less weight lost more right codes
+          // (tea bags, bookshelf, tablet) than it saved
+          { hits: text.hits, weight: 1 },
+          { hits: semantic, weight: 1 },
+        ],
+        limit,
+      ),
+    };
+  }
+  if (mode === "expanded") {
+    const rewritten = await rewriteQuery(trimmed);
+    const other: SearchLanguage = language === "nb" ? "en" : "nb";
+    const [original, inLanguage, inOther, semantic, semanticNb, semanticEn] = await Promise.all([
+      searchText(trimmed, language, HYBRID_CANDIDATES),
+      searchText(rewritten[language], language, HYBRID_CANDIDATES),
+      // The other language's tariff text, with the context still in the
+      // asked language
+      searchText(rewritten[other], other, HYBRID_CANDIDATES, language),
+      searchBySimilarity(trimmed, language, HYBRID_CANDIDATES),
+      searchBySimilarity(rewritten.nb, language, HYBRID_CANDIDATES),
+      searchBySimilarity(rewritten.en, language, HYBRID_CANDIDATES),
+    ]);
+    return {
+      query: trimmed,
+      matched: "expanded",
+      rewritten,
+      hits: fuseRankings(
+        [
+          { hits: original.hits, weight: 1 },
+          { hits: inLanguage.hits, weight: 1 },
+          { hits: inOther.hits, weight: 1 },
+          { hits: semantic, weight: 1 },
+          { hits: semanticNb, weight: 1 },
+          { hits: semanticEn, weight: 1 },
+        ],
+        limit,
+      ),
+    };
   }
 
-  const words = searchWords(trimmed);
-  if (words.length === 0) return { query: trimmed, matched: "all", hits: [] };
-
-  const all = await searchByText(words, "&", language, limit);
-  if (all.length > 0 || words.length === 1) {
-    return { query: trimmed, matched: "all", hits: all };
-  }
-  return { query: trimmed, matched: "any", hits: await searchByText(words, "|", language, limit) };
+  const text = await searchText(trimmed, language, limit);
+  return { query: trimmed, ...text };
 }
 
 export interface CommodityReference {

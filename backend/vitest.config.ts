@@ -16,6 +16,8 @@ export default defineConfig({
       ...testEnv,
       // Word-based vectors without a model; real models are never called
       EMBEDDING_PROVIDER: "fake",
+      // Answers set by each test (FakeLlm.answer); real models are never called
+      LLM_PROVIDER: "fake",
       REQUESTS_PER_ADDRESS: "1000000",
       REGISTRATIONS_PER_ADDRESS: "100000",
       LOGIN_FAILURES_PER_ACCOUNT: "100000",

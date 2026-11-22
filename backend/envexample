@@ -38,3 +38,12 @@ OLLAMA_HOST=http://localhost:11434
 OLLAMA_EMBEDDING_MODEL=embeddinggemma
 GEMINI_API_KEY=
 GEMINI_EMBEDDING_MODEL=gemini-embedding-001
+
+# Language model: rewrites searches into the tariff's wording (search
+# mode=expanded) and later chooses codes. Locally Ollama (ollama pull
+# gemma4:12b), in production the Gemini API. Without them, mode=expanded
+# answers 503.
+LLM_PROVIDER=ollama
+OLLAMA_LLM_MODEL=gemma4:12b
+GEMINI_LLM_MODEL=
+# LLM_TIMEOUT_SECONDS=60
