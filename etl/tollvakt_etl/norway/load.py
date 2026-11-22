@@ -103,12 +103,13 @@ def write_dataset(conn: psycopg.Connection, dataset: NorwayDataset) -> None:
         # Parents come before children in the list, so the foreign key holds
         cur.executemany(
             "INSERT INTO tariff_nodes (id, parent_id, node_type, code, hs_code, description_nb, "
-            "description_en, agri_reduction, sort_order, depth, path) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            "description_en, agri_reduction, sort_order, depth, path, search_text_nb, search_text_en) "
+            "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
             [
                 (
                     n.id, n.parent_id, n.node_type, n.code, n.hs_code, n.description_nb,
                     n.description_en, n.agri_reduction, n.sort_order, n.depth, n.path,
+                    n.search_text_nb, n.search_text_en,
                 )
                 for n in dataset.nodes
             ],

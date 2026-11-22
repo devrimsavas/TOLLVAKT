@@ -1,0 +1,304 @@
+// Search in the tariff tree and details of one commodity code.
+import { QueryTypes } from "sequelize";
+import { sequelize } from "../config/database.js";
+
+export type SearchLanguage = "nb" | "en";
+
+export const MAX_SEARCH_WORDS = 10;
+
+const CONFIG: Record<SearchLanguage, { vector: string; config: string }> = {
+  nb: { vector: "search_vector_nb", config: "norwegian" },
+  en: { vector: "search_vector_en", config: "english" },
+};
+
+export interface SearchHit {
+  code: string;
+  descriptionNb: string | null;
+  descriptionEn: string | null;
+  // The texts from the section down to the code, in the search language
+  context: string | null;
+  rank: number;
+}
+
+export interface SearchResult {
+  query: string;
+  // "all": every word matched; "any": nothing matched all words, so codes
+  // matching some of them are shown
+  matched: "all" | "any" | "code";
+  hits: SearchHit[];
+}
+
+// The words of a search, safe to put into to_tsquery: letters, digits and
+// inner hyphens only (e.g. "t-skjorte")
+export function searchWords(query: string): string[] {
+  const words =
+    query.toLowerCase().match(/[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*/gu) ?? [];
+  return [...new Set(words)].slice(0, MAX_SEARCH_WORDS);
+}
+
+// "bomull t-skjorte" -> "bomull:* & t-skjorte:*": every word, as a prefix,
+// so partly typed words match too
+export function toTsQuery(words: string[], operator: "&" | "|"): string {
+  return words.map((w) => `${w}:*`).join(` ${operator} `);
+}
+
+const today = () =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Oslo" }).format(
+    new Date(),
+  );
+
+async function searchByText(
+  words: string[],
+  operator: "&" | "|",
+  language: SearchLanguage,
+  limit: number,
+): Promise<SearchHit[]> {
+  const { vector, config } = CONFIG[language];
+  // With "|", codes matching more of the words come first; the text rank
+  // only orders codes matching the same number of words
+  const wordQueries = words.map((_, i) => `to_tsquery(:config, :word${i})`);
+  const matchedWords = wordQueries
+    .map((q) => `(n.${vector} @@ ${q})::int`)
+    .join(" + ");
+  const wordReplacements = Object.fromEntries(
+    words.map((w, i) => [`word${i}`, `${w}:*`]),
+  );
+  const contextColumn =
+    language === "nb" ? "n.search_text_nb" : "n.search_text_en";
+  const rows = await sequelize.query<{
+    code: string;
+    description_nb: string | null;
+    description_en: string | null;
+    context: string | null;
+    rank: number;
+  }>(
+    `SELECT n.code, n.description_nb, n.description_en, ${contextColumn} AS context,
+            ts_rank_cd(n.${vector}, q) AS rank,
+            ${matchedWords} AS matched_words
+       FROM tariff_nodes n
+       JOIN commodities c ON c.code = n.code
+       CROSS JOIN to_tsquery(:config, :tsquery) q
+      WHERE n.node_type = 'commodity'
+        AND n.${vector} @@ q
+        AND (c.valid_to IS NULL OR c.valid_to >= :today)
+      ORDER BY matched_words DESC, rank DESC, n.code
+      LIMIT :limit`,
+    {
+      type: QueryTypes.SELECT,
+      replacements: {
+        config,
+        tsquery: toTsQuery(words, operator),
+        today: today(),
+        limit,
+        ...wordReplacements,
+      },
+    },
+  );
+  return rows.map((r) => ({
+    code: r.code,
+    descriptionNb: r.description_nb,
+    descriptionEn: r.description_en,
+    context: r.context,
+    rank: Number(r.rank),
+  }));
+}
+
+async function searchByCode(
+  digits: string,
+  language: SearchLanguage,
+  limit: number,
+): Promise<SearchHit[]> {
+  const contextColumn =
+    language === "nb" ? "n.search_text_nb" : "n.search_text_en";
+  const rows = await sequelize.query<{
+    code: string;
+    description_nb: string | null;
+    description_en: string | null;
+    context: string | null;
+  }>(
+    `SELECT n.code, n.description_nb, n.description_en, ${contextColumn} AS context
+       FROM tariff_nodes n
+       JOIN commodities c ON c.code = n.code
+      WHERE n.node_type = 'commodity'
+        AND n.code LIKE :prefix
+        AND (c.valid_to IS NULL OR c.valid_to >= :today)
+      ORDER BY n.code
+      LIMIT :limit`,
+    {
+      type: QueryTypes.SELECT,
+      replacements: { prefix: `${digits}%`, today: today(), limit },
+    },
+  );
+  return rows.map((r) => ({
+    code: r.code,
+    descriptionNb: r.description_nb,
+    descriptionEn: r.description_en,
+    context: r.context,
+    rank: 1,
+  }));
+}
+
+// A query of digits (dots and spaces allowed, e.g. "6109.10") searches
+// codes; anything else searches the texts
+export async function searchCommodities(
+  query: string,
+  language: SearchLanguage,
+  limit: number,
+): Promise<SearchResult> {
+  const trimmed = query.trim();
+  if (/^[\d.\s]+$/.test(trimmed)) {
+    const digits = trimmed.replace(/[.\s]/g, "");
+    return {
+      query: trimmed,
+      matched: "code",
+      hits: await searchByCode(digits, language, limit),
+    };
+  }
+
+  const words = searchWords(trimmed);
+  if (words.length === 0) return { query: trimmed, matched: "all", hits: [] };
+
+  const all = await searchByText(words, "&", language, limit);
+  if (all.length > 0 || words.length === 1) {
+    return { query: trimmed, matched: "all", hits: all };
+  }
+  return {
+    query: trimmed,
+    matched: "any",
+    hits: await searchByText(words, "|", language, limit),
+  };
+}
+
+export interface CommodityReference {
+  code: string;
+  expression: string | null;
+  definitionNbHtml: string | null;
+  definitionEnHtml: string | null;
+  // The tree node the reference is attached to (the code or a level above)
+  attachedTo: string | null;
+}
+
+export interface CommodityDetails {
+  code: string;
+  hsCode: string | null;
+  descriptionNb: string | null;
+  descriptionEn: string | null;
+  path: {
+    code: string | null;
+    hsCode: string | null;
+    nodeType: string;
+    descriptionNb: string | null;
+    descriptionEn: string | null;
+  }[];
+  unit: string | null;
+  unitDescription: string | null;
+  secondaryUnit: string | null;
+  validFrom: string;
+  validTo: string | null;
+  classifications: { code: string; description: string | null }[];
+  references: CommodityReference[];
+}
+
+export async function getCommodity(
+  code: string,
+): Promise<CommodityDetails | null> {
+  const [row] = await sequelize.query<{
+    code: string;
+    node_id: number | null;
+    hs_code: string | null;
+    description_nb: string | null;
+    description_en: string | null;
+    unit: string | null;
+    unit_description: string | null;
+    secondary_unit: string | null;
+    valid_from: string;
+    valid_to: string | null;
+  }>(
+    `SELECT c.code, c.node_id, n.hs_code, n.description_nb, n.description_en, c.unit,
+            c.unit_description, c.secondary_unit, c.valid_from, c.valid_to
+       FROM commodities c
+       LEFT JOIN tariff_nodes n ON n.id = c.node_id
+      WHERE c.code = :code`,
+    { type: QueryTypes.SELECT, replacements: { code } },
+  );
+  if (!row) return null;
+
+  // The code's node and every node above it, top first
+  const nodes = row.node_id
+    ? await sequelize.query<{
+        id: number;
+        code: string | null;
+        hs_code: string | null;
+        node_type: string;
+        description_nb: string | null;
+        description_en: string | null;
+      }>(
+        `WITH RECURSIVE up AS (
+           SELECT id, parent_id, code, hs_code, node_type, description_nb, description_en, depth
+             FROM tariff_nodes WHERE id = :id
+           UNION ALL
+           SELECT n.id, n.parent_id, n.code, n.hs_code, n.node_type, n.description_nb, n.description_en, n.depth
+             FROM tariff_nodes n JOIN up ON n.id = up.parent_id
+         )
+         SELECT id, code, hs_code, node_type, description_nb, description_en FROM up ORDER BY depth`,
+        { type: QueryTypes.SELECT, replacements: { id: row.node_id } },
+      )
+    : [];
+
+  const nodeIds = nodes.map((n) => n.id);
+  const references = nodeIds.length
+    ? await sequelize.query<{
+        code: string;
+        expression: string | null;
+        definition_nb_html: string | null;
+        definition_en_html: string | null;
+        attached_to: string | null;
+      }>(
+        `SELECT r.code, r.expression, r.definition_nb_html, r.definition_en_html,
+                n.code AS attached_to
+           FROM tariff_node_references nr
+           JOIN tariff_references r ON r.code = nr.reference_code
+           JOIN tariff_nodes n ON n.id = nr.node_id
+          WHERE nr.node_id IN (:ids)
+          ORDER BY n.depth, r.code`,
+        { type: QueryTypes.SELECT, replacements: { ids: nodeIds } },
+      )
+    : [];
+
+  const classifications = await sequelize.query<{
+    code: string;
+    description: string | null;
+  }>(
+    `SELECT code, description FROM commodity_classifications
+      WHERE commodity_code = :code AND (valid_to IS NULL OR valid_to >= :today)
+      ORDER BY code`,
+    { type: QueryTypes.SELECT, replacements: { code, today: today() } },
+  );
+
+  return {
+    code: row.code,
+    hsCode: row.hs_code,
+    descriptionNb: row.description_nb,
+    descriptionEn: row.description_en,
+    path: nodes.slice(0, -1).map((n) => ({
+      code: n.code,
+      hsCode: n.hs_code || null,
+      nodeType: n.node_type,
+      descriptionNb: n.description_nb,
+      descriptionEn: n.description_en,
+    })),
+    unit: row.unit,
+    unitDescription: row.unit_description,
+    secondaryUnit: row.secondary_unit,
+    validFrom: row.valid_from,
+    validTo: row.valid_to,
+    classifications,
+    references: references.map((r) => ({
+      code: r.code,
+      expression: r.expression,
+      definitionNbHtml: r.definition_nb_html,
+      definitionEnHtml: r.definition_en_html,
+      attachedTo: r.attached_to,
+    })),
+  };
+}

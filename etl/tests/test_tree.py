@@ -57,3 +57,17 @@ def test_fails_when_ids_differ():
 
     with pytest.raises(TreeMismatchError, match="Different ids"):
         build_tree(NB_TREE, en)
+
+
+def test_builds_search_texts_from_the_whole_path():
+    nodes = build_tree(NB_TREE, EN_TREE)
+    leaf = next(n for n in nodes if n.code == "01012902")
+
+    assert leaf.search_text_nb == (
+        "Levende dyr; animalske produkter > Levende dyr > "
+        "Hester, esler, muldyr og mulesler, levende. > hester > andre > av vekt under 133 kg"
+    )
+    assert leaf.search_text_en.endswith("Horses > Other > Of a weight less than 133 kg")
+    # The node's own text keeps the tariff's colon
+    horses = next(n for n in nodes if n.description_en == "Horses :")
+    assert horses.search_text_en.endswith("> Horses")

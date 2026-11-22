@@ -27,3 +27,10 @@ def test_clean_text():
     assert clean_text("  Horses :  ") == "Horses :"
     assert clean_text("   ") is None
     assert clean_text(None) is None
+
+
+def test_clean_text_decodes_entities_and_removes_soft_hyphens():
+    assert clean_text("laksefisk (&#34;salmonidae&#34;)") == 'laksefisk ("salmonidae")'
+    assert clean_text("men&#39;s &#96;x&#96; a &#61; b") == "men's `x` a = b"
+    assert clean_text("Oncor\u00adhynchus nerka") == "Oncorhynchus nerka"
+    assert clean_text("\u00ad") is None

@@ -14,6 +14,8 @@ import indexRouter from "./routes/index.js";
 import healthRouter from "./routes/health.js";
 import authRouter from "./routes/auth.js";
 import dutyRouter from "./routes/duty.js";
+import commoditiesRouter from "./routes/commodities.js";
+import countriesRouter from "./routes/countries.js";
 
 const app = express();
 
@@ -56,6 +58,8 @@ app.use("/", indexRouter);
 app.use("/api/health", healthRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/duty", dutyRouter);
+app.use("/api/commodities", commoditiesRouter);
+app.use("/api/countries", countriesRouter);
 
 const swaggerPath = path.join(process.cwd(), "swagger_output.json");
 

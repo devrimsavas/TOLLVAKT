@@ -45,6 +45,9 @@ class TariffNode:
     sort_order: int
     depth: int
     path: str
+    # The texts of every node from the section down to this one, for search
+    search_text_nb: str | None = None
+    search_text_en: str | None = None
     references: list[str] = field(default_factory=list)
 
 
@@ -53,6 +56,15 @@ def _children(node: dict[str, Any], keys: tuple[str, ...]) -> list[dict[str, Any
     for key in keys:
         children.extend(node.get(key) or [])
     return children
+
+
+def _join_path(parent_text: str | None, own: str | None) -> str | None:
+    # The tariff ends texts that have sub-items with a colon ("Other, frozen :");
+    # in a path the ">" already says that
+    if own:
+        own = own.rstrip(" :") or None
+    parts = [part for part in (parent_text, own) if part]
+    return " > ".join(parts) or None
 
 
 def _where(path: str) -> str:
@@ -111,6 +123,8 @@ def build_tree(nb_root: dict[str, Any], en_root: dict[str, Any]) -> list[TariffN
             path=path,
             references=list(dict.fromkeys(nb.get("henvisninger") or [])),
         )
+        node.search_text_nb = _join_path(parent.search_text_nb if parent else None, node.description_nb)
+        node.search_text_en = _join_path(parent.search_text_en if parent else None, node.description_en)
         nodes.append(node)
 
         nb_children = _children(nb, CHILD_KEYS_NB)

@@ -131,3 +131,15 @@ def test_keeps_old_exchange_rate_periods(db, tmp_path):
         "SELECT valid_from::text, rate::text FROM exchange_rates WHERE currency_code = 'EUR' ORDER BY valid_from"
     ).fetchall()
     assert periods == [("2026-11-12", "10.454000"), ("2026-11-26", "10.532000")]
+
+
+def test_stores_search_texts_that_full_text_search_can_find(db, tmp_path):
+    dataset, report = load_dataset(write_folder(tmp_path))
+    import_dataset(db, dataset, report)
+
+    # "hest" is only in the parent's text, not in the code's own text
+    found = db.execute(
+        "SELECT code FROM tariff_nodes WHERE node_type = 'commodity' "
+        "AND search_vector_nb @@ to_tsquery('norwegian', 'hest') ORDER BY code"
+    ).fetchall()
+    assert found == [("01012100",), ("01012902",)]

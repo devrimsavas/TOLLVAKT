@@ -12,6 +12,11 @@ const doc = {
   tags: [
     { name: "Auth", description: "Registration, login and the current user" },
     {
+      name: "Commodities",
+      description: "Search in the Norwegian customs tariff and details of a code",
+    },
+    { name: "Countries", description: "Origin countries" },
+    {
       name: "Duty",
       description: "Customs duty and VAT calculation with Tolletaten's rates",
     },

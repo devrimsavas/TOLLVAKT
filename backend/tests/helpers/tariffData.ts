@@ -9,18 +9,32 @@ export async function seedTariffData(): Promise<void> {
       ('TEF', 'Toll fra EU- land', 'B', '1990-01-01'),
       ('RALL', 'Restriksjon fra alle land', 'N', '1990-01-01'),
       ('ALLE', 'Avgift fra alle land', 'N', '1990-01-01');
-    INSERT INTO countries (code, name_nb) VALUES ('TR', 'Tyrkia'), ('DE', 'Tyskland'), ('CN', 'Kina');
+    INSERT INTO countries (code, name_nb) VALUES ('TR', 'Tyrkia'), ('DE', 'Tyskland'), ('CN', 'Kina'),
+      ('XB', 'Kanariøyene');
     INSERT INTO country_group_members (country_code, group_code, valid_from) VALUES
       ('TR', 'TTYR', '1992-04-17'), ('DE', 'TEF', '1990-01-01');
 
-    INSERT INTO tariff_nodes (id, parent_id, node_type, code, description_nb, description_en, sort_order, depth, path) VALUES
-      (1, NULL, 'section', '11', 'Tekstilmaterialer og varer derav', 'Textiles and textile articles', 0, 0, '11'),
-      (2, 1, 'heading', '6109', 'T-skjorter, singleter og andre undertrøyer, av trikotasje.', 'T-shirts, singlets and other vests, knitted or crocheted.', 0, 1, '11/6109'),
-      (3, 2, 'commodity', '61091000', 'av bomull', 'Of cotton', 0, 2, '11/6109/61091000'),
-      (4, NULL, 'commodity', '02011000', 'hele og halve skrotter', 'Carcasses and half-carcasses', 1, 0, '02011000');
-    INSERT INTO commodities (code, node_id, unit, valid_from, season_from, season_to) VALUES
-      ('61091000', 3, 'KG', '1988-01-01', '0101', '1231'),
-      ('02011000', 4, 'KG', '1988-01-01', '0101', '1231');
+    INSERT INTO tariff_nodes (id, parent_id, node_type, code, description_nb, description_en, search_text_nb, search_text_en, sort_order, depth, path) VALUES
+      (1, NULL, 'section', '11', 'Tekstilmaterialer og varer derav', 'Textiles and textile articles',
+        'Tekstilmaterialer og varer derav', 'Textiles and textile articles', 0, 0, '11'),
+      (2, 1, 'heading', '6109', 'T-skjorter, singleter og andre undertrøyer, av trikotasje.', 'T-shirts, singlets and other vests, knitted or crocheted.',
+        'Tekstilmaterialer og varer derav > T-skjorter, singleter og andre undertrøyer, av trikotasje.',
+        'Textiles and textile articles > T-shirts, singlets and other vests, knitted or crocheted.', 0, 1, '11/6109'),
+      (3, 2, 'commodity', '61091000', 'av bomull', 'Of cotton',
+        'Tekstilmaterialer og varer derav > T-skjorter, singleter og andre undertrøyer, av trikotasje. > av bomull',
+        'Textiles and textile articles > T-shirts, singlets and other vests, knitted or crocheted. > Of cotton', 0, 2, '11/6109/61091000'),
+      (5, 2, 'commodity', '61099000', 'av andre tekstilmaterialer', 'Of other textile materials',
+        'Tekstilmaterialer og varer derav > T-skjorter, singleter og andre undertrøyer, av trikotasje. > av andre tekstilmaterialer',
+        'Textiles and textile articles > T-shirts, singlets and other vests, knitted or crocheted. > Of other textile materials', 1, 2, '11/6109/61099000'),
+      (4, NULL, 'commodity', '02011000', 'hele og halve skrotter', 'Carcasses and half-carcasses',
+        'hele og halve skrotter', 'Carcasses and half-carcasses', 1, 0, '02011000');
+    INSERT INTO commodities (code, node_id, unit, valid_from, valid_to, season_from, season_to) VALUES
+      ('61091000', 3, 'KG', '1988-01-01', NULL, '0101', '1231'),
+      ('61099000', 5, 'KG', '1988-01-01', '2020-12-31', '0101', '1231'),
+      ('02011000', 4, 'KG', '1988-01-01', NULL, '0101', '1231');
+    INSERT INTO tariff_references (code, expression, definition_nb_html, definition_en_html) VALUES
+      ('TKV 061', 'Trikotasje', '<p>Varer av trikotasje</p>', '<p>Knitted goods</p>');
+    INSERT INTO tariff_node_references (node_id, reference_code) VALUES (2, 'TKV 061');
     INSERT INTO commodity_classifications (commodity_code, code, description, valid_from) VALUES
       ('02011000', 'NA', 'Næringsmiddel', '2020-01-01');
 

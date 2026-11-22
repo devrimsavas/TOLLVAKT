@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import html
 from datetime import date
 from decimal import Decimal, InvalidOperation
 
@@ -27,9 +28,18 @@ def parse_decimal(value: str | None) -> Decimal | None:
         raise ValueError(f"not a number: {value!r}") from exc
 
 
+SOFT_HYPHEN = "\u00ad"
+
+
 def clean_text(value: str | None) -> str | None:
-    """Trims whitespace; returns None for empty text."""
+    """Plain text from Tolletaten's fields: decodes HTML entities (&#34; -> "),
+    removes soft hyphens, which split words for search ("Oncor\u00adhynchus"),
+    and trims whitespace. Returns None for empty text.
+
+    Not for fields that are HTML (reference definitions), where entities
+    must stay encoded."""
     if value is None:
         return None
-    text = " ".join(value.split())
+    text = html.unescape(value).replace(SOFT_HYPHEN, "")
+    text = " ".join(text.split())
     return text or None
