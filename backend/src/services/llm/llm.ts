@@ -3,11 +3,14 @@
 //
 // LLM_PROVIDER=ollama   OLLAMA_HOST, OLLAMA_LLM_MODEL (e.g. gemma4:12b),
 //                       OLLAMA_NUM_CTX (context window in tokens, default 16384)
-// LLM_PROVIDER=gemini   GEMINI_API_KEY, GEMINI_LLM_MODEL
+// LLM_PROVIDER=gemini   GEMINI_API_KEY, GEMINI_LLM_MODEL,
+//                       GEMINI_THINKING_LEVEL (e.g. low; empty = the model's default)
 // LLM_PROVIDER=fake     tests only: answers from a function the test sets
 //
 // Answers are JSON, checked against a schema the caller gives: the model is
 // asked for exactly that shape (Ollama "format", Gemini "responseSchema").
+
+import { postJsonWithRetry } from "../http.js";
 
 const DEFAULT_TIMEOUT_SECONDS = 60;
 // Ollama gives a model only 4096 tokens of context unless asked for more;
@@ -116,32 +119,14 @@ export async function generateJsonWithRetry(llm: Llm, request: JsonRequest): Pro
   }
 }
 
-async function postJson(
+function postJson(
   url: string,
   body: unknown,
   headers: Record<string, string>,
   timeoutMs: number,
   who: string,
 ): Promise<unknown> {
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...headers },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(timeoutMs),
-    });
-  } catch (error) {
-    if (error instanceof Error && error.name === "TimeoutError") {
-      throw new LlmError(`${who} did not answer within ${timeoutMs / 1000} seconds`);
-    }
-    throw new LlmError(`${who} could not be reached`);
-  }
-  if (!response.ok) {
-    // 429: the Gemini free tier's limit per minute or per day is used up
-    throw new LlmError(`${who} answered ${response.status}`);
-  }
-  return response.json();
+  return postJsonWithRetry(url, body, headers, timeoutMs, who, (message) => new LlmError(message));
 }
 
 export class OllamaLlm implements Llm {
@@ -185,6 +170,9 @@ export class GeminiLlm implements Llm {
     private readonly apiKey: string,
     private readonly name: string,
     private readonly timeoutMs: number,
+    // How much the model thinks before answering; "low" is faster and
+    // cheaper, and enough for choosing among given candidates
+    private readonly thinkingLevel?: string,
   ) {
     this.model = `gemini:${name}`;
   }
@@ -199,6 +187,7 @@ export class GeminiLlm implements Llm {
           responseMimeType: "application/json",
           responseSchema: schema,
           temperature: 0,
+          ...(this.thinkingLevel ? { thinkingConfig: { thinkingLevel: this.thinkingLevel } } : {}),
         },
       },
       { "x-goog-api-key": this.apiKey },
@@ -238,7 +227,12 @@ export function createLlm(): Llm | null {
       );
     case "gemini":
       if (!env.GEMINI_API_KEY || !env.GEMINI_LLM_MODEL) return null;
-      return new GeminiLlm(env.GEMINI_API_KEY, env.GEMINI_LLM_MODEL, timeoutMs);
+      return new GeminiLlm(
+        env.GEMINI_API_KEY,
+        env.GEMINI_LLM_MODEL,
+        timeoutMs,
+        env.GEMINI_THINKING_LEVEL?.trim() || undefined,
+      );
     case "fake":
       return new FakeLlm();
     default:

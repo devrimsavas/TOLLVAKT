@@ -6,6 +6,8 @@
 // EMBEDDING_PROVIDER=gemini   GEMINI_API_KEY, GEMINI_EMBEDDING_MODEL (production)
 // EMBEDDING_PROVIDER=fake     tests only: word-based vectors without a model
 
+import { postJsonWithRetry } from "../http.js";
+
 // Fixed by the database column (vector(768))
 export const EMBEDDING_DIMENSIONS = 768;
 
@@ -31,32 +33,14 @@ function checkVector(vector: unknown, model: string): number[] {
   return vector as number[];
 }
 
-async function postJson(
+function postJson(
   url: string,
   body: unknown,
   headers: Record<string, string>,
   timeoutMs: number,
   who: string,
 ): Promise<unknown> {
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...headers },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(timeoutMs),
-    });
-  } catch (error) {
-    if (error instanceof Error && error.name === "TimeoutError") {
-      throw new EmbeddingError(`${who} did not answer within ${timeoutMs / 1000} seconds`);
-    }
-    throw new EmbeddingError(`${who} could not be reached`);
-  }
-  if (!response.ok) {
-    // 429: the Gemini free tier's limit per minute or per day is used up
-    throw new EmbeddingError(`${who} answered ${response.status}`);
-  }
-  return response.json();
+  return postJsonWithRetry(url, body, headers, timeoutMs, who, (message) => new EmbeddingError(message));
 }
 
 export class OllamaEmbedder implements Embedder {

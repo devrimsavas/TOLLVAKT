@@ -4,6 +4,7 @@
 //   npm run eval:search                  all methods
 //   npm run eval:search -- --save        also write eval/results/search-<time>.json
 //   npm run eval:search -- --verbose     also print the language model's rewrites
+//   npm run eval:search -- --cases eval/holdout-cases.json   another test set
 //
 // For each case and method it records the place of the right code among the
 // first 50 results. The summary shows how often it is first, in the first 5,
@@ -40,7 +41,14 @@ export interface EvalCase {
 const METHODS: SearchMode[] = ["text", "semantic", "hybrid", "expanded"];
 const DEPTH = 50;
 const CUTOFFS = [1, 5, 10, 20];
-const CASES_FILE = path.join(process.cwd(), "eval", "classification-cases.json");
+const DEFAULT_CASES = path.join("eval", "classification-cases.json");
+
+// --cases <file> measures another test set, e.g. eval/holdout-cases.json
+export function casesFile(argv: string[]): string {
+  const index = argv.indexOf("--cases");
+  const file = index !== -1 ? argv[index + 1] : undefined;
+  return path.resolve(process.cwd(), file ?? DEFAULT_CASES);
+}
 const RESULTS_DIR = path.join(process.cwd(), "eval", "results");
 
 // Place of the expected code (1 = first), or null if not among the results
@@ -96,7 +104,7 @@ async function currentCodes(codes: string[]): Promise<Set<string>> {
 async function main(): Promise<void> {
   const save = process.argv.includes("--save");
   const verbose = process.argv.includes("--verbose");
-  const { cases } = JSON.parse(await readFile(CASES_FILE, "utf8")) as { cases: EvalCase[] };
+  const { cases } = JSON.parse(await readFile(casesFile(process.argv), "utf8")) as { cases: EvalCase[] };
 
   const known = await currentCodes(cases.map((c) => c.expected));
   for (const c of cases.filter((c) => !known.has(c.expected))) {

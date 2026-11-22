@@ -4,6 +4,7 @@
 //   npm run eval:classify                 summary and one line per case
 //   npm run eval:classify -- --verbose    also the model's reasons and questions
 //   npm run eval:classify -- --save       also write eval/results/classify-<time>.json
+//   npm run eval:classify -- --cases eval/holdout-cases.json   another test set
 //
 // "candidates" is how often the right code was among the codes the model
 // chose from: classification cannot do better than that. "first" and "top 3"
@@ -16,9 +17,9 @@ import { sequelize } from "../config/database.js";
 import { classify, ClassificationUnavailableError, type Classification } from "../services/classifier.js";
 import { SemanticSearchUnavailableError } from "../services/commodityService.js";
 import { QueryRewriteUnavailableError } from "../services/queryRewriter.js";
-import type { EvalCase } from "./evalSearch.js";
+import { casesFile, type EvalCase } from "./evalSearch.js";
 
-const CASES_FILE = path.join(process.cwd(), "eval", "classification-cases.json");
+
 const RESULTS_DIR = path.join(process.cwd(), "eval", "results");
 
 export interface CaseOutcome {
@@ -45,7 +46,7 @@ const percent = (part: number, whole: number) =>
 async function main(): Promise<void> {
   const verbose = process.argv.includes("--verbose");
   const save = process.argv.includes("--save");
-  const { cases } = JSON.parse(await readFile(CASES_FILE, "utf8")) as { cases: EvalCase[] };
+  const { cases } = JSON.parse(await readFile(casesFile(process.argv), "utf8")) as { cases: EvalCase[] };
 
   const rows: { case: EvalCase; outcome: CaseOutcome; result?: Classification; error?: string }[] = [];
   for (const evalCase of cases) {

@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { fuseRankings, type SearchHit } from "../src/services/commodityService.js";
-import { placeOf, summarize, type EvalCase } from "../src/eval/evalSearch.js";
+import path from "node:path";
+import { casesFile, placeOf, summarize, type EvalCase } from "../src/eval/evalSearch.js";
 
 const hit = (code: string): SearchHit => ({
   code,
@@ -66,8 +67,13 @@ describe("search evaluation", () => {
     expect(placeOf(codes, "62034209", 4)).toBe(2);
   });
 
-  it("has a well-formed test set", () => {
-    const { cases } = JSON.parse(readFileSync("eval/classification-cases.json", "utf8")) as { cases: EvalCase[] };
+  it("reads the test set from --cases, or the default one", () => {
+    expect(casesFile(["node", "x"])).toBe(path.resolve("eval/classification-cases.json"));
+    expect(casesFile(["node", "x", "--cases", "eval/holdout-cases.json"])).toBe(path.resolve("eval/holdout-cases.json"));
+  });
+
+  it.each(["eval/classification-cases.json", "eval/holdout-cases.json"])("has a well-formed test set in %s", (file) => {
+    const { cases } = JSON.parse(readFileSync(file, "utf8")) as { cases: EvalCase[] };
 
     expect(cases.length).toBeGreaterThanOrEqual(30);
     expect(new Set(cases.map((c) => c.id)).size).toBe(cases.length);
@@ -76,5 +82,12 @@ describe("search evaluation", () => {
       expect(["nb", "en"]).toContain(c.lang);
       expect(c.query.trim()).not.toBe("");
     }
+  });
+
+  it("keeps the held-out set apart from the tuning set", () => {
+    const read = (file: string) =>
+      (JSON.parse(readFileSync(file, "utf8")) as { cases: EvalCase[] }).cases.map((c) => c.expected);
+    const tuning = new Set(read("eval/classification-cases.json"));
+    expect(read("eval/holdout-cases.json").filter((code) => tuning.has(code))).toEqual([]);
   });
 });

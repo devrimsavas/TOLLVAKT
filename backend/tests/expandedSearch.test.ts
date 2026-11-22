@@ -168,6 +168,16 @@ describe("language models", () => {
     ).rejects.toThrow("could not be reached");
   });
 
+  it("Gemini sends the thinking level when one is set", async () => {
+    const fetchMock = answer(200, { candidates: [{ content: { parts: [{ text: '{"nb":"a","en":"b"}' }] } }] });
+
+    await new GeminiLlm("k", "gemini-x", 1000, "low").generateJson({ system: "", prompt: "", schema });
+
+    expect(JSON.parse(fetchMock.mock.calls[0]![1].body).generationConfig.thinkingConfig).toEqual({
+      thinkingLevel: "low",
+    });
+  });
+
   it("is chosen from the environment", () => {
     vi.stubEnv("LLM_PROVIDER", "ollama");
     vi.stubEnv("OLLAMA_LLM_MODEL", "gemma4:12b");

@@ -1,0 +1,191 @@
+{
+  "description": "Held-out test set: products never used while tuning prompts or search, to check that results generalise beyond eval/classification-cases.json. Codes checked against the tariff; each description leads to one code. Use with --cases eval/holdout-cases.json.",
+  "cases": [
+    {
+      "id": "wool-sweater-men",
+      "query": "Strikket ullgenser til herre",
+      "lang": "nb",
+      "expected": "61101100"
+    },
+    {
+      "id": "stroller",
+      "query": "Sportsvogn (barnetrille), komplett",
+      "lang": "nb",
+      "expected": "87150001"
+    },
+    {
+      "id": "lawn-mower-electric",
+      "query": "Elektrisk gressklipper",
+      "lang": "nb",
+      "expected": "84331101"
+    },
+    {
+      "id": "cordless-drill",
+      "query": "Batteridrill",
+      "lang": "nb",
+      "expected": "84672100"
+    },
+    {
+      "id": "screwdriver",
+      "query": "Skrutrekker",
+      "lang": "nb",
+      "expected": "82054000"
+    },
+    {
+      "id": "cast-iron-pan",
+      "query": "Stekepanne i støpejern, uten emalje",
+      "lang": "nb",
+      "expected": "73239100"
+    },
+    {
+      "id": "kitchen-knife",
+      "query": "Kjøkkenkniv i stål",
+      "lang": "nb",
+      "expected": "82119201"
+    },
+    {
+      "id": "water-glasses",
+      "query": "Vannglass i vanlig glass, uten stett",
+      "lang": "nb",
+      "expected": "70133700"
+    },
+    {
+      "id": "olive-oil",
+      "query": "Extra virgin olivenolje på flaske",
+      "lang": "nb",
+      "expected": "15092090"
+    },
+    {
+      "id": "pasta-dry",
+      "query": "Tørr pasta uten egg",
+      "lang": "nb",
+      "expected": "19021900"
+    },
+    {
+      "id": "milk-chocolate",
+      "query": "Melkesjokolade i plater, uten fyll",
+      "lang": "nb",
+      "expected": "18063200"
+    },
+    {
+      "id": "honey",
+      "query": "Honning på glass",
+      "lang": "nb",
+      "expected": "04090000"
+    },
+    {
+      "id": "shampoo",
+      "query": "Sjampo",
+      "lang": "nb",
+      "expected": "33051000"
+    },
+    {
+      "id": "toothpaste",
+      "query": "Tannkrem",
+      "lang": "nb",
+      "expected": "33061000"
+    },
+    {
+      "id": "perfume",
+      "query": "Parfyme (eau de parfum)",
+      "lang": "nb",
+      "expected": "33030010"
+    },
+    {
+      "id": "building-bricks",
+      "query": "Byggeklosser i plast for barn",
+      "lang": "nb",
+      "expected": "95030030"
+    },
+    {
+      "id": "jigsaw-puzzle",
+      "query": "Puslespill med 1000 brikker",
+      "lang": "nb",
+      "expected": "95030060"
+    },
+    {
+      "id": "football",
+      "query": "Fotball (oppblåsbar)",
+      "lang": "nb",
+      "expected": "95066200"
+    },
+    {
+      "id": "tent",
+      "query": "Turtelt i polyester, 3 kg",
+      "lang": "nb",
+      "expected": "63062201"
+    },
+    {
+      "id": "sleeping-bag",
+      "query": "Sovepose",
+      "lang": "nb",
+      "expected": "94043000"
+    },
+    {
+      "id": "umbrella",
+      "query": "Paraply med teleskopskaft",
+      "lang": "nb",
+      "expected": "66019100"
+    },
+    {
+      "id": "sunglasses",
+      "query": "Solbriller",
+      "lang": "nb",
+      "expected": "90041000"
+    },
+    {
+      "id": "wristwatch",
+      "query": "Armbåndsur med batteri og visere, kasse i stål",
+      "lang": "nb",
+      "expected": "91021100"
+    },
+    {
+      "id": "vacuum-cleaner",
+      "query": "Støvsuger, 1200 W, med pose",
+      "lang": "nb",
+      "expected": "85081100"
+    },
+    {
+      "id": "coffee-maker",
+      "query": "Kaffetrakter",
+      "lang": "nb",
+      "expected": "85167100"
+    },
+    {
+      "id": "hair-dryer",
+      "query": "Hårføner",
+      "lang": "nb",
+      "expected": "85163100"
+    },
+    {
+      "id": "toaster",
+      "query": "Brødrister",
+      "lang": "nb",
+      "expected": "85167200"
+    },
+    {
+      "id": "pc-monitor",
+      "query": "PC-skjerm, 27 tommer",
+      "lang": "nb",
+      "expected": "85285204"
+    },
+    {
+      "id": "bath-towels-en",
+      "query": "Cotton terry bath towels",
+      "lang": "en",
+      "expected": "63026000"
+    },
+    {
+      "id": "leather-wallet-en",
+      "query": "Leather wallet",
+      "lang": "en",
+      "expected": "42023100"
+    },
+    {
+      "id": "steel-bottle-en",
+      "query": "Stainless steel water bottle, not insulated, uncoated",
+      "lang": "en",
+      "expected": "73239390"
+    }
+  ]
+}

@@ -3,9 +3,13 @@ import { afterAll, beforeEach } from "vitest";
 import { QueryTypes } from "sequelize";
 import { sequelize } from "../../src/config/database.js";
 import { setLogSink } from "../../src/config/logger.js";
+import { retrySettings } from "../../src/services/http.js";
 
 // Logs are not written during tests
 setLogSink(() => {});
+
+// Retries against model providers do not wait during tests
+retrySettings.sleep = async () => {};
 
 // Every table except "migrations", where umzug records the applied
 // migrations: emptying it would make the next run apply them again

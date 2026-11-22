@@ -46,6 +46,7 @@ GEMINI_EMBEDDING_MODEL=gemini-embedding-001
 LLM_PROVIDER=ollama
 OLLAMA_LLM_MODEL=gemma4:12b
 GEMINI_LLM_MODEL=
+# GEMINI_THINKING_LEVEL=low
 # LLM_TIMEOUT_SECONDS=60
 # Context window Ollama gives the model, in tokens (Ollama's own default,
 # 4096, is too small for classification)

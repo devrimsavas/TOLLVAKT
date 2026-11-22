@@ -152,6 +152,23 @@ async function searchByCode(
   }));
 }
 
+// pgvector's version, read once: iterative index scans exist from 0.8
+let iterativeScan: Promise<boolean> | undefined;
+
+export function supportsIterativeScan(version: string): boolean {
+  const [major = 0, minor = 0] = version.split(".").map(Number);
+  return major > 0 || minor >= 8;
+}
+
+function hasIterativeScan(): Promise<boolean> {
+  iterativeScan ??= sequelize
+    .query<{ extversion: string }>("SELECT extversion FROM pg_extension WHERE extname = 'vector'", {
+      type: QueryTypes.SELECT,
+    })
+    .then(([row]) => (row ? supportsIterativeScan(row.extversion) : false));
+  return iterativeScan;
+}
+
 async function searchBySimilarity(
   query: string,
   language: SearchLanguage,
@@ -184,6 +201,13 @@ async function searchBySimilarity(
     // The index looks at this many candidates (default 40); it must be at
     // least as many as are asked for
     await sequelize.query(`SET LOCAL hnsw.ef_search = ${candidates}`, { transaction });
+    // With vectors from more than one model in the table, the index finds
+    // the nearest of all models and the model filter then drops some. From
+    // pgvector 0.8 the index can keep scanning until enough rows pass the
+    // filter; the outer query sorts them by distance again.
+    if (await hasIterativeScan()) {
+      await sequelize.query("SET LOCAL hnsw.iterative_scan = relaxed_order", { transaction });
+    }
     return sequelize.query<{
       code: string;
       description_nb: string | null;
