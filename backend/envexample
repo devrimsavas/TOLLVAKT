@@ -25,6 +25,22 @@ LOGIN_FAILURES_PER_ACCOUNT=10
 LOGIN_FAILURES_PER_ADDRESS=30
 REGISTRATIONS_PER_ADDRESS=10
 REQUESTS_PER_ADDRESS=1500
+# Password reset emails per account and per address in an hour, and wrong
+# passwords when a logged-in user changes the password or deletes the
+# account, in 15 minutes
+PASSWORD_RESETS_PER_ACCOUNT=5
+PASSWORD_RESETS_PER_ADDRESS=20
+PASSWORD_CHECK_FAILURES_PER_ACCOUNT=10
+# Email (password reset links). EMAIL_PROVIDER is "log" (write emails to the
+# console, the default) or "resend" (send them with https://resend.com, needs
+# RESEND_API_KEY). onboarding@resend.dev only delivers to the address the
+# Resend account was made with; use an address on your own verified domain
+# in production. WEB_APP_URL is where the links in emails point.
+EMAIL_PROVIDER=log
+RESEND_API_KEY=
+EMAIL_FROM=Tollvakt <onboarding@resend.dev>
+WEB_APP_URL=http://localhost:3001
+
 # Daily quotas for the calls that use a model (classification and search
 # with mode=semantic, hybrid or expanded), counted from midnight in Norway.
 # Guests are counted per address, members per account (an admin can give a

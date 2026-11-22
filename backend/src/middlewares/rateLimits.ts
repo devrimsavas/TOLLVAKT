@@ -78,6 +78,42 @@ export const registerLimit = rateLimit({
   handler: tooMany("Too many new accounts from this address. Try again later."),
 });
 
+// Password reset emails for one account, from any address: stops filling
+// someone's inbox
+export const passwordResetPerAccountLimit = rateLimit({
+  ...common,
+  windowMs: 60 * MINUTE,
+  limit: envLimit("PASSWORD_RESETS_PER_ACCOUNT", 5),
+  keyGenerator: (req) => {
+    const email: unknown = req.body?.email;
+    return `reset:${typeof email === "string" ? normalizeEmail(email) : ""}`;
+  },
+  identifier: "password-reset-account",
+  handler: tooMany("Too many password reset emails. Try again later."),
+});
+
+// Password reset emails from one address, for any accounts
+export const passwordResetPerAddressLimit = rateLimit({
+  ...common,
+  windowMs: 60 * MINUTE,
+  limit: envLimit("PASSWORD_RESETS_PER_ADDRESS", 20),
+  identifier: "password-reset-address",
+  handler: tooMany("Too many password reset emails. Try again later."),
+});
+
+// Wrong passwords when a logged-in user changes their password or deletes
+// their account: a stolen session cannot be used to guess the password.
+// Runs after requireAuth, so it counts per user.
+export const passwordCheckLimit = rateLimit({
+  ...common,
+  windowMs: 15 * MINUTE,
+  limit: envLimit("PASSWORD_CHECK_FAILURES_PER_ACCOUNT", 10),
+  skipSuccessfulRequests: true,
+  keyGenerator: (req) => `user:${req.auth?.userId ?? ""}`,
+  identifier: "password-check",
+  handler: tooMany("Too many wrong passwords. Try again later."),
+});
+
 // All API requests from one address
 export const apiLimit = rateLimit({
   ...common,

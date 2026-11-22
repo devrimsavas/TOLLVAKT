@@ -379,7 +379,7 @@ One row per call that uses a model: classification, and search with `mode=semant
 | Column | Type | Notes |
 |---|---|---|
 | id | bigserial PK | |
-| user_id | integer NULL | FK users, `ON DELETE SET NULL`; NULL for a guest |
+| user_id | integer NULL | FK users, `ON DELETE SET NULL`; NULL for a guest, and for a member who deleted the account (the row then points to no one but still counts towards the global limit) |
 | client_hash | char(64) NULL | guests: HMAC-SHA256 of the IP address, keyed with `JWT_SECRET`; the address itself is never stored |
 | kind | varchar(20) | `classify` or `search` |
 | created_at | timestamptz | indexed alone, with user_id and with client_hash |
@@ -403,6 +403,18 @@ A member's classifications, saved as they were answered, so they can be seen aga
 | missing_information | jsonb | questions to the member |
 | candidates | jsonb | the codes the model chose from |
 | created_at | timestamptz | index (user_id, created_at DESC) |
+
+### `password_reset_tokens` (migration 0016)
+
+| Column | Type | Notes |
+|---|---|---|
+| id | serial PK | |
+| user_id | integer | FK users, `ON DELETE CASCADE` |
+| token_hash | char(64) UNIQUE | SHA-256 of the token in the emailed link; the token itself is never stored |
+| expires_at | timestamptz | 60 minutes after it was sent |
+| created_at | timestamptz | |
+
+One link per user: a new request replaces the old one, and using it deletes it.
 
 ---
 
