@@ -1,2 +1,12 @@
 # The same database as the backend; the backend's migrations create the tables
 DATABASE_URL=postgres://postgres:password@localhost:5432/tollvakt
+
+# Semantic search. The query vector must come from the same model as the
+# stored tariff vectors, so these must match backend/.env. Locally Ollama
+# (ollama pull embeddinggemma), in production the Gemini API (a key from
+# Google AI Studio). Used by: python -m tollvakt_etl.embed_norway
+EMBEDDING_PROVIDER=ollama
+OLLAMA_HOST=http://localhost:11434
+OLLAMA_EMBEDDING_MODEL=embeddinggemma
+GEMINI_API_KEY=
+GEMINI_EMBEDDING_MODEL=gemini-embedding-001

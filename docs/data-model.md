@@ -300,18 +300,32 @@ English snapshot of current free trade agreement rates (`ratetradeagreements`). 
 
 ## 9. AI retrieval
 
-The embedding tables need the pgvector extension and a fixed vector dimension, so they get their own migration when the embedding model is chosen. `bku_rulings` is already created (migration 0010).
+Semantic search compares a vector of the user's description with vectors of the tariff texts (pgvector, migration 0013). Vectors come from an embedding model: locally Ollama with `embeddinggemma`, in production the Gemini API with `gemini-embedding-001`. Both give 768 dimensions, the size fixed by the column type.
 
-### `tariff_node_embeddings`
+Vectors are stored per **text**, not per tree node. Node ids change on every import, but most texts do not: the ETL (`python -m tollvakt_etl.embed_norway`) sends only texts without a vector for the current model, so re-importing an unchanged tariff costs nothing, and a stopped run continues where it stopped. Afterwards it removes the model's vectors whose text no node has any more.
+
+What is embedded: the search text (`search_text_nb`, `search_text_en`: the whole path from the section down to the code) of every commodity node, in both languages. A query is compared with both, and the nearer one counts.
+
+### `tariff_nodes` (added by migration 0013)
 
 | Column | Type | Notes |
 |---|---|---|
-| node_id | int FK → tariff_nodes | |
-| language | char(2) | `nb`, `en` |
-| model | varchar | embedding model name |
-| content | text | the text that was embedded (description + parent path) |
-| embedding | vector(n) | dimension fixed by the chosen embedding model |
-| PK | (node_id, language, model) | |
+| search_hash_nb | char(32) | generated: `md5(search_text_nb)`; links the node to its vector |
+| search_hash_en | char(32) | generated: `md5(search_text_en)` |
+
+### `text_embeddings`
+
+| Column | Type | Notes |
+|---|---|---|
+| model | varchar(100) | provider and model, e.g. `ollama:embeddinggemma`, `gemini:gemini-embedding-001` |
+| text_hash | char(32) | md5 of the embedded text |
+| embedding | vector(768) | HNSW index for cosine distance |
+| created_at | timestamptz | |
+| PK | (model, text_hash) | |
+
+Vectors from different models cannot be compared, so the model is part of the key and the backend searches only its own model's vectors. One model per database is expected; while switching, both models' vectors can be kept until the new run is complete.
+
+The same table will hold vectors for BKU rulings (keyed by the hash of their text) once that data is available.
 
 ### `bku_rulings` (empty until the data is available)
 
@@ -326,7 +340,6 @@ The embedding tables need the pgvector extension and a fixed vector dimension, s
 | valid_to | date NULL | |
 | source_url | text | |
 
-`bku_ruling_embeddings`: same shape as `tariff_node_embeddings`, with `ruling_id`.
 
 ---
 
@@ -361,4 +374,3 @@ The embedding tables need the pgvector extension and a fixed vector dimension, s
 ## Open points
 
 - Meaning of the placeholder rate `999999,99` and of a blank `satsEnhet`: check against `tariff_references` (e.g. `AGRI`) and Tolletaten's tariff before using in calculations.
-- Embedding model and vector dimension: chosen when the classification flow is built.

@@ -25,6 +25,6 @@ def db():
     if not url:
         pytest.skip("TEST_DATABASE_URL is not set")
     with psycopg.connect(url) as conn:
-        conn.execute(f"TRUNCATE import_runs, exchange_rates, {', '.join(OWNED_TABLES)} RESTART IDENTITY CASCADE")
+        conn.execute(f"TRUNCATE import_runs, exchange_rates, text_embeddings, {', '.join(OWNED_TABLES)} RESTART IDENTITY CASCADE")
         conn.commit()
         yield conn

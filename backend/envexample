@@ -28,3 +28,13 @@ REQUESTS_PER_ADDRESS=1500
 # Proxies whose X-Forwarded-For is trusted for the client's address. The default
 # trusts this machine and private networks (the web app, Docker).
 TRUST_PROXY=loopback, linklocal, uniquelocal
+
+# Semantic search. The query vector must come from the same model as the
+# stored tariff vectors, so these must match etl/.env. Locally Ollama
+# (ollama pull embeddinggemma), in production the Gemini API (a key from
+# Google AI Studio). Without them, search with mode=semantic answers 503.
+EMBEDDING_PROVIDER=ollama
+OLLAMA_HOST=http://localhost:11434
+OLLAMA_EMBEDDING_MODEL=embeddinggemma
+GEMINI_API_KEY=
+GEMINI_EMBEDDING_MODEL=gemini-embedding-001

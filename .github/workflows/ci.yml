@@ -13,10 +13,11 @@ jobs:
       run:
         working-directory: backend
 
-    # A throwaway PostgreSQL database that exists only during this run
+    # A throwaway PostgreSQL database that exists only during this run,
+    # with the pgvector extension the migrations need
     services:
       postgres:
-        image: postgres:17
+        image: pgvector/pgvector:pg18
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -68,7 +69,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:17
+        image: pgvector/pgvector:pg18
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres

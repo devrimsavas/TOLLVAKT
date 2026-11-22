@@ -22,6 +22,7 @@ const TARIFF_TABLES = [
   "destination_tariff_lines",
   "destination_duty_rates",
   "bku_rulings",
+  "text_embeddings",
 ];
 
 async function tableNames(): Promise<string[]> {

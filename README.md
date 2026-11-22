@@ -6,7 +6,7 @@
 
 Tollvakt helps small Norwegian businesses find the right commodity code (varenummer), estimate customs duty and VAT, and check whether a free trade agreement can lower the duty, before the goods reach the border.
 
-> Status: in development. Norwegian data import and duty calculation API are working.
+> Status: in development. Norwegian data import, duty calculation API and commodity search are working; AI classification is in progress.
 
 ---
 
@@ -101,35 +101,38 @@ Later candidates: other destination countries only when customers ask for them.
 ## Roadmap
 
 ### Phase 0: Foundation
-
-- [ ] Repository, README, licence
-- [ ] Common tariff data model (design + migrations)
-- [ ] Backend skeleton (Express + TypeScript, auth, Swagger) reusing Leverandørvakt/Regelvakt patterns
+- [x] Repository and README
+- [ ] Licence
+- [x] Common tariff data model (design + migrations)
+- [x] Backend skeleton (Express + TypeScript, auth, Swagger) reusing Leverandørvakt/Regelvakt patterns
+- [x] CI on GitHub Actions (backend and ETL tests against PostgreSQL)
 
 ### Phase 1: Norway
-
-- [ ] ETL: Tolletaten tariff structure, duty rates, exchange rates
-- [ ] ETL: BKU rulings (depending on availability)
-- [ ] Duty + VAT calculator (deterministic, tested against Tolletaten's own examples)
-- [ ] Classification flow (retrieval + LLM + reasoning)
-- [ ] Free-trade-agreement check and proof-of-origin guidance
+- [x] ETL: Tolletaten tariff structure, duty rates, fees, restrictions, exchange rates
+- [ ] ETL: BKU rulings (not available as open data; asked Tolletaten)
+- [x] Duty + VAT calculator
+- [ ] Duty + VAT calculator checked against Tolletaten's own calculation examples
+- [x] Free-trade-agreement check (preferential vs. ordinary rate, possible saving)
+- [ ] Proof-of-origin guidance
+- [x] Commodity search: full-text (nb/en) and code search
+- [x] Semantic search (pgvector; Ollama locally, Gemini in production)
+- [ ] Accuracy test set (products with known correct codes)
+- [ ] Classification flow (retrieval + LLM + reasoning, top 3 codes)
+- [ ] Section and chapter notes extracted from the tariff PDF
 
 ### Phase 2: Export destinations
-
 - [ ] ETL: EU TARIC
 - [ ] ETL: UK Trade Tariff API
 - [ ] ETL: USA (USITC HTS API)
 - [ ] Destination duty lookup via 6-digit HS mapping
 
 ### Phase 3: Frontend and pilot
-
 - [ ] Next.js UI (nb / en)
 - [ ] "Free customs check" demo for pilot users
 - [ ] Deployment to production
 - [ ] Pilot with Norwegian importers and exporters
 
 ### Later
-
 - [ ] Batch classification (CSV upload of product lists)
 - [ ] Change alerts when a rate for a saved code changes
 - [ ] API for freight forwarders

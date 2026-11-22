@@ -1,5 +1,7 @@
 // Inserts a small, realistic piece of Tolletaten's data for API tests.
+import { QueryTypes } from "sequelize";
 import { sequelize } from "../../src/config/database.js";
+import { fakeEmbedding } from "../../src/services/embeddings/embedder.js";
 
 export async function seedTariffData(): Promise<void> {
   await sequelize.query(`
@@ -57,4 +59,23 @@ export async function seedTariffData(): Promise<void> {
       ('EUR', '2026-11-12', '2026-11-25', 'EURO', 10.454, '10,454', 1),
       ('EUR', '2026-11-26', '2026-12-09', 'EURO', 10.532, '10,532', 1);
   `);
+}
+
+// Stores a vector for each commodity's search texts, as the ETL does, with
+// the tests' fake model
+export async function seedEmbeddings(): Promise<void> {
+  const rows = await sequelize.query<{ hash: string; text: string }>(
+    `SELECT search_hash_nb AS hash, search_text_nb AS text FROM tariff_nodes
+      WHERE node_type = 'commodity' AND search_text_nb IS NOT NULL
+     UNION
+     SELECT search_hash_en, search_text_en FROM tariff_nodes
+      WHERE node_type = 'commodity' AND search_text_en IS NOT NULL`,
+    { type: QueryTypes.SELECT },
+  );
+  for (const row of rows) {
+    await sequelize.query(
+      "INSERT INTO text_embeddings (model, text_hash, embedding) VALUES ('fake', :hash, CAST(:vector AS vector))",
+      { replacements: { hash: row.hash, vector: `[${fakeEmbedding(row.text).join(",")}]` } },
+    );
+  }
 }

@@ -1,6 +1,7 @@
 // Search in the tariff tree and details of one commodity code.
 import { QueryTypes } from "sequelize";
 import { sequelize } from "../config/database.js";
+import { createEmbedder } from "./embeddings/embedder.js";
 
 export type SearchLanguage = "nb" | "en";
 
@@ -10,6 +11,12 @@ const CONFIG: Record<SearchLanguage, { vector: string; config: string }> = {
   nb: { vector: "search_vector_nb", config: "norwegian" },
   en: { vector: "search_vector_en", config: "english" },
 };
+
+export type SearchMode = "text" | "semantic";
+
+// Semantic search cannot run: no embedding model is set up, or the ETL has
+// not created vectors with it yet
+export class SemanticSearchUnavailableError extends Error {}
 
 export interface SearchHit {
   code: string;
@@ -23,16 +30,16 @@ export interface SearchHit {
 export interface SearchResult {
   query: string;
   // "all": every word matched; "any": nothing matched all words, so codes
-  // matching some of them are shown
-  matched: "all" | "any" | "code";
+  // matching some of them are shown; "code": digits matched the start of
+  // codes; "semantic": nearest in meaning (rank is the cosine similarity)
+  matched: "all" | "any" | "code" | "semantic";
   hits: SearchHit[];
 }
 
 // The words of a search, safe to put into to_tsquery: letters, digits and
 // inner hyphens only (e.g. "t-skjorte")
 export function searchWords(query: string): string[] {
-  const words =
-    query.toLowerCase().match(/[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*/gu) ?? [];
+  const words = query.toLowerCase().match(/[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*/gu) ?? [];
   return [...new Set(words)].slice(0, MAX_SEARCH_WORDS);
 }
 
@@ -43,9 +50,7 @@ export function toTsQuery(words: string[], operator: "&" | "|"): string {
 }
 
 const today = () =>
-  new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Oslo" }).format(
-    new Date(),
-  );
+  new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Oslo" }).format(new Date());
 
 async function searchByText(
   words: string[],
@@ -60,11 +65,8 @@ async function searchByText(
   const matchedWords = wordQueries
     .map((q) => `(n.${vector} @@ ${q})::int`)
     .join(" + ");
-  const wordReplacements = Object.fromEntries(
-    words.map((w, i) => [`word${i}`, `${w}:*`]),
-  );
-  const contextColumn =
-    language === "nb" ? "n.search_text_nb" : "n.search_text_en";
+  const wordReplacements = Object.fromEntries(words.map((w, i) => [`word${i}`, `${w}:*`]));
+  const contextColumn = language === "nb" ? "n.search_text_nb" : "n.search_text_en";
   const rows = await sequelize.query<{
     code: string;
     description_nb: string | null;
@@ -108,8 +110,7 @@ async function searchByCode(
   language: SearchLanguage,
   limit: number,
 ): Promise<SearchHit[]> {
-  const contextColumn =
-    language === "nb" ? "n.search_text_nb" : "n.search_text_en";
+  const contextColumn = language === "nb" ? "n.search_text_nb" : "n.search_text_en";
   const rows = await sequelize.query<{
     code: string;
     description_nb: string | null;
@@ -138,21 +139,99 @@ async function searchByCode(
   }));
 }
 
-// A query of digits (dots and spaces allowed, e.g. "6109.10") searches
-// codes; anything else searches the texts
+async function searchBySimilarity(
+  query: string,
+  language: SearchLanguage,
+  limit: number,
+): Promise<SearchHit[]> {
+  const embedder = createEmbedder();
+  if (!embedder) {
+    throw new SemanticSearchUnavailableError(
+      "Semantic search is not set up (EMBEDDING_PROVIDER in backend/.env)",
+    );
+  }
+  const [stored] = await sequelize.query(
+    "SELECT 1 FROM text_embeddings WHERE model = :model LIMIT 1",
+    { type: QueryTypes.SELECT, replacements: { model: embedder.model } },
+  );
+  if (!stored) {
+    throw new SemanticSearchUnavailableError(
+      `There are no vectors from ${embedder.model} yet. Run: python -m tollvakt_etl.embed_norway`,
+    );
+  }
+
+  const vector = `[${(await embedder.embedQuery(query)).join(",")}]`;
+  const contextColumn = language === "nb" ? "n.search_text_nb" : "n.search_text_en";
+  // Every code has a vector per language; the nearest of the two counts.
+  // More vectors than codes are fetched, since two may belong to one code
+  // and expired codes are left out afterwards.
+  const candidates = limit * 4;
+
+  const rows = await sequelize.transaction(async (transaction) => {
+    // The index looks at this many candidates (default 40); it must be at
+    // least as many as are asked for
+    await sequelize.query(`SET LOCAL hnsw.ef_search = ${candidates}`, { transaction });
+    return sequelize.query<{
+      code: string;
+      description_nb: string | null;
+      description_en: string | null;
+      context: string | null;
+      distance: number;
+    }>(
+      `WITH nearest AS (
+         SELECT text_hash, embedding <=> CAST(:vector AS vector) AS distance
+           FROM text_embeddings
+          WHERE model = :model
+          ORDER BY embedding <=> CAST(:vector AS vector)
+          LIMIT :candidates
+       )
+       SELECT n.code, n.description_nb, n.description_en, ${contextColumn} AS context,
+              min(e.distance) AS distance
+         FROM nearest e
+         JOIN tariff_nodes n
+           ON n.node_type = 'commodity'
+          AND (n.search_hash_nb = e.text_hash OR n.search_hash_en = e.text_hash)
+         JOIN commodities c ON c.code = n.code
+        WHERE c.valid_to IS NULL OR c.valid_to >= :today
+        GROUP BY n.code, n.description_nb, n.description_en, ${contextColumn}
+        ORDER BY distance, n.code
+        LIMIT :limit`,
+      {
+        type: QueryTypes.SELECT,
+        transaction,
+        replacements: { vector, model: embedder.model, candidates, today: today(), limit },
+      },
+    );
+  });
+
+  return rows.map((r) => ({
+    code: r.code,
+    descriptionNb: r.description_nb,
+    descriptionEn: r.description_en,
+    context: r.context,
+    rank: 1 - Number(r.distance),
+  }));
+}
+
+// mode "semantic" searches by meaning. Otherwise a query of digits (dots and
+// spaces allowed, e.g. "6109.10") searches codes, and anything else the texts.
 export async function searchCommodities(
   query: string,
   language: SearchLanguage,
   limit: number,
+  mode: SearchMode = "text",
 ): Promise<SearchResult> {
   const trimmed = query.trim();
-  if (/^[\d.\s]+$/.test(trimmed)) {
-    const digits = trimmed.replace(/[.\s]/g, "");
+  if (mode === "semantic") {
     return {
       query: trimmed,
-      matched: "code",
-      hits: await searchByCode(digits, language, limit),
+      matched: "semantic",
+      hits: await searchBySimilarity(trimmed, language, limit),
     };
+  }
+  if (/^[\d.\s]+$/.test(trimmed)) {
+    const digits = trimmed.replace(/[.\s]/g, "");
+    return { query: trimmed, matched: "code", hits: await searchByCode(digits, language, limit) };
   }
 
   const words = searchWords(trimmed);
@@ -162,11 +241,7 @@ export async function searchCommodities(
   if (all.length > 0 || words.length === 1) {
     return { query: trimmed, matched: "all", hits: all };
   }
-  return {
-    query: trimmed,
-    matched: "any",
-    hits: await searchByText(words, "|", language, limit),
-  };
+  return { query: trimmed, matched: "any", hits: await searchByText(words, "|", language, limit) };
 }
 
 export interface CommodityReference {
@@ -199,9 +274,7 @@ export interface CommodityDetails {
   references: CommodityReference[];
 }
 
-export async function getCommodity(
-  code: string,
-): Promise<CommodityDetails | null> {
+export async function getCommodity(code: string): Promise<CommodityDetails | null> {
   const [row] = await sequelize.query<{
     code: string;
     node_id: number | null;
@@ -265,10 +338,7 @@ export async function getCommodity(
       )
     : [];
 
-  const classifications = await sequelize.query<{
-    code: string;
-    description: string | null;
-  }>(
+  const classifications = await sequelize.query<{ code: string; description: string | null }>(
     `SELECT code, description FROM commodity_classifications
       WHERE commodity_code = :code AND (valid_to IS NULL OR valid_to >= :today)
       ORDER BY code`,
@@ -282,7 +352,7 @@ export async function getCommodity(
     descriptionEn: row.description_en,
     path: nodes.slice(0, -1).map((n) => ({
       code: n.code,
-      hsCode: n.hs_code || null,
+      hsCode: n.hs_code,
       nodeType: n.node_type,
       descriptionNb: n.description_nb,
       descriptionEn: n.description_en,

@@ -2,21 +2,25 @@ import type { Request, Response } from "express";
 import {
   getCommodity,
   searchCommodities,
+  SemanticSearchUnavailableError,
   type SearchLanguage,
+  type SearchMode,
 } from "../services/commodityService.js";
+import { EmbeddingError } from "../services/embeddings/embedder.js";
 
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 const MAX_QUERY_LENGTH = 200;
 
-// GET /api/commodities/search?q=...&lang=nb|en&limit=20
+// GET /api/commodities/search?q=...&lang=nb|en&limit=20&mode=text|semantic
 export const search = async (req: Request, res: Response) => {
   // #swagger.tags = ["Commodities"]
   /* #swagger.summary = "Search commodity codes by text or code"
-     #swagger.description = "Full-text search in the Norwegian (nb, default) or English (en) tariff texts, including the texts above each code. Every word matches as a prefix; if no code matches all words, codes matching some of them are returned (matched: any). A query of digits searches codes (e.g. 6109 or 6109.10)."
+     #swagger.description = "Full-text search in the Norwegian (nb, default) or English (en) tariff texts, including the texts above each code. Every word matches as a prefix; if no code matches all words, codes matching some of them are returned (matched: any). A query of digits searches codes (e.g. 6109 or 6109.10). mode=semantic searches by meaning with the embedding model instead (matched: semantic; rank is the similarity, 0 to 1)."
      #swagger.parameters["q"] = { in: "query", required: true, type: "string", example: "t-skjorte bomull" }
      #swagger.parameters["lang"] = { in: "query", type: "string", enum: ["nb", "en"] }
-     #swagger.parameters["limit"] = { in: "query", type: "integer", example: 20 } */
+     #swagger.parameters["limit"] = { in: "query", type: "integer", example: 20 }
+     #swagger.parameters["mode"] = { in: "query", type: "string", enum: ["text", "semantic"] } */
   const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
   if (!q || q.length > MAX_QUERY_LENGTH) {
     res.status(400).json({ error: `q is required (max ${MAX_QUERY_LENGTH} characters)` });
@@ -33,9 +37,20 @@ export const search = async (req: Request, res: Response) => {
     return;
   }
 
+  const mode = req.query.mode ?? "text";
+  if (mode !== "text" && mode !== "semantic") {
+    res.status(400).json({ error: "mode must be text or semantic" });
+    return;
+  }
+
   try {
-    res.json(await searchCommodities(q, lang as SearchLanguage, limit));
+    res.json(await searchCommodities(q, lang as SearchLanguage, limit, mode as SearchMode));
   } catch (error) {
+    if (error instanceof SemanticSearchUnavailableError || error instanceof EmbeddingError) {
+      req.log.warn({ err: error }, "Semantic search unavailable");
+      res.status(503).json({ error: error.message });
+      return;
+    }
     req.log.error({ err: error }, "Request failed");
     res.status(500).json({ error: "Search failed" });
   }

@@ -14,6 +14,8 @@ export default defineConfig({
     env: {
       JWT_SECRET: "test-secret",
       ...testEnv,
+      // Word-based vectors without a model; real models are never called
+      EMBEDDING_PROVIDER: "fake",
       REQUESTS_PER_ADDRESS: "1000000",
       REGISTRATIONS_PER_ADDRESS: "100000",
       LOGIN_FAILURES_PER_ACCOUNT: "100000",
