@@ -62,6 +62,8 @@
 }
 
 .code {
+  color: inherit;
+  text-underline-offset: 0.2em;
   font-size: var(--ds-heading-xs-font-size);
   font-weight: var(--ds-font-weight-semibold);
   font-variant-numeric: tabular-nums;

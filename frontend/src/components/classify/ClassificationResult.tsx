@@ -51,7 +51,13 @@ export function ClassificationResult({
             <li key={suggestion.code}>
               <Card className={styles.suggestion} data-variant={index === 0 ? "tinted" : undefined}>
                 <div className={styles.suggestionHeader}>
-                  <span className={styles.code}>{formatCode(suggestion.code)}</span>
+                  <NextLink
+                    href={`/search/${suggestion.code}`}
+                    className={styles.code}
+                    aria-label={t("openCode", { code: formatCode(suggestion.code) })}
+                  >
+                    {formatCode(suggestion.code)}
+                  </NextLink>
                   <Tag data-size="sm" data-color={CONFIDENCE_COLORS[suggestion.confidence]}>
                     {t(`confidence.${suggestion.confidence}`)}
                   </Tag>

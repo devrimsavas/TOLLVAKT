@@ -384,10 +384,13 @@ export interface CommodityReference {
 
 export interface CommodityDetails {
   code: string;
+  // The code's node in the tariff tree (GET /api/tariff/tree)
+  nodeId: number | null;
   hsCode: string | null;
   descriptionNb: string | null;
   descriptionEn: string | null;
   path: {
+    nodeId: number;
     code: string | null;
     hsCode: string | null;
     nodeType: string;
@@ -476,10 +479,12 @@ export async function getCommodity(code: string): Promise<CommodityDetails | nul
 
   return {
     code: row.code,
+    nodeId: row.node_id,
     hsCode: row.hs_code,
     descriptionNb: row.description_nb,
     descriptionEn: row.description_en,
     path: nodes.slice(0, -1).map((n) => ({
+      nodeId: n.id,
       code: n.code,
       hsCode: n.hs_code,
       nodeType: n.node_type,

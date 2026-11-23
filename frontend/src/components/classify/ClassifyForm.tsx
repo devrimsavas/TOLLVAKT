@@ -3,12 +3,7 @@
 import NextLink from "next/link";
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
-import {
-  Alert,
-  Button,
-  Paragraph,
-  Textfield,
-} from "@digdir/designsystemet-react";
+import { Alert, Button, Paragraph, Textfield } from "@digdir/designsystemet-react";
 import { classifyAction, type ClassifyState } from "@/lib/classifyActions";
 import { MAX_DESCRIPTION_LENGTH, type Usage } from "@/lib/classification";
 import { ClassificationResult } from "./ClassificationResult";
@@ -42,8 +37,7 @@ export function ClassifyForm({ initialUsage }: { initialUsage: Usage | null }) {
           }}
           defaultValue={state.description}
           error={
-            state.error === "descriptionRequired" ||
-            state.error === "descriptionTooLong"
+            state.error === "descriptionRequired" || state.error === "descriptionTooLong"
               ? t(`errors.${state.error}`, { max: MAX_DESCRIPTION_LENGTH })
               : undefined
           }
@@ -61,10 +55,7 @@ export function ClassifyForm({ initialUsage }: { initialUsage: Usage | null }) {
       {state.error &&
         state.error !== "descriptionRequired" &&
         state.error !== "descriptionTooLong" && (
-          <Alert
-            data-color={state.error === "unavailable" ? "danger" : "warning"}
-            role="alert"
-          >
+          <Alert data-color={state.error === "unavailable" ? "danger" : "warning"} role="alert">
             <Paragraph>{t(`errors.${state.error}`)}</Paragraph>
             {state.error === "quotaGuest" && (
               <Button asChild data-size="sm" className={styles.alertAction}>
@@ -102,8 +93,7 @@ export function ClassifyForm({ initialUsage }: { initialUsage: Usage | null }) {
 
 function UsageLine({ usage }: { usage: Usage }) {
   const t = useTranslations("classify.usage");
-  if (usage.limit === null)
-    return <span className={styles.usage}>{t("unlimited")}</span>;
+  if (usage.limit === null) return <span className={styles.usage}>{t("unlimited")}</span>;
   return (
     <span className={styles.usage}>
       {t("left", { remaining: usage.remaining ?? 0, limit: usage.limit })}

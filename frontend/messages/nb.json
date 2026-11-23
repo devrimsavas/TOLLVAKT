@@ -241,7 +241,6 @@
     "submit": "Finn varenummer",
     "working": "Søker i tariffen …",
     "register": "Lag en gratis konto",
-    "counter": { "under": "%d tegn igjen", "over": "%d tegn for mye" },
     "guestNote": "Lag en gratis konto for å klassifisere opptil 10 varer om dagen og ta vare på klassifiseringene dine.",
     "usage": {
       "left": "{remaining} av {limit} klassifiseringer igjen i dag",
@@ -270,7 +269,42 @@
       "searchedFor": "Søkte i tariffen etter: {words}",
       "saved": "Lagret i klassifiseringene dine.",
       "openSaved": "Åpne",
-      "notBinding": "Forslag, ikke en bindende klassifisering. Sjekk koden før du deklarerer; vil du være sikker, kan du søke Tolletaten om bindende klassifiseringsuttalelse (BKU)."
+      "notBinding": "Forslag, ikke en bindende klassifisering. Sjekk koden før du deklarerer; vil du være sikker, kan du søke Tolletaten om bindende klassifiseringsuttalelse (BKU).",
+      "openCode": "Åpne varenummeret {code} i tariffen"
+    },
+    "counter": {
+      "under": "%d tegn igjen",
+      "over": "%d tegn for mye"
+    }
+  },
+  "tariff": {
+    "title": "Søk i tariffen",
+    "lead": "Søk på varenummer eller ord, eller bla i tariffen nivå for nivå. Gratis, uten daglig grense.",
+    "label": "Varenummer eller ord",
+    "placeholder": "For eksempel 6109 eller t-skjorte bomull",
+    "clear": "Tøm",
+    "button": "Søk",
+    "unavailable": "Tariffen kan ikke lastes akkurat nå. Prøv igjen om litt.",
+    "results": "{count, plural, =0 {Fant ingen varenumre} one {# varenummer} other {# varenumre}}",
+    "someWords": "Ingen varenumre passet alle ordene, så disse passer noen av dem.",
+    "noResults": "Prøv andre ord, færre ord eller de første sifrene i varenummeret.",
+    "browse": "Bla i tariffen",
+    "back": "Tilbake til søket",
+    "path": "Plass i tariffen",
+    "facts": "Om varenummeret",
+    "hsCode": "HS-kode (internasjonal, 6 sifre)",
+    "unit": "Enhet",
+    "validFrom": "Gyldig fra",
+    "validTo": "Gyldig til",
+    "references": "Definisjoner",
+    "inTariff": "Varenummeret i tariffen",
+    "notBinding": "Fra Tolletatens åpne data. Vil du ha et bindende svar på hvilket varenummer varene dine har, kan du søke Tolletaten om bindende klassifiseringsuttalelse (BKU).",
+    "tree": {
+      "label": "Tolltariffen",
+      "section": "Avsnitt",
+      "chapter": "Kapittel",
+      "loading": "Laster …",
+      "failed": "Kunne ikke åpne dette nivået. Prøv igjen."
     }
   }
 }

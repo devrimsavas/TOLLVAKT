@@ -19,6 +19,7 @@ const doc = {
     { name: "Classification", description: "AI-assisted commodity code suggestions" },
     { name: "Saved classifications", description: "A member's classifications, to see again and print" },
     { name: "Usage", description: "Today's quota for the model-backed calls" },
+    { name: "Tariff tree", description: "Browse the tariff one level at a time" },
     { name: "Admin", description: "Accounts, limits and use of the models (admins only)" },
     {
       name: "Duty",
