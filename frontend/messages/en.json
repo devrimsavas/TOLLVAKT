@@ -24,7 +24,8 @@
       "title": "Find the right commodity code before the goods reach the border",
       "lead": "Describe the product in your own words. Tollvakt searches the Norwegian customs tariff, suggests the most likely commodity codes and explains why, so you know what to check before you declare.",
       "primary": "Get started for free",
-      "secondary": "See how it works"
+      "secondary": "See how it works",
+      "toClassify": "Classify a product"
     },
     "example": {
       "title": "Example answer",
@@ -96,6 +97,10 @@
       "title": "Try it with your own product",
       "text": "Create a free account and classify up to 10 products a day.",
       "button": "Create a free account"
+    },
+    "try": {
+      "title": "Try it now",
+      "lead": "No account needed: describe one product and see what Tollvakt suggests."
     }
   },
   "footer": {
@@ -225,6 +230,50 @@
       "independent": "It is not affiliated with Tolletaten or any other agency.",
       "contact": "Questions or feedback:",
       "source": "Source code on GitHub"
+    }
+  },
+  "classify": {
+    "title": "Classify a product",
+    "lead": "Describe the product, and Tollvakt suggests the most likely commodity codes with reasons.",
+    "label": "Product description",
+    "hint": "What it is, what it is made of and what it is used for. Norwegian or English.",
+    "placeholder": "For example: knitted wool sweater for men",
+    "submit": "Find commodity codes",
+    "working": "Searching the tariff…",
+    "register": "Create a free account",
+    "counter": {
+      "under": "%d characters left",
+      "over": "%d characters too many"
+    },
+    "guestNote": "Create a free account to classify up to 10 products a day and keep your classifications.",
+    "usage": {
+      "left": "{remaining} of {limit} classifications left today",
+      "unlimited": "No daily limit (admin)"
+    },
+    "errors": {
+      "descriptionRequired": "Describe the product",
+      "descriptionTooLong": "At most {max} characters",
+      "quotaGuest": "Visitors without an account can classify one product a day. Create a free account to classify up to 10 a day.",
+      "quotaUser": "You have used today's classifications. You can classify again from midnight.",
+      "quotaGlobal": "Tollvakt has reached its limit for today. Try again tomorrow.",
+      "unavailable": "Classification is not available right now. Try again in a little while."
+    },
+    "result": {
+      "title": "Suggested commodity codes",
+      "noneTitle": "No code fits",
+      "none": "None of the codes Tollvakt found fits the description. Add details, such as what the product is used for, and try again.",
+      "noneHint": "Where it might belong instead",
+      "confidence": {
+        "high": "High confidence",
+        "medium": "Medium confidence",
+        "low": "Low confidence"
+      },
+      "path": "Place in the tariff",
+      "questions": "Questions that would decide the code",
+      "searchedFor": "Searched the tariff for: {words}",
+      "saved": "Saved in your classifications.",
+      "openSaved": "Open",
+      "notBinding": "Suggestions, not a binding classification. Check the code before you declare; for certainty, apply to Tolletaten for a binding ruling (BKU)."
     }
   }
 }

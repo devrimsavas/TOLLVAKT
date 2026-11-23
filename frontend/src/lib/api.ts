@@ -16,6 +16,8 @@ export type ApiResult<T> =
       error: string;
       // With 429: how long until the API accepts the request again
       retryAfterSeconds?: number;
+      // The whole error answer, for the fields some endpoints add
+      data?: unknown;
     };
 
 // The address of the visitor's browser, sent on to the API, which limits
@@ -97,7 +99,13 @@ export async function apiFetch<T>(
       typeof data.retryAfterSeconds === "number"
         ? data.retryAfterSeconds
         : undefined;
-    return { ok: false, status: response.status, error, retryAfterSeconds };
+    return {
+      ok: false,
+      status: response.status,
+      error,
+      retryAfterSeconds,
+      data,
+    };
   }
   return { ok: true, status: response.status, data: data as T };
 }

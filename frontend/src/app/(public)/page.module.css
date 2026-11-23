@@ -162,6 +162,10 @@
   list-style: none;
 }
 
+.try {
+  max-width: 50rem;
+}
+
 .disclaimer {
   margin-top: var(--ds-size-6);
 }

@@ -24,7 +24,8 @@
       "title": "Finn riktig varenummer før varene kommer til grensen",
       "lead": "Beskriv varen med dine egne ord. Tollvakt søker i tolltariffen, foreslår de mest sannsynlige varenumrene og forklarer hvorfor, så du vet hva du skal sjekke før du deklarerer.",
       "primary": "Kom i gang gratis",
-      "secondary": "Se hvordan det virker"
+      "secondary": "Se hvordan det virker",
+      "toClassify": "Klassifiser en vare"
     },
     "example": {
       "title": "Eksempel på svar",
@@ -96,6 +97,10 @@
       "title": "Prøv med din egen vare",
       "text": "Lag en gratis konto og klassifiser opptil 10 varer om dagen.",
       "button": "Lag en gratis konto"
+    },
+    "try": {
+      "title": "Prøv nå",
+      "lead": "Ingen konto nødvendig: beskriv én vare og se hva Tollvakt foreslår."
     }
   },
   "footer": {
@@ -225,6 +230,47 @@
       "independent": "Den er ikke tilknyttet Tolletaten eller andre etater.",
       "contact": "Spørsmål eller tilbakemeldinger:",
       "source": "Kildekode på GitHub"
+    }
+  },
+  "classify": {
+    "title": "Klassifiser en vare",
+    "lead": "Beskriv varen, så foreslår Tollvakt de mest sannsynlige varenumrene med begrunnelse.",
+    "label": "Varebeskrivelse",
+    "hint": "Hva den er, hva den er laget av og hva den brukes til. Norsk eller engelsk.",
+    "placeholder": "For eksempel: strikket genser i ull til herre",
+    "submit": "Finn varenummer",
+    "working": "Søker i tariffen …",
+    "register": "Lag en gratis konto",
+    "counter": { "under": "%d tegn igjen", "over": "%d tegn for mye" },
+    "guestNote": "Lag en gratis konto for å klassifisere opptil 10 varer om dagen og ta vare på klassifiseringene dine.",
+    "usage": {
+      "left": "{remaining} av {limit} klassifiseringer igjen i dag",
+      "unlimited": "Ingen daglig grense (admin)"
+    },
+    "errors": {
+      "descriptionRequired": "Beskriv varen",
+      "descriptionTooLong": "Høyst {max} tegn",
+      "quotaGuest": "Besøkende uten konto kan klassifisere én vare om dagen. Lag en gratis konto for å klassifisere opptil 10 om dagen.",
+      "quotaUser": "Du har brukt dagens klassifiseringer. Du kan klassifisere igjen fra midnatt.",
+      "quotaGlobal": "Tollvakt har nådd grensen sin for i dag. Prøv igjen i morgen.",
+      "unavailable": "Klassifisering er ikke tilgjengelig akkurat nå. Prøv igjen om litt."
+    },
+    "result": {
+      "title": "Foreslåtte varenumre",
+      "noneTitle": "Ingen kode passer",
+      "none": "Ingen av kodene Tollvakt fant, passer beskrivelsen. Legg til detaljer, for eksempel hva varen brukes til, og prøv igjen.",
+      "noneHint": "Hvor den kanskje hører hjemme",
+      "confidence": {
+        "high": "Høy sikkerhet",
+        "medium": "Middels sikkerhet",
+        "low": "Lav sikkerhet"
+      },
+      "path": "Plass i tariffen",
+      "questions": "Spørsmål som avgjør koden",
+      "searchedFor": "Søkte i tariffen etter: {words}",
+      "saved": "Lagret i klassifiseringene dine.",
+      "openSaved": "Åpne",
+      "notBinding": "Forslag, ikke en bindende klassifisering. Sjekk koden før du deklarerer; vil du være sikker, kan du søke Tolletaten om bindende klassifiseringsuttalelse (BKU)."
     }
   }
 }

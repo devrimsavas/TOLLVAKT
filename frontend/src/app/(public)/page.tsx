@@ -19,6 +19,9 @@ import {
   QuestionmarkCircleIcon,
 } from "@navikt/aksel-icons";
 import { DATA_SOURCES } from "@/components/SiteFooter";
+import { ClassifyForm } from "@/components/classify/ClassifyForm";
+import { getSessionToken } from "@/lib/session";
+import { getUsage } from "@/lib/usage";
 import styles from "./page.module.css";
 
 const FEATURES = [
@@ -42,6 +45,9 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
   const t = await getTranslations("home");
   const footer = await getTranslations("footer");
   const { deleted } = await searchParams;
+  // A member is sent to the classify page; a guest tries it here
+  const loggedIn = Boolean(await getSessionToken());
+  const usage = loggedIn ? null : await getUsage();
 
   return (
     <>
@@ -72,7 +78,11 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
                 </NextLink>
               </Button>
               <Button asChild variant="secondary" data-size="lg">
-                <a href="#how-it-works">{t("hero.secondary")}</a>
+                {loggedIn ? (
+                  <NextLink href="/classify">{t("hero.toClassify")}</NextLink>
+                ) : (
+                  <a href="#try">{t("hero.secondary")}</a>
+                )}
               </Button>
             </div>
           </div>
@@ -113,6 +123,22 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
           </figure>
         </div>
       </section>
+
+      {!loggedIn && (
+        <section
+          id="try"
+          className={`container ${styles.section} ${styles.try}`}
+          aria-labelledby="try-title"
+        >
+          <Heading id="try-title" level={2} data-size="lg">
+            {t("try.title")}
+          </Heading>
+          <Paragraph data-size="lg" className={styles.sectionLead}>
+            {t("try.lead")}
+          </Paragraph>
+          <ClassifyForm initialUsage={usage} />
+        </section>
+      )}
 
       <section
         className={`container ${styles.section}`}

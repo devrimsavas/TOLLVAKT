@@ -17,7 +17,8 @@
     "pretest": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit && tsc -p tests"
+    "typecheck": "tsc --noEmit && tsc -p tests",
+    "e2e:api": "node --import ./tests/e2e/fakeServices.mjs dist/server.js"
   },
   "dependencies": {
     "@types/express": "^5.0.6",
