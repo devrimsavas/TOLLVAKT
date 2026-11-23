@@ -116,7 +116,7 @@ function TreeItem({
   );
 
   return (
-    <li className={styles.item} data-selected={selected || undefined}>
+    <li className={styles.item} data-type={node.nodeType} data-selected={selected || undefined}>
       {node.nodeType === "commodity" && node.code ? (
         <NextLink
           href={`/search/${node.code}`}

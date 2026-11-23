@@ -1,6 +1,7 @@
 import NextLink from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { Alert, Card, Heading, Link, Paragraph, Tag } from "@digdir/designsystemet-react";
+import { SparklesIcon } from "@navikt/aksel-icons";
 import {
   formatCode,
   pathLevels,
@@ -32,9 +33,14 @@ export function ClassificationResult({
 
   return (
     <section className={styles.result} aria-labelledby="result-title">
-      <Heading id="result-title" level={2} data-size="sm">
-        {result.suggestions.length > 0 ? t("title") : t("noneTitle")}
-      </Heading>
+      <div className={styles.resultHeader}>
+        <Heading id="result-title" level={2} data-size="sm">
+          {result.suggestions.length > 0 ? t("title") : t("noneTitle")}
+        </Heading>
+        <span className={styles.byAssistant}>
+          <SparklesIcon aria-hidden /> {t("byAssistant")}
+        </span>
+      </div>
 
       {result.suggestions.length === 0 && (
         <Alert data-color="warning">{t("none")}</Alert>

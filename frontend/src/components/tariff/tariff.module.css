@@ -102,6 +102,69 @@
   font-size: var(--ds-body-sm-font-size);
 }
 
+/* Each level of the tariff looks different, so it is clear at a glance
+   where in the tree a line is: sections are bands in the brand color,
+   chapters bold with the number in a box, headings medium, the levels
+   below them lighter, and commodity codes links. */
+
+.tree > .level {
+  display: grid;
+  gap: var(--ds-size-2);
+}
+
+.item[data-type="section"] > .branch,
+.item[data-type="section"] > .empty {
+  padding-block: var(--ds-size-3);
+  background: var(--ds-color-accent-surface-tinted);
+  font-weight: var(--ds-font-weight-semibold);
+}
+
+.item[data-type="section"] > .branch:hover {
+  background: var(--ds-color-accent-surface-hover);
+}
+
+.item[data-type="section"] > .branch .nodeCode {
+  color: var(--ds-color-accent-text-default);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.item[data-type="section"] > .level {
+  margin-top: var(--ds-size-2);
+  margin-bottom: var(--ds-size-2);
+  border-left-color: var(--ds-color-accent-border-default);
+}
+
+.item[data-type="chapter"] > .branch {
+  font-weight: var(--ds-font-weight-semibold);
+}
+
+.item[data-type="chapter"] > .branch .nodeCode {
+  padding: 0 var(--ds-size-2);
+  border-radius: var(--ds-border-radius-sm);
+  background: var(--ds-color-neutral-surface-tinted);
+}
+
+.item[data-type="chapter"] > .level {
+  border-left-color: var(--ds-color-accent-border-subtle);
+}
+
+.item[data-type="subchapter"] > .branch,
+.item[data-type="heading"] > .branch {
+  font-weight: var(--ds-font-weight-medium);
+}
+
+.item[data-type="heading"] > .branch .nodeCode {
+  color: var(--ds-color-accent-text-subtle);
+}
+
+.item[data-type="subheading"] > .branch,
+.item[data-type="group"] > .branch,
+.item[data-type="group"] > .empty {
+  color: var(--ds-color-neutral-text-subtle);
+  font-size: var(--ds-body-sm-font-size);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .chevron {
     transition: none;

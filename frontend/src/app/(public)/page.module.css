@@ -166,6 +166,11 @@
   max-width: 50rem;
 }
 
+.aiTag {
+  gap: var(--ds-size-1);
+  margin-bottom: var(--ds-size-2);
+}
+
 .disclaimer {
   margin-top: var(--ds-size-6);
 }

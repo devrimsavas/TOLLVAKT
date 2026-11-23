@@ -100,7 +100,8 @@
     },
     "try": {
       "title": "Prøv nå",
-      "lead": "Ingen konto nødvendig: beskriv én vare og se hva Tollvakt foreslår."
+      "lead": "Ingen konto nødvendig: beskriv én vare og se hva Tollvakt foreslår.",
+      "badge": "AI-assistent"
     }
   },
   "footer": {
@@ -233,8 +234,6 @@
     }
   },
   "classify": {
-    "title": "Klassifiser en vare",
-    "lead": "Beskriv varen, så foreslår Tollvakt de mest sannsynlige varenumrene med begrunnelse.",
     "label": "Varebeskrivelse",
     "hint": "Hva den er, hva den er laget av og hva den brukes til. Norsk eller engelsk.",
     "placeholder": "For eksempel: strikket genser i ull til herre",
@@ -270,11 +269,38 @@
       "saved": "Lagret i klassifiseringene dine.",
       "openSaved": "Åpne",
       "notBinding": "Forslag, ikke en bindende klassifisering. Sjekk koden før du deklarerer; vil du være sikker, kan du søke Tolletaten om bindende klassifiseringsuttalelse (BKU).",
-      "openCode": "Åpne varenummeret {code} i tariffen"
+      "openCode": "Åpne varenummeret {code} i tariffen",
+      "byAssistant": "Foreslått av AI-assistenten"
     },
     "counter": {
       "under": "%d tegn igjen",
       "over": "%d tegn for mye"
+    },
+    "assistant": {
+      "badge": "AI-assistent",
+      "title": "Klassifiser en vare med AI",
+      "lead": "Beskriv varen med dine egne ord. Tollvakts AI-assistent finner de mest sannsynlige varenumrene blant de over 7 000 i tariffen, og forklarer hvorfor.",
+      "steps": {
+        "rewrite": {
+          "title": "Forstår.",
+          "text": "Skriver om beskrivelsen din til tariffens egne ord, på norsk og engelsk."
+        },
+        "search": {
+          "title": "Søker.",
+          "text": "Leter gjennom hele tariffen, etter ord og etter mening."
+        },
+        "choose": {
+          "title": "Velger.",
+          "text": "Velger opptil tre varenumre fra tariffen, med begrunnelse og hvor sikker den er."
+        }
+      },
+      "caution": "En AI kan ta feil. Den foreslår bare varenumre som finnes i tariffen, aldri oppdiktede; sjekk koden før du deklarerer."
+    },
+    "progress": {
+      "reading": "Leser beskrivelsen din",
+      "searching": "Søker i tariffen",
+      "comparing": "Sammenligner kandidatene",
+      "writing": "Skriver begrunnelsene"
     }
   },
   "tariff": {

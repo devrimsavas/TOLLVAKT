@@ -33,8 +33,137 @@
   gap: var(--ds-size-4);
 }
 
-.result > h2 {
+.resultHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--ds-size-2) var(--ds-size-4);
+}
+
+.resultHeader h2 {
   margin: 0;
+}
+
+.byAssistant {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-size-1);
+  font-size: var(--ds-body-sm-font-size);
+  color: var(--ds-color-accent-text-subtle);
+}
+
+/* The assistant at work */
+
+.progress {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-size-4);
+  padding: var(--ds-size-4) var(--ds-size-5);
+  border: 1px solid var(--ds-color-accent-border-subtle);
+  border-radius: var(--ds-border-radius-lg);
+  background: var(--ds-color-accent-background-tinted);
+}
+
+.progress ol {
+  display: grid;
+  gap: var(--ds-size-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.progress li {
+  color: var(--ds-color-neutral-text-subtle);
+}
+
+.progress li[data-state="done"] {
+  color: var(--ds-color-neutral-text-default);
+}
+
+.progress li[data-state="done"]::before {
+  content: "✓ ";
+  color: var(--ds-color-success-text-subtle);
+}
+
+.progress li[data-state="active"] {
+  color: var(--ds-color-accent-text-default);
+  font-weight: var(--ds-font-weight-semibold);
+}
+
+/* The page's head: an AI assistant does the work */
+
+.intro {
+  display: grid;
+  gap: var(--ds-size-4);
+  padding: var(--ds-size-6);
+  border: 1px solid var(--ds-color-accent-border-subtle);
+  border-radius: var(--ds-border-radius-lg);
+  background: linear-gradient(
+    135deg,
+    var(--ds-color-accent-background-tinted),
+    var(--ds-color-neutral-background-default)
+  );
+}
+
+.intro p {
+  margin: 0;
+}
+
+.introTop {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-size-4);
+}
+
+.introTop h1 {
+  margin: var(--ds-size-1) 0 0;
+}
+
+.robot {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--ds-color-accent-base-default);
+  color: var(--ds-color-accent-base-contrast-default);
+  font-size: 2rem;
+}
+
+.aiTag {
+  gap: var(--ds-size-1);
+}
+
+.introSteps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--ds-size-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.introSteps li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-size-2);
+  font-size: var(--ds-body-sm-font-size);
+}
+
+.introIcon {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--ds-color-accent-text-subtle);
+}
+
+@media (max-width: 40rem) {
+  .introSteps {
+    grid-template-columns: 1fr;
+  }
 }
 
 .suggestions {

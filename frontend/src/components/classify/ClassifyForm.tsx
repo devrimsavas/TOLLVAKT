@@ -1,9 +1,9 @@
 "use client";
 
 import NextLink from "next/link";
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Alert, Button, Paragraph, Textfield } from "@digdir/designsystemet-react";
+import { Alert, Button, Paragraph, Spinner, Textfield } from "@digdir/designsystemet-react";
 import { classifyAction, type ClassifyState } from "@/lib/classifyActions";
 import { MAX_DESCRIPTION_LENGTH, type Usage } from "@/lib/classification";
 import { ClassificationResult } from "./ClassificationResult";
@@ -52,7 +52,10 @@ export function ClassifyForm({ initialUsage }: { initialUsage: Usage | null }) {
         </div>
       </form>
 
-      {state.error &&
+      {pending && <Progress />}
+
+      {!pending &&
+        state.error &&
         state.error !== "descriptionRequired" &&
         state.error !== "descriptionTooLong" && (
           <Alert data-color={state.error === "unavailable" ? "danger" : "warning"} role="alert">
@@ -74,7 +77,7 @@ export function ClassifyForm({ initialUsage }: { initialUsage: Usage | null }) {
         </Alert>
       )}
 
-      {state.result && (
+      {!pending && state.result && (
         <div aria-live="polite">
           <ClassificationResult result={state.result} showSavedLink />
           {guest && (
@@ -98,5 +101,36 @@ function UsageLine({ usage }: { usage: Usage }) {
     <span className={styles.usage}>
       {t("left", { remaining: usage.remaining ?? 0, limit: usage.limit })}
     </span>
+  );
+}
+
+const PROGRESS_STEPS = ["reading", "searching", "comparing", "writing"] as const;
+const STEP_MS = 2500;
+
+// What the assistant is doing while the answer is on its way. The steps are
+// the real ones, in order; the timing is only an estimate, so the last one
+// stays until the answer comes.
+function Progress() {
+  const t = useTranslations("classify.progress");
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(
+      () => setStep((current) => Math.min(current + 1, PROGRESS_STEPS.length - 1)),
+      STEP_MS,
+    );
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className={styles.progress} role="status">
+      <Spinner aria-hidden data-size="sm" />
+      <ol>
+        {PROGRESS_STEPS.map((key, index) => (
+          <li key={key} data-state={index < step ? "done" : index === step ? "active" : "waiting"}>
+            {t(key)}
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }

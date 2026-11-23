@@ -1,6 +1,9 @@
+/* The brand color in a light tint, with a stripe of the full color on top,
+   so the header is Tollvakt's own in light and dark mode alike */
 .header {
-  border-bottom: 1px solid var(--ds-color-neutral-border-subtle);
-  background: var(--ds-color-neutral-background-default);
+  border-top: 3px solid var(--ds-color-accent-base-default);
+  border-bottom: 1px solid var(--ds-color-accent-border-subtle);
+  background: var(--ds-color-accent-background-tinted);
   position: sticky;
   top: 0;
   z-index: 10;

@@ -17,6 +17,7 @@ import {
   GlobeIcon,
   MagnifyingGlassIcon,
   QuestionmarkCircleIcon,
+  SparklesIcon,
 } from "@navikt/aksel-icons";
 import { DATA_SOURCES } from "@/components/SiteFooter";
 import { ClassifyForm } from "@/components/classify/ClassifyForm";
@@ -130,6 +131,9 @@ export default async function HomePage({ searchParams }: PageProps<"/">) {
           className={`container ${styles.section} ${styles.try}`}
           aria-labelledby="try-title"
         >
+          <Tag data-color="accent" data-size="sm" className={styles.aiTag}>
+            <SparklesIcon aria-hidden /> {t("try.badge")}
+          </Tag>
           <Heading id="try-title" level={2} data-size="lg">
             {t("try.title")}
           </Heading>

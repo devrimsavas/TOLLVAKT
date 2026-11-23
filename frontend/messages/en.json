@@ -100,7 +100,8 @@
     },
     "try": {
       "title": "Try it now",
-      "lead": "No account needed: describe one product and see what Tollvakt suggests."
+      "lead": "No account needed: describe one product and see what Tollvakt suggests.",
+      "badge": "AI assistant"
     }
   },
   "footer": {
@@ -233,8 +234,6 @@
     }
   },
   "classify": {
-    "title": "Classify a product",
-    "lead": "Describe the product, and Tollvakt suggests the most likely commodity codes with reasons.",
     "label": "Product description",
     "hint": "What it is, what it is made of and what it is used for. Norwegian or English.",
     "placeholder": "For example: knitted wool sweater for men",
@@ -270,11 +269,38 @@
       "saved": "Saved in your classifications.",
       "openSaved": "Open",
       "notBinding": "Suggestions, not a binding classification. Check the code before you declare; for certainty, apply to Tolletaten for a binding ruling (BKU).",
-      "openCode": "Open the code {code} in the tariff"
+      "openCode": "Open the code {code} in the tariff",
+      "byAssistant": "Suggested by the AI assistant"
     },
     "counter": {
       "under": "%d characters left",
       "over": "%d characters too many"
+    },
+    "assistant": {
+      "badge": "AI assistant",
+      "title": "Classify a product with AI",
+      "lead": "Describe the product in your own words. Tollvakt's AI assistant finds the most likely commodity codes among the more than 7,000 in the tariff, and explains why.",
+      "steps": {
+        "rewrite": {
+          "title": "Understands.",
+          "text": "Rewrites your description in the tariff's own words, in Norwegian and English."
+        },
+        "search": {
+          "title": "Searches.",
+          "text": "Looks through the whole tariff, by words and by meaning."
+        },
+        "choose": {
+          "title": "Chooses.",
+          "text": "Picks up to three codes from the tariff, with reasons and how sure it is."
+        }
+      },
+      "caution": "An AI can be wrong. It only suggests codes that exist in the tariff, never made-up ones; check the code before you declare."
+    },
+    "progress": {
+      "reading": "Reading your description",
+      "searching": "Searching the tariff",
+      "comparing": "Comparing the candidates",
+      "writing": "Writing the reasons"
     }
   },
   "tariff": {

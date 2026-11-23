@@ -13,7 +13,7 @@ test.describe("accounts", () => {
     await page.getByRole("button", { name: "Create account" }).click();
 
     await expect(page).toHaveURL(/\/classify$/);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Classify a product");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Classify a product with AI");
   });
 
   test("shows a message for each wrong field", async ({ page }) => {
