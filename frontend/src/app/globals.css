@@ -1,0 +1,99 @@
+/* Global styles. Colors, sizes and spacing come from the Designsystemet
+   tokens (--ds-*); app-specific rules stay small and use those tokens. */
+
+body {
+  margin: 0;
+  font-family: "Inter Variable", sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+/* Centers page content and keeps lines readable on wide screens */
+.container {
+  width: 100%;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: var(--ds-size-6);
+  box-sizing: border-box;
+}
+
+@media (max-width: 36rem) {
+  .container {
+    padding-inline: var(--ds-size-4);
+  }
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-size-2);
+}
+
+.logo-text {
+  font-size: var(--ds-heading-xs-font-size);
+  font-weight: var(--ds-font-weight-semibold);
+  letter-spacing: -0.01em;
+}
+
+/* Hidden on screen, read by screen readers */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.tag-row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--ds-size-2);
+}
+
+/* Chart series colors. Series 1 is the theme's accent; series 2 is an
+   orange checked for colorblind separation and contrast against the
+   surface in both modes. */
+:root {
+  --chart-series-1: var(--ds-color-accent-base-default);
+  --chart-series-2: #eb6834;
+}
+
+[data-color-scheme="dark"] {
+  --chart-series-2: #d95926;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-color-scheme="auto"] {
+    --chart-series-2: #d95926;
+  }
+}
+
+/* Printing (the company report): only the page's own content, on white
+   paper. The report switches the color scheme to light while printing. */
+@media print {
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff;
+  }
+
+  a {
+    text-decoration: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 15mm;
+}

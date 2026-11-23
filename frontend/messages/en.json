@@ -1,0 +1,230 @@
+{
+  "metadata": {
+    "title": "Tollvakt – find the right commodity code",
+    "description": "Describe a product in Norwegian or English and get the most likely Norwegian commodity codes (varenummer), with reasons, how sure the suggestion is and what to check, from Tolletaten's open data."
+  },
+  "header": {
+    "skipLink": "Skip to main content",
+    "home": "Tollvakt, home",
+    "about": "About",
+    "logIn": "Log in",
+    "getStarted": "Get started",
+    "menu": "Menu",
+    "switchLanguage": "Norsk",
+    "switchLanguageLabel": "Bytt til norsk",
+    "colorScheme": "Switch between light and dark mode",
+    "toApp": "Classify",
+    "logOut": "Log out",
+    "settings": "Settings"
+  },
+  "home": {
+    "accountDeleted": "Your account and everything that belonged to it has been deleted.",
+    "hero": {
+      "eyebrow": "Customs classification for Norwegian businesses",
+      "title": "Find the right commodity code before the goods reach the border",
+      "lead": "Describe the product in your own words. Tollvakt searches the Norwegian customs tariff, suggests the most likely commodity codes and explains why, so you know what to check before you declare.",
+      "primary": "Get started for free",
+      "secondary": "See how it works"
+    },
+    "example": {
+      "title": "Example answer",
+      "description": "\"Knitted wool sweater for men\"",
+      "high": "High confidence",
+      "low": "Low confidence",
+      "highReason": "Jerseys and pullovers, knitted, of wool: the description fits this subheading.",
+      "lowReason": "Only if the wool is from Kashmir goats.",
+      "question": "Question for you: what kind of wool is the sweater made of?",
+      "caption": "An example of a classification"
+    },
+    "features": {
+      "title": "What Tollvakt does",
+      "lead": "From a product description to commodity codes you can check, in a few seconds.",
+      "describe": {
+        "title": "Write as you speak",
+        "text": "\"Bluetooth earbuds\" or \"kosebamse\": no need to know the tariff's own words."
+      },
+      "reasons": {
+        "title": "Reasons you can check",
+        "text": "Every suggestion shows its place in the tariff and why it fits."
+      },
+      "questions": {
+        "title": "What decides the code",
+        "text": "When a detail is missing, such as the material, Tollvakt asks for it."
+      },
+      "search": {
+        "title": "Search the tariff",
+        "text": "Search by text or code, and see the full path of every code."
+      },
+      "history": {
+        "title": "Kept for you",
+        "text": "Your classifications are saved, to look at again or print."
+      },
+      "languages": {
+        "title": "Norwegian and English",
+        "text": "Describe the product in either language, and read the answer in yours."
+      }
+    },
+    "steps": {
+      "title": "How it works",
+      "describe": {
+        "title": "Describe the product",
+        "text": "What it is, what it is made of and what it is used for."
+      },
+      "choose": {
+        "title": "Get the likely codes",
+        "text": "Up to three commodity codes, with reasons and how sure each one is."
+      },
+      "check": {
+        "title": "Check and decide",
+        "text": "Answer the open questions and check the code before you declare."
+      }
+    },
+    "sources": {
+      "title": "Built on official data",
+      "lead": "Tollvakt uses open data from Norwegian public agencies.",
+      "tolletaten": {
+        "name": "Tolletaten",
+        "text": "The customs tariff with its texts in Norwegian and English, duty rates and exchange rates."
+      },
+      "ssb": {
+        "name": "Statistics Norway",
+        "text": "Which goods Norwegian businesses import most, used to test Tollvakt on real products."
+      },
+      "notBinding": "Tollvakt gives suggestions, not binding decisions. For certainty, apply to Tolletaten for a binding classification ruling (BKU), which is free."
+    },
+    "cta": {
+      "title": "Try it with your own product",
+      "text": "Create a free account and classify up to 10 products a day.",
+      "button": "Create a free account"
+    }
+  },
+  "footer": {
+    "tagline": "The right commodity code, before the goods reach the border.",
+    "product": "Tollvakt",
+    "dataSources": "Data sources",
+    "tolletaten": "Tolletaten (Norwegian Customs)",
+    "ssb": "Statistics Norway",
+    "notBinding": "Suggestions only, not binding classifications.",
+    "license": "Contains data under the Norwegian licence for Open Government data (NLOD) distributed by Tolletaten and Statistics Norway.",
+    "independent": "Tollvakt is an independent project and is not affiliated with these agencies.",
+    "opensInNewTab": "(opens in a new tab)",
+    "builtBy": "Built by"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "passwordHint": "At least {min} characters",
+    "login": {
+      "title": "Log in",
+      "lead": "Log in to classify products and see your saved classifications.",
+      "submit": "Log in",
+      "noAccount": "No account yet?",
+      "toRegister": "Create an account",
+      "expired": "Your session has ended. Log in again to continue.",
+      "forgot": "Forgot your password?",
+      "passwordChanged": "Your password has been changed. Log in with the new one."
+    },
+    "register": {
+      "title": "Create an account",
+      "lead": "Free to use. You only need an email address.",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "toLogin": "Log in"
+    },
+    "errors": {
+      "firstNameRequired": "Enter your first name",
+      "lastNameRequired": "Enter your last name",
+      "nameTooLong": "The name can be at most 100 characters",
+      "emailInvalid": "Enter a valid email address, like name@example.com",
+      "passwordRequired": "Enter your password",
+      "passwordTooShort": "The password must be at least {min} characters",
+      "emailTaken": "There is already an account with this email address. Log in instead?",
+      "invalidCredentials": "The email address or password is wrong",
+      "unavailable": "The service is not available right now. Try again in a little while.",
+      "passwordMismatch": "The passwords are not the same",
+      "tooManyLogins": "Too many failed attempts. Wait {minutes, plural, one {# minute} other {# minutes}} and try again.",
+      "tooManyAccounts": "Too many new accounts from your network. Wait {minutes, plural, one {# minute} other {# minutes}} and try again.",
+      "tooManyResets": "Too many reset emails asked for. Wait {minutes, plural, one {# minute} other {# minutes}} and try again.",
+      "linkInvalid": "This link no longer works. It may have been used already, or it is more than 60 minutes old.",
+      "passwordWrong": "The password is wrong",
+      "tooManyChecks": "Too many wrong passwords. Wait {minutes, plural, one {# minute} other {# minutes}} and try again.",
+      "lastAdmin": "This is the only admin account, so it cannot be deleted. Make another user admin first."
+    },
+    "confirmPassword": "Repeat password",
+    "forgot": {
+      "title": "Forgot your password?",
+      "lead": "Enter the email address of your account, and we will send you a link to choose a new password.",
+      "submit": "Send link",
+      "sent": "If an account has the address {email}, a link to choose a new password is on its way. It works for 60 minutes. Check your spam folder if it does not arrive.",
+      "toLogin": "Back to log in"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "lead": "Your other sessions end when the password is changed.",
+      "password": "New password",
+      "submit": "Save the new password",
+      "newLink": "Ask for a new link"
+    }
+  },
+  "app": {
+    "comingSoon": "This page is being built.",
+    "nav": {
+      "label": "Main menu",
+      "home": "Tollvakt, classify",
+      "account": "Account: {name}",
+      "classify": "Classify",
+      "history": "My classifications",
+      "search": "Search the tariff",
+      "admin": "Admin",
+      "settings": "Settings"
+    }
+  },
+  "about": {
+    "title": "About Tollvakt",
+    "lead": "Tollvakt helps Norwegian businesses find the right commodity code for the goods they import and export.",
+    "why": {
+      "title": "Why it exists",
+      "text1": "Every imported or exported item needs a commodity code. The duty, the VAT basis and the rules for the goods all depend on it, and a wrong code found in an audit means paying the difference afterwards.",
+      "text2": "The tariff has more than 7,000 codes, written in its own language. Tollvakt lets you describe the product in everyday words and shows you which codes are most likely, and why."
+    },
+    "how": {
+      "title": "How it finds the codes",
+      "rewrite": {
+        "title": "Rewriting.",
+        "text": "A language model rewrites your description into the tariff's wording, in Norwegian and English."
+      },
+      "search": {
+        "title": "Searching.",
+        "text": "Full-text and semantic search find the candidate codes in the tariff."
+      },
+      "choose": {
+        "title": "Choosing.",
+        "text": "The language model reads the candidates' paths in the tariff and picks up to three, with reasons. It can only pick codes from the tariff, never invent one."
+      },
+      "limits": "Tollvakt is tested on products with known codes, and it is still a help, not a decision. It does not yet read the tariff's section and chapter notes or Tolletaten's binding rulings. For certainty, apply for a binding classification ruling (BKU)."
+    },
+    "data": {
+      "title": "Where the data comes from",
+      "text": "Everything is open data from Norwegian public agencies.",
+      "tolletaten": "the customs tariff in Norwegian and English, duty rates, fees and exchange rates",
+      "ssb": "import statistics, used to choose the products Tollvakt is tested on"
+    },
+    "privacy": {
+      "title": "Your data",
+      "account": "Your account: name, email address and language. The password is stored only as a hash.",
+      "classifications": "Your classifications: what you described and the answer you got, so you can see them again. You can delete them one by one, or all of them with your account.",
+      "usage": "How many classifications you have made each day, for the daily limit. For visitors without an account, only a coded form of the address is kept, never the address itself.",
+      "notStored": "Your descriptions are sent to the language model to be classified. Do not write trade secrets or personal information in them."
+    },
+    "project": {
+      "title": "The project",
+      "byName": "Tollvakt is built by {name}, a full-stack developer in Norway.",
+      "text": "Tollvakt is built by an independent developer in Norway.",
+      "independent": "It is not affiliated with Tolletaten or any other agency.",
+      "contact": "Questions or feedback:",
+      "source": "Source code on GitHub"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="4.5 2.5 23 27">
+  <!-- The Tollvakt mark: a shield holding a parcel -->
+  <path d="M16 2.5 27.5 6.5v8.6c0 7.1-4.8 12.6-11.5 14.4C9.3 27.7 4.5 22.2 4.5 15.1V6.5Z" fill="#0A6B5E"/>
+  <path d="M10 11.5 16 9l6 2.5v7L16 21l-6-2.5Z" fill="#ffffff"/>
+  <path d="M10 11.5 16 14l6-2.5M16 14v7" fill="none" stroke="#0A6B5E" stroke-width="1.4" stroke-linejoin="round"/>
+</svg>

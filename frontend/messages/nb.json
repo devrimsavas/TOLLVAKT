@@ -1,0 +1,230 @@
+{
+  "metadata": {
+    "title": "Tollvakt – finn riktig varenummer",
+    "description": "Beskriv en vare på norsk eller engelsk og få de mest sannsynlige varenumrene i tolltariffen, med begrunnelse, hvor sikkert forslaget er og hva du bør sjekke, fra Tolletatens åpne data."
+  },
+  "header": {
+    "skipLink": "Hopp til hovedinnholdet",
+    "home": "Tollvakt, forsiden",
+    "about": "Om",
+    "logIn": "Logg inn",
+    "getStarted": "Kom i gang",
+    "menu": "Meny",
+    "switchLanguage": "English",
+    "switchLanguageLabel": "Switch to English",
+    "colorScheme": "Bytt mellom lys og mørk modus",
+    "toApp": "Klassifiser",
+    "logOut": "Logg ut",
+    "settings": "Innstillinger"
+  },
+  "home": {
+    "accountDeleted": "Kontoen din og alt som hørte til den er slettet.",
+    "hero": {
+      "eyebrow": "Tollklassifisering for norske bedrifter",
+      "title": "Finn riktig varenummer før varene kommer til grensen",
+      "lead": "Beskriv varen med dine egne ord. Tollvakt søker i tolltariffen, foreslår de mest sannsynlige varenumrene og forklarer hvorfor, så du vet hva du skal sjekke før du deklarerer.",
+      "primary": "Kom i gang gratis",
+      "secondary": "Se hvordan det virker"
+    },
+    "example": {
+      "title": "Eksempel på svar",
+      "description": "«Strikket genser i ull til herre»",
+      "high": "Høy sikkerhet",
+      "low": "Lav sikkerhet",
+      "highReason": "Gensere og pullovere, strikket, av ull: beskrivelsen passer denne underposisjonen.",
+      "lowReason": "Bare hvis ullen er fra kasjmirgeit.",
+      "question": "Spørsmål til deg: hva slags ull er genseren laget av?",
+      "caption": "Et eksempel på en klassifisering"
+    },
+    "features": {
+      "title": "Hva Tollvakt gjør",
+      "lead": "Fra en varebeskrivelse til varenumre du kan sjekke, på noen sekunder.",
+      "describe": {
+        "title": "Skriv som du snakker",
+        "text": "«Bluetooth-ørepropper» eller «kosebamse»: du trenger ikke kunne tariffens egne ord."
+      },
+      "reasons": {
+        "title": "Begrunnelser du kan sjekke",
+        "text": "Hvert forslag viser plassen i tariffen og hvorfor det passer."
+      },
+      "questions": {
+        "title": "Hva som avgjør koden",
+        "text": "Mangler en detalj, som materialet, spør Tollvakt om den."
+      },
+      "search": {
+        "title": "Søk i tariffen",
+        "text": "Søk på tekst eller varenummer, og se hele veien til hver kode."
+      },
+      "history": {
+        "title": "Lagret for deg",
+        "text": "Klassifiseringene dine lagres, så du kan se dem igjen eller skrive dem ut."
+      },
+      "languages": {
+        "title": "Norsk og engelsk",
+        "text": "Beskriv varen på ett av språkene, og les svaret på ditt."
+      }
+    },
+    "steps": {
+      "title": "Slik virker det",
+      "describe": {
+        "title": "Beskriv varen",
+        "text": "Hva den er, hva den er laget av og hva den brukes til."
+      },
+      "choose": {
+        "title": "Få de sannsynlige kodene",
+        "text": "Opptil tre varenumre, med begrunnelse og hvor sikkert hvert forslag er."
+      },
+      "check": {
+        "title": "Sjekk og bestem",
+        "text": "Svar på de åpne spørsmålene og sjekk koden før du deklarerer."
+      }
+    },
+    "sources": {
+      "title": "Bygget på offentlige data",
+      "lead": "Tollvakt bruker åpne data fra norske offentlige etater.",
+      "tolletaten": {
+        "name": "Tolletaten",
+        "text": "Tolltariffen med tekster på norsk og engelsk, tollsatser og valutakurser."
+      },
+      "ssb": {
+        "name": "Statistisk sentralbyrå",
+        "text": "Hvilke varer norske bedrifter importerer mest, brukt til å teste Tollvakt på ekte varer."
+      },
+      "notBinding": "Tollvakt gir forslag, ikke bindende avgjørelser. Vil du være sikker, kan du søke Tolletaten om bindende klassifiseringsuttalelse (BKU), som er gratis."
+    },
+    "cta": {
+      "title": "Prøv med din egen vare",
+      "text": "Lag en gratis konto og klassifiser opptil 10 varer om dagen.",
+      "button": "Lag en gratis konto"
+    }
+  },
+  "footer": {
+    "tagline": "Riktig varenummer, før varene kommer til grensen.",
+    "product": "Tollvakt",
+    "dataSources": "Datakilder",
+    "tolletaten": "Tolletaten",
+    "ssb": "Statistisk sentralbyrå",
+    "notBinding": "Kun forslag, ikke bindende klassifiseringer.",
+    "license": "Inneholder data under Norsk lisens for offentlige data (NLOD) tilgjengeliggjort av Tolletaten og Statistisk sentralbyrå.",
+    "independent": "Tollvakt er et uavhengig prosjekt og er ikke tilknyttet disse etatene.",
+    "opensInNewTab": "(åpnes i ny fane)",
+    "builtBy": "Laget av"
+  },
+  "auth": {
+    "email": "E-post",
+    "password": "Passord",
+    "firstName": "Fornavn",
+    "lastName": "Etternavn",
+    "passwordHint": "Minst {min} tegn",
+    "login": {
+      "title": "Logg inn",
+      "lead": "Logg inn for å klassifisere varer og se de lagrede klassifiseringene dine.",
+      "submit": "Logg inn",
+      "noAccount": "Har du ikke konto?",
+      "toRegister": "Opprett konto",
+      "expired": "Økten din er avsluttet. Logg inn igjen for å fortsette.",
+      "forgot": "Glemt passordet?",
+      "passwordChanged": "Passordet ditt er endret. Logg inn med det nye."
+    },
+    "register": {
+      "title": "Opprett konto",
+      "lead": "Gratis å bruke. Du trenger bare en e-postadresse.",
+      "submit": "Opprett konto",
+      "haveAccount": "Har du allerede en konto?",
+      "toLogin": "Logg inn"
+    },
+    "errors": {
+      "firstNameRequired": "Skriv inn fornavnet ditt",
+      "lastNameRequired": "Skriv inn etternavnet ditt",
+      "nameTooLong": "Navnet kan ha høyst 100 tegn",
+      "emailInvalid": "Skriv inn en gyldig e-postadresse, for eksempel navn@eksempel.no",
+      "passwordRequired": "Skriv inn passordet ditt",
+      "passwordTooShort": "Passordet må ha minst {min} tegn",
+      "emailTaken": "Det finnes allerede en konto med denne e-postadressen. Vil du logge inn i stedet?",
+      "invalidCredentials": "E-postadressen eller passordet er feil",
+      "unavailable": "Tjenesten er ikke tilgjengelig akkurat nå. Prøv igjen om litt.",
+      "passwordMismatch": "Passordene er ikke like",
+      "tooManyLogins": "For mange mislykkede forsøk. Vent {minutes, plural, one {# minutt} other {# minutter}} og prøv igjen.",
+      "tooManyAccounts": "For mange nye kontoer fra nettverket ditt. Vent {minutes, plural, one {# minutt} other {# minutter}} og prøv igjen.",
+      "tooManyResets": "Du har bedt om for mange e-poster. Vent {minutes, plural, one {# minutt} other {# minutter}} og prøv igjen.",
+      "linkInvalid": "Denne lenken virker ikke lenger. Den kan være brukt allerede, eller den er over 60 minutter gammel.",
+      "passwordWrong": "Passordet er feil",
+      "tooManyChecks": "For mange feil passord. Vent {minutes, plural, one {# minutt} other {# minutter}} og prøv igjen.",
+      "lastAdmin": "Dette er den eneste administratorkontoen, så den kan ikke slettes. Gjør en annen bruker til administrator først."
+    },
+    "confirmPassword": "Gjenta passordet",
+    "forgot": {
+      "title": "Glemt passordet?",
+      "lead": "Skriv inn e-postadressen til kontoen din, så sender vi deg en lenke for å velge et nytt passord.",
+      "submit": "Send lenke",
+      "sent": "Hvis en konto har adressen {email}, er en lenke for å velge nytt passord på vei. Den virker i 60 minutter. Sjekk søppelpostmappen hvis den ikke kommer.",
+      "toLogin": "Tilbake til innlogging"
+    },
+    "reset": {
+      "title": "Velg nytt passord",
+      "lead": "De andre øktene dine avsluttes når passordet endres.",
+      "password": "Nytt passord",
+      "submit": "Lagre det nye passordet",
+      "newLink": "Be om en ny lenke"
+    }
+  },
+  "app": {
+    "comingSoon": "Denne siden er under arbeid.",
+    "nav": {
+      "label": "Hovedmeny",
+      "home": "Tollvakt, klassifiser",
+      "account": "Konto: {name}",
+      "classify": "Klassifiser",
+      "history": "Mine klassifiseringer",
+      "search": "Søk i tariffen",
+      "admin": "Admin",
+      "settings": "Innstillinger"
+    }
+  },
+  "about": {
+    "title": "Om Tollvakt",
+    "lead": "Tollvakt hjelper norske bedrifter med å finne riktig varenummer for varene de importerer og eksporterer.",
+    "why": {
+      "title": "Hvorfor den finnes",
+      "text1": "Alle varer som importeres eller eksporteres, trenger et varenummer. Tollen, grunnlaget for merverdiavgift og reglene for varen avhenger av det, og et feil varenummer som blir funnet i en kontroll, betyr etterberegning.",
+      "text2": "Tariffen har over 7 000 varenumre, skrevet på sitt eget språk. Med Tollvakt beskriver du varen med vanlige ord og ser hvilke varenumre som er mest sannsynlige, og hvorfor."
+    },
+    "how": {
+      "title": "Slik finner den kodene",
+      "rewrite": {
+        "title": "Omskriving.",
+        "text": "En språkmodell skriver beskrivelsen din om til tariffens ordlyd, på norsk og engelsk."
+      },
+      "search": {
+        "title": "Søk.",
+        "text": "Fritekstsøk og semantisk søk finner kandidatkodene i tariffen."
+      },
+      "choose": {
+        "title": "Valg.",
+        "text": "Språkmodellen leser kandidatenes plass i tariffen og velger opptil tre, med begrunnelse. Den kan bare velge koder fra tariffen, aldri finne på en."
+      },
+      "limits": "Tollvakt er testet på varer med kjente varenumre, og er likevel en hjelp, ikke en avgjørelse. Den leser ennå ikke tariffens avsnitts- og kapittelbestemmelser eller Tolletatens bindende uttalelser. Vil du være sikker, kan du søke om bindende klassifiseringsuttalelse (BKU)."
+    },
+    "data": {
+      "title": "Hvor dataene kommer fra",
+      "text": "Alt er åpne data fra norske offentlige etater.",
+      "tolletaten": "tolltariffen på norsk og engelsk, tollsatser, avgifter og valutakurser",
+      "ssb": "importstatistikk, brukt til å velge varene Tollvakt testes på"
+    },
+    "privacy": {
+      "title": "Dine data",
+      "account": "Kontoen din: navn, e-postadresse og språk. Passordet lagres bare som en hash.",
+      "classifications": "Klassifiseringene dine: hva du beskrev og svaret du fikk, så du kan se dem igjen. Du kan slette dem én og én, eller alle sammen med kontoen.",
+      "usage": "Hvor mange klassifiseringer du har gjort hver dag, for den daglige grensen. For besøkende uten konto lagres bare en kodet form av adressen, aldri selve adressen.",
+      "notStored": "Beskrivelsene dine sendes til språkmodellen for å klassifiseres. Ikke skriv forretningshemmeligheter eller personopplysninger i dem."
+    },
+    "project": {
+      "title": "Prosjektet",
+      "byName": "Tollvakt er laget av {name}, fullstack-utvikler i Norge.",
+      "text": "Tollvakt er laget av en uavhengig utvikler i Norge.",
+      "independent": "Den er ikke tilknyttet Tolletaten eller andre etater.",
+      "contact": "Spørsmål eller tilbakemeldinger:",
+      "source": "Kildekode på GitHub"
+    }
+  }
+}
