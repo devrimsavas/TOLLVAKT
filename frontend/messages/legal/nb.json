@@ -1,0 +1,126 @@
+{
+  "legal": {
+    "updated": "Sist oppdatert {date}",
+    "privacyLink": "Personvern",
+    "termsLink": "Vilkår for bruk",
+    "registerConsent": "Når du oppretter en konto, godtar du <terms>vilkårene for bruk</terms>. <privacy>Personvernerklæringen</privacy> forklarer hva som lagres om deg.",
+    "aboutPrivacyLink": "Les hele personvernerklæringen",
+    "contact": "E-post:",
+    "privacy": {
+      "title": "Personvernerklæring",
+      "lead": "Hva Tollvakt lagrer om deg, hvorfor, hvem som hjelper oss å drive tjenesten, og hva du kan gjøre.",
+      "controller": {
+        "title": "Hvem som er ansvarlig",
+        "text": "Tollvakt drives av {name}, en privatperson i Norge, som er behandlingsansvarlig for personopplysningene som beskrives her. Skriv til denne adressen om du har spørsmål om dine opplysninger."
+      },
+      "collected": {
+        "title": "Hva vi lagrer",
+        "account": "Kontoen din: fornavn og etternavn, e-postadresse, språk og når du sist logget inn. Passordet lagres bare som en hash (bcrypt), aldri i klartekst.",
+        "classifications": "Klassifiseringene dine, når du er logget inn: varebeskrivelsen du skrev og svaret du fikk, slik at du kan åpne, skrive ut og slette dem senere.",
+        "usage": "Din bruk av språkmodellen: tidspunkt og type (klassifisering eller søk) for hvert kall, slik at den daglige grensen kan telles.",
+        "guests": "Besøkende uten konto: for den daglige grensen lagres en kodet form av IP-adressen (en hash med nøkkel) sammen med tidspunktet. Selve IP-adressen lagres ikke, og koden kan ikke gjøres om til adressen uten serverens hemmelige nøkkel.",
+        "resetLinks": "Tilbakestilling av passord: en kodet form av lenken vi sender deg på e-post, gyldig i 60 minutter.",
+        "notStored": "Vi lagrer ikke IP-adressen din, og vi sporer deg ikke på andre nettsteder."
+      },
+      "purposes": {
+        "title": "Formål og behandlingsgrunnlag",
+        "contract": "For å gi deg tjenesten du har registrert deg for (personvernforordningen artikkel 6 nr. 1 bokstav b): kontoen din, lagrede klassifiseringer og e-post for å tilbakestille passordet.",
+        "interest": "Vår berettigede interesse (artikkel 6 nr. 1 bokstav f) i å holde tjenesten gratis og i drift: daglige grenser for besøkende og medlemmer, vern mot misbruk, sikkerhet og anonym statistikk over hvor mye tjenesten brukes."
+      },
+      "model": {
+        "title": "Språkmodellen (Google Gemini)",
+        "text1": "For å foreslå varenumre sendes varebeskrivelsene du skriver, og ordene du søker etter i tolltariffen, til Googles Gemini API. Navnet og e-postadressen din sendes ikke med.",
+        "text2": "Tollvakt bruker Gemini som en betalt tjeneste. På disse vilkårene bruker ikke Google beskrivelsene eller svarene til å forbedre sine produkter; de lagres bare en begrenset tid for å avdekke misbruk. Google kan behandle dem utenfor EØS (se nedenfor).",
+        "warning": "Ikke skriv personopplysninger, forretningshemmeligheter eller andre fortrolige opplysninger i en varebeskrivelse. Beskriv varen, ikke kunden eller handelen."
+      },
+      "processors": {
+        "title": "Hvem som hjelper oss å drive Tollvakt",
+        "text": "Disse selskapene behandler opplysninger på våre vegne (databehandlere), bare for formålet som er oppgitt:",
+        "netcup": "netcup GmbH, Tyskland: serveren der databasen og appen kjører.",
+        "cloudflare": "Cloudflare, Inc., USA: fører forbindelsen din fram til serveren vår og beskytter den. Cloudflare ser IP-adressen din og sidene du åpner mens de passerer.",
+        "google": "Google LLC, USA: språkmodellen Gemini, som beskrevet over.",
+        "resend": "Resend (Plus Five Five, Inc.), USA: sender e-postene for å tilbakestille passord. Får e-postadressen din og selve e-posten.",
+        "goatcounter": "GoatCounter: teller sidevisninger. Setter ingen informasjonskapsler og lagrer ingen personopplysninger; IP-adressen brukes bare i minnet for å skille besøk fra hverandre, og lagres aldri."
+      },
+      "transfers": {
+        "title": "Opplysninger utenfor EØS",
+        "text": "Cloudflare, Google og Resend holder til i USA. Overføringene bygger på EUs beslutning om tilstrekkelig beskyttelsesnivå for EU-U.S. Data Privacy Framework, som disse selskapene er sertifisert under, og på EUs standardavtaler (standard contractual clauses) i databehandleravtalene deres."
+      },
+      "retention": {
+        "title": "Hvor lenge vi lagrer",
+        "account": "Kontoen og klassifiseringene dine: til du sletter dem. Under Innstillinger kan du slette én klassifisering, eller hele kontoen med alt innhold.",
+        "usage": "Bruksregistreringer: etter 90 dager fjernes koblingen til deg eller til den kodede IP-adressen; bare et anonymt antall per dag blir igjen.",
+        "resetLinks": "Lenker for å tilbakestille passord: slettes et døgn etter at de gikk ut.",
+        "backups": "Sikkerhetskopier av databasen: lagres i 14 dager, så slettede opplysninger er borte fra dem senest etter 14 dager.",
+        "logs": "Serverlogger: adressen til hver forespørsel, resultatet og, for innloggede brukere, et kontonummer, men ingen IP-adresser eller innhold. Bare de nyeste loggene beholdes."
+      },
+      "cookies": {
+        "title": "Informasjonskapsler",
+        "text": "Tollvakt bruker bare to informasjonskapsler, begge nødvendige for tjenesten, så vi ber ikke om samtykke:",
+        "session": "session: holder deg innlogget. Den kan ikke leses av skript, og den slettes når du logger ut.",
+        "locale": "locale: husker språket du valgte, i ett år.",
+        "none": "Det finnes ingen informasjonskapsler for reklame, sporing eller analyse."
+      },
+      "rights": {
+        "title": "Dine rettigheter",
+        "text": "Du har rett til å se opplysningene vi har om deg, få dem rettet eller slettet, få dem utlevert i et maskinlesbart format, og protestere mot eller begrense bruken av dem.",
+        "self": "Under <settings>Innstillinger</settings> kan du laste ned alle opplysningene dine som en fil, og slette kontoen din selv.",
+        "ask": "Skriv til oss om alt annet; vi svarer innen 30 dager.",
+        "complaint": "Mener du at vi behandler opplysningene dine i strid med regelverket, kan du klage til Datatilsynet."
+      },
+      "security": {
+        "title": "Sikkerhet",
+        "text": "All trafikk er kryptert (HTTPS). Passord og tilbakestillingslenker lagres bare som hasher. Databasen kan ikke nås fra internett, og den sikkerhetskopieres hver natt."
+      },
+      "changes": {
+        "title": "Endringer",
+        "text": "Hvis erklæringen endres, publiseres den nye versjonen her med ny dato. Viktige endringer varsles på nettstedet før de trer i kraft."
+      }
+    },
+    "terms": {
+      "title": "Vilkår for bruk",
+      "lead": "Reglene for å bruke Tollvakt. De er korte; les dem før du stoler på et svar.",
+      "service": {
+        "title": "Tjenesten",
+        "text": "Tollvakt hjelper deg å finne varenumre i den norske tolltariffen og anslå toll og merverdiavgift. Tjenesten drives av {name}, en privatperson i Norge, og er gratis å bruke. Den er ny, i en pilotfase, og kan endres."
+      },
+      "users": {
+        "title": "Hvem kan bruke den",
+        "text": "Tollvakt er laget for bedrifter og personer som importerer eller eksporterer varer. Du må være 18 år eller eldre for å opprette en konto."
+      },
+      "notBinding": {
+        "title": "Forslag, ikke avgjørelser",
+        "text1": "Varenumrene Tollvakt foreslår, kommer fra en språkmodell og kan være feil. Beløpene for toll og merverdiavgift er anslag. Ingen av dem er en bindende klassifisering eller et tollvedtak.",
+        "text2": "Importøren, eller den som leverer tolldeklarasjonen, er alltid ansvarlig for varenummeret og beløpene som deklareres. Kontroller varenummeret mot tolltariffen, og be Tolletaten om en bindende klassifiseringsuttalelse (BKU) i viktige eller uklare saker."
+      },
+      "data": {
+        "title": "Tariffdataene",
+        "text": "Tolltariffen, satsene, avgiftene, restriksjonene og valutakursene kommer fra Tolletatens åpne data, under Norsk lisens for offentlige data (NLOD), og oppdateres hver dag. De kan likevel være forsinket eller inneholde feil; Tolletatens egne publikasjoner gjelder."
+      },
+      "account": {
+        "title": "Kontoen din",
+        "text": "Oppgi riktige opplysninger, hold passordet for deg selv, og si fra hvis du tror noen andre har brukt kontoen din. Én konto per person."
+      },
+      "use": {
+        "title": "Rimelig bruk",
+        "limits": "Det er daglige grenser for bruk av språkmodellen, for besøkende og for medlemmer.",
+        "noBypass": "Ikke prøv å omgå grensene, for eksempel med flere kontoer, og ikke hent ut data fra Tollvakt med skript eller roboter.",
+        "noMisuse": "Ikke bruk Tollvakt til noe ulovlig, og ikke prøv å skade eller bryte deg inn i tjenesten.",
+        "noSecrets": "Ikke skriv personopplysninger eller fortrolige opplysninger i varebeskrivelser (se personvernerklæringen).",
+        "closing": "Vi kan begrense eller stenge en konto som bryter disse vilkårene."
+      },
+      "availability": {
+        "title": "Tilgjengelighet og endringer",
+        "text": "Vi prøver å holde Tollvakt tilgjengelig og korrekt, men kan ikke love at tjenesten alltid virker. Vi kan endre, stanse eller legge ned tjenesten, eller endre disse vilkårene. Legges den ned, får medlemmene beskjed på forhånd og kan laste ned opplysningene sine."
+      },
+      "liability": {
+        "title": "Ansvar",
+        "text": "Tollvakt leveres som den er, uten garantier. Så langt norsk lov tillater det, er vi ikke ansvarlige for tap som følger av bruken av tjenesten, for eksempel toll eller avgifter som er betalt feil, forsinkelser eller beslutninger tatt på grunnlag av et forslag."
+      },
+      "law": {
+        "title": "Lovvalg",
+        "text": "Disse vilkårene følger norsk lov. Spørsmål eller uenighet løses best ved at du skriver til oss først."
+      }
+    }
+  }
+}

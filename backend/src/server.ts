@@ -6,6 +6,7 @@ import { sequelize } from "./config/database.js";
 import { runMigrations } from "./config/migrator.js";
 import { ensureAdmin } from "./config/ensureAdmin.js";
 import { logger } from "./config/logger.js";
+import { startRetention } from "./services/retentionService.js";
 
 const log = logger.child({ module: "server" });
 
@@ -28,6 +29,7 @@ const startServer = async () => {
     log.info("Database connected");
     await runMigrations();
     await ensureAdmin();
+    startRetention();
     app.listen(PORT, () => {
       log.info(`listening at ${PORT}`);
     });

@@ -12,7 +12,7 @@ interface SiteDetails {
 export const SITE: SiteDetails = {
   ownerName: "Devrim Savas Yilmaz",
   // The email address you want people to write to, shown on the about page
-  contactEmail: "",
+  contactEmail: "devrimsavasyilmaz@gmail.com",
   // Your LinkedIn profile, e.g. "https://www.linkedin.com/in/your-name"
   linkedInUrl: "https://www.linkedin.com/in/devrimsavas/",
   // Your portfolio site, if you want to link it

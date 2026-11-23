@@ -1,0 +1,126 @@
+{
+  "legal": {
+    "updated": "Last updated {date}",
+    "privacyLink": "Privacy",
+    "termsLink": "Terms of use",
+    "registerConsent": "By creating an account you accept the <terms>terms of use</terms>. The <privacy>privacy statement</privacy> explains what is stored about you.",
+    "aboutPrivacyLink": "Read the full privacy statement",
+    "contact": "Email:",
+    "privacy": {
+      "title": "Privacy statement",
+      "lead": "What Tollvakt stores about you, why, who helps us run the service, and what you can do about it.",
+      "controller": {
+        "title": "Who is responsible",
+        "text": "Tollvakt is run by {name}, a private person in Norway, who is the data controller (behandlingsansvarlig) for the personal data described here. Write to this address with any question about your data."
+      },
+      "collected": {
+        "title": "What we store",
+        "account": "Your account: first and last name, email address, language and when you last logged in. The password is stored only as a hash (bcrypt), never as plain text.",
+        "classifications": "Your classifications, when you are logged in: the product description you wrote and the answer you got, so you can open, print and delete them later.",
+        "usage": "Your use of the language model: the time and kind (classification or search) of each call, so the daily limit can be counted.",
+        "guests": "Visitors without an account: for the daily limit, a coded form of the IP address (a keyed hash) is stored with the time of the call. The IP address itself is not stored, and the code cannot be turned back into the address without the server's secret key.",
+        "resetLinks": "Password reset: a coded form of the link we email you, valid for 60 minutes.",
+        "notStored": "We do not store your IP address, and we do not track you across other websites."
+      },
+      "purposes": {
+        "title": "Why, and on what legal basis",
+        "contract": "To give you the service you signed up for (GDPR article 6 (1) (b)): your account, your saved classifications and password reset emails.",
+        "interest": "Our legitimate interest (article 6 (1) (f)) in keeping the service free and working: daily limits for visitors and members, protection against misuse, security, and anonymous statistics of how much the service is used."
+      },
+      "model": {
+        "title": "The language model (Google Gemini)",
+        "text1": "To suggest commodity codes, the product descriptions you write, and the words you search for in the tariff, are sent to Google's Gemini API. Your name and email address are not sent with them.",
+        "text2": "Tollvakt uses Gemini as a paid service. On those terms Google does not use the descriptions or the answers to improve its products; it keeps them for a limited time only to detect misuse. Google may process them outside the EEA (see below).",
+        "warning": "Do not write personal data, trade secrets or other confidential information in a product description. Describe the product, not the customer or the deal."
+      },
+      "processors": {
+        "title": "Who helps us run Tollvakt",
+        "text": "These companies process data on our behalf (databehandlere), only for the purpose given:",
+        "netcup": "netcup GmbH, Germany: the server where the database and the app run.",
+        "cloudflare": "Cloudflare, Inc., USA: brings your connection to our server and protects it. Cloudflare sees your IP address and the pages you open while they pass through.",
+        "google": "Google LLC, USA: the Gemini language model, as described above.",
+        "resend": "Resend (Plus Five Five, Inc.), USA: sends the password reset emails. It receives your email address and the email.",
+        "goatcounter": "GoatCounter: counts page views. It sets no cookies and stores no personal data; the IP address is used only in memory to tell visits apart, and is never saved."
+      },
+      "transfers": {
+        "title": "Data outside the EEA",
+        "text": "Cloudflare, Google and Resend are in the USA. The transfers rely on the EU's adequacy decision for the EU-U.S. Data Privacy Framework, which these companies are certified under, and on the EU's standard contractual clauses in their data processing agreements."
+      },
+      "retention": {
+        "title": "How long we keep it",
+        "account": "Your account and your classifications: until you delete them. You can delete one classification, or your whole account with everything in it, under Settings.",
+        "usage": "Usage records: after 90 days the link to you or to the coded IP address is removed; only an anonymous count per day remains.",
+        "resetLinks": "Password reset links: deleted a day after they expired.",
+        "backups": "Backups of the database: kept for 14 days, so deleted data is gone from them after 14 days at the latest.",
+        "logs": "Server logs: the address of each request, its result and, for logged-in users, an account number, but no IP addresses or contents. Only the most recent logs are kept."
+      },
+      "cookies": {
+        "title": "Cookies",
+        "text": "Tollvakt uses only two cookies, both needed for the service, so we do not ask for consent:",
+        "session": "session: keeps you logged in. It cannot be read by scripts, and it is deleted when you log out.",
+        "locale": "locale: remembers the language you chose, for a year.",
+        "none": "There are no cookies for advertising, tracking or analytics."
+      },
+      "rights": {
+        "title": "Your rights",
+        "text": "You have the right to see the data we have about you, to have it corrected or deleted, to get it in a machine-readable form, and to object to or restrict how it is used.",
+        "self": "Under <settings>Settings</settings> you can download all your data as a file, and delete your account yourself.",
+        "ask": "For anything else, write to us; we answer within 30 days.",
+        "complaint": "If you think we process your data unlawfully, you can complain to the Norwegian Data Protection Authority (Datatilsynet)."
+      },
+      "security": {
+        "title": "Security",
+        "text": "All traffic is encrypted (HTTPS). Passwords and reset links are stored only as hashes. The database cannot be reached from the internet, and it is backed up every night."
+      },
+      "changes": {
+        "title": "Changes",
+        "text": "If this statement changes, the new version is published here with a new date. Important changes are announced on the site before they take effect."
+      }
+    },
+    "terms": {
+      "title": "Terms of use",
+      "lead": "The rules for using Tollvakt. They are short; please read them before you rely on an answer.",
+      "service": {
+        "title": "The service",
+        "text": "Tollvakt helps find commodity codes in the Norwegian customs tariff and estimate duty and VAT. It is run by {name}, a private person in Norway, and is free to use. It is a new service in a pilot phase, and it may change."
+      },
+      "users": {
+        "title": "Who can use it",
+        "text": "Tollvakt is made for businesses and people who import or export goods. You must be 18 or older to create an account."
+      },
+      "notBinding": {
+        "title": "Suggestions, not decisions",
+        "text1": "The codes Tollvakt suggests come from a language model and can be wrong. The duty and VAT amounts are estimates. Neither is a binding classification or a customs decision.",
+        "text2": "The importer, or whoever makes the customs declaration, is always responsible for the code and the amounts declared. Check the code against the tariff, and for important or unclear cases ask Tolletaten for a binding classification ruling (BKU)."
+      },
+      "data": {
+        "title": "The tariff data",
+        "text": "The tariff, rates, fees, restrictions and exchange rates come from Tolletaten's open data, under the Norwegian licence for open government data (NLOD), and are updated every day. They can still be late or contain errors; Tolletaten's own publications decide."
+      },
+      "account": {
+        "title": "Your account",
+        "text": "Give correct details, keep your password to yourself, and tell us if you think someone else has used your account. One account per person."
+      },
+      "use": {
+        "title": "Fair use",
+        "limits": "There are daily limits on the use of the language model, for visitors and for members.",
+        "noBypass": "Do not try to get around the limits, for example with several accounts, and do not collect data from Tollvakt with scripts or robots.",
+        "noMisuse": "Do not use Tollvakt for anything unlawful, and do not try to harm or break into the service.",
+        "noSecrets": "Do not write personal data or confidential information in product descriptions (see the privacy statement).",
+        "closing": "We may limit or close an account that breaks these terms."
+      },
+      "availability": {
+        "title": "Availability and changes",
+        "text": "We try to keep Tollvakt available and correct, but we cannot promise that it always works. We may change, pause or close the service, or change these terms. If we close it, members are told in advance and can download their data."
+      },
+      "liability": {
+        "title": "Liability",
+        "text": "Tollvakt is provided as it is, without any guarantee. To the extent Norwegian law allows, we are not liable for losses that come from using the service, such as duty or fees that were paid wrongly, delays, or decisions made from a suggestion."
+      },
+      "law": {
+        "title": "Law",
+        "text": "These terms follow Norwegian law. Questions or disagreements are best solved by writing to us first."
+      }
+    }
+  }
+}

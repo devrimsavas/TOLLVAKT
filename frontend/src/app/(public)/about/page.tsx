@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import NextLink from "next/link";
 import { getTranslations } from "next-intl/server";
 import {
   Alert,
@@ -22,6 +23,7 @@ const STORED = ["account", "classifications", "usage", "notStored"] as const;
 export default async function AboutPage() {
   const t = await getTranslations("about");
   const footer = await getTranslations("footer");
+  const legal = await getTranslations("legal");
 
   return (
     <article className={`container ${styles.page}`}>
@@ -85,6 +87,11 @@ export default async function AboutPage() {
             <li key={key}>{t(`privacy.${key}`)}</li>
           ))}
         </ul>
+        <Paragraph>
+          <Link asChild>
+            <NextLink href="/privacy">{legal("aboutPrivacyLink")}</NextLink>
+          </Link>
+        </Paragraph>
       </section>
 
       <section className={`${styles.section} ${styles.project}`}>

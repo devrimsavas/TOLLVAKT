@@ -17,6 +17,7 @@ export const DATA_SOURCES = [
 export async function SiteFooter() {
   const t = await getTranslations("footer");
   const header = await getTranslations("header");
+  const legal = await getTranslations("legal");
   const loggedIn = Boolean(await getSessionToken());
 
   return (
@@ -35,6 +36,16 @@ export async function SiteFooter() {
             <li>
               <Link asChild>
                 <NextLink href="/about">{header("about")}</NextLink>
+              </Link>
+            </li>
+            <li>
+              <Link asChild>
+                <NextLink href="/privacy">{legal("privacyLink")}</NextLink>
+              </Link>
+            </li>
+            <li>
+              <Link asChild>
+                <NextLink href="/terms">{legal("termsLink")}</NextLink>
               </Link>
             </li>
             <li>

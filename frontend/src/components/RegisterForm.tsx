@@ -1,14 +1,16 @@
 "use client";
 
 import { useActionState } from "react";
+import NextLink from "next/link";
 import { useTranslations } from "next-intl";
-import { Alert, Button, Textfield } from "@digdir/designsystemet-react";
+import { Alert, Button, Link, Paragraph, Textfield } from "@digdir/designsystemet-react";
 import { registerAction, type AuthFormState } from "@/lib/authActions";
 import { MIN_PASSWORD_LENGTH } from "@/lib/authRules";
 import styles from "./AuthForms.module.css";
 
 export function RegisterForm() {
   const t = useTranslations("auth");
+  const legal = useTranslations("legal");
   const [state, action, pending] = useActionState<AuthFormState, FormData>(
     registerAction,
     {},
@@ -71,6 +73,20 @@ export function RegisterForm() {
         error={error("confirmPassword")}
         required
       />
+      <Paragraph data-size="sm">
+        {legal.rich("registerConsent", {
+          terms: (chunks) => (
+            <Link asChild>
+              <NextLink href="/terms">{chunks}</NextLink>
+            </Link>
+          ),
+          privacy: (chunks) => (
+            <Link asChild>
+              <NextLink href="/privacy">{chunks}</NextLink>
+            </Link>
+          ),
+        })}
+      </Paragraph>
       <Button type="submit" loading={pending} disabled={pending}>
         {t("register.submit")}
       </Button>
