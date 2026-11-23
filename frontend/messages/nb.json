@@ -175,7 +175,6 @@
     }
   },
   "app": {
-    "comingSoon": "Denne siden er under arbeid.",
     "nav": {
       "label": "Hovedmeny",
       "home": "Tollvakt, klassifiser",
@@ -406,6 +405,49 @@
         "ownAccount": "Du kan ikke stenge din egen konto",
         "failed": "Kunne ikke lagre. Prøv igjen."
       }
+    }
+  },
+  "settings": {
+    "title": "Innstillinger",
+    "lead": "Kontoen din, passordet ditt og dataene dine.",
+    "account": {
+      "title": "Kontoen din",
+      "name": "Navn",
+      "email": "E-post",
+      "since": "Medlem siden",
+      "limit": "Daglige klassifiseringer",
+      "limitValue": "{limit} om dagen ({remaining} igjen i dag)",
+      "unlimited": "Ingen daglig grense (admin)",
+      "language": "Språk",
+      "languageNote": "Appen, AI-ens svar og e-postene følger språket du velger øverst på siden."
+    },
+    "languages": {
+      "nb": "Norsk",
+      "en": "Engelsk"
+    },
+    "password": {
+      "title": "Bytt passord",
+      "text": "Alle andre enheter der du er logget inn, logges ut når passordet byttes.",
+      "current": "Nåværende passord",
+      "new": "Nytt passord",
+      "submit": "Bytt passord",
+      "changed": "Passordet ditt er byttet. Andre enheter er logget ut."
+    },
+    "data": {
+      "title": "Last ned dataene dine",
+      "text": "Alt Tollvakt lagrer om deg i én fil: kontoen din, de lagrede klassifiseringene og hvor mange du gjorde hver dag.",
+      "button": "Last ned dataene mine (JSON)",
+      "failed": "Filen kunne ikke lages. Prøv igjen om litt."
+    },
+    "delete": {
+      "heading": "Slett kontoen",
+      "intro": "Sletter kontoen din og de lagrede klassifiseringene. Det kan ikke angres.",
+      "button": "Slett kontoen min",
+      "title": "Slette kontoen din?",
+      "text": "Kontoen og klassifiseringene dine slettes med en gang og kan ikke hentes tilbake. Skriv passordet ditt for å bekrefte.",
+      "password": "Passord",
+      "confirm": "Slett kontoen min",
+      "cancel": "Avbryt"
     }
   }
 }

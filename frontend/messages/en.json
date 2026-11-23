@@ -175,7 +175,6 @@
     }
   },
   "app": {
-    "comingSoon": "This page is being built.",
     "nav": {
       "label": "Main menu",
       "home": "Tollvakt, classify",
@@ -406,6 +405,49 @@
         "ownAccount": "You cannot close your own account",
         "failed": "Could not save. Try again."
       }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "lead": "Your account, your password and your data.",
+    "account": {
+      "title": "Your account",
+      "name": "Name",
+      "email": "Email",
+      "since": "Member since",
+      "limit": "Daily classifications",
+      "limitValue": "{limit} a day ({remaining} left today)",
+      "unlimited": "No daily limit (admin)",
+      "language": "Language",
+      "languageNote": "The app, the AI's answers and the emails follow the language you choose at the top of the page."
+    },
+    "languages": {
+      "nb": "Norwegian",
+      "en": "English"
+    },
+    "password": {
+      "title": "Change password",
+      "text": "Every other device where you are logged in is logged out when the password changes.",
+      "current": "Current password",
+      "new": "New password",
+      "submit": "Change password",
+      "changed": "Your password has been changed. Other devices have been logged out."
+    },
+    "data": {
+      "title": "Download your data",
+      "text": "Everything Tollvakt stores about you in one file: your account, your saved classifications and how many you made each day.",
+      "button": "Download my data (JSON)",
+      "failed": "The file could not be made. Try again in a little while."
+    },
+    "delete": {
+      "heading": "Delete account",
+      "intro": "Deletes your account and your saved classifications. It cannot be undone.",
+      "button": "Delete my account",
+      "title": "Delete your account?",
+      "text": "Your account and your classifications are deleted at once and cannot be brought back. Type your password to confirm.",
+      "password": "Password",
+      "confirm": "Delete my account",
+      "cancel": "Cancel"
     }
   }
 }
