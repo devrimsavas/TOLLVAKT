@@ -1,0 +1,35 @@
+{
+  "feedback": {
+    "title": "Tilbakemelding",
+    "lead": "Fortell oss om erfaringen din med Tollvakt: meld fra om feil, gale forslag og ideer til hva den bør kunne. Tollvakt er ny, og tilbakemeldingene dine avgjør hva som kommer videre.",
+    "link": "Tilbakemelding",
+    "resultLink": "Er et forslag feil, eller noe uklart? Si fra",
+    "kind": {
+      "legend": "Hva gjelder det?",
+      "idea": "En idé eller et ønske",
+      "problem": "Noe er feil",
+      "other": "Noe annet"
+    },
+    "message": "Meldingen din",
+    "messageHint": "Var en klassifisering feil, skriv varen og varenummeret du mener er riktig.",
+    "email": "E-postadressen din (valgfritt)",
+    "emailHint": "Bare hvis du vil ha svar. La feltet stå tomt for å sende tilbakemeldingen anonymt.",
+    "website": "La dette feltet stå tomt",
+    "privacy": "Meldingen, og e-postadressen din hvis du oppgir den, sendes til oss på e-post og lagres ikke på nettstedet. Ikke skriv personopplysninger om andre eller fortrolige opplysninger.",
+    "submit": "Send tilbakemelding",
+    "sent": "Takk! Tilbakemeldingen din er sendt.",
+    "sentAnonymous": "Takk! Tilbakemeldingen din er sendt anonymt.",
+    "sendAnother": "Send en ny tilbakemelding",
+    "counter": {
+      "under": "%d tegn igjen",
+      "over": "%d tegn for mye"
+    },
+    "errors": {
+      "messageTooShort": "Skriv minst {min} tegn.",
+      "messageTooLong": "Meldingen kan være på høyst {max} tegn.",
+      "emailInvalid": "Skriv en gyldig e-postadresse, eller la feltet stå tomt.",
+      "tooMany": "Du har sendt mange meldinger. Prøv igjen om {minutes} minutter.",
+      "unavailable": "Tilbakemeldingen kunne ikke sendes. Prøv igjen senere, eller skriv til {email}."
+    }
+  }
+}

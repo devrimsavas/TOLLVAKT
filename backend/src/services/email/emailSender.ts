@@ -10,6 +10,8 @@ export interface Email {
   // Both a plain-text and an HTML version, for every mail program
   text: string;
   html: string;
+  // Where a reply goes, when it is not the sender (feedback from a user)
+  replyTo?: string;
 }
 
 export interface EmailSender {
@@ -42,6 +44,7 @@ const resendSender: EmailSender = {
         subject: email.subject,
         text: email.text,
         html: email.html,
+        ...(email.replyTo ? { reply_to: email.replyTo } : {}),
       }),
       signal: AbortSignal.timeout(10_000),
     });
@@ -65,6 +68,7 @@ const logSender: EmailSender = {
       [
         "---- Email (EMAIL_PROVIDER=log, not sent) ----",
         `To: ${email.to}`,
+        ...(email.replyTo ? [`Reply-To: ${email.replyTo}`] : []),
         `Subject: ${email.subject}`,
         "",
         email.text,

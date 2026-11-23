@@ -20,6 +20,7 @@
         "usage": "Din bruk av språkmodellen: tidspunkt og type (klassifisering eller søk) for hvert kall, slik at den daglige grensen kan telles.",
         "guests": "Besøkende uten konto: for den daglige grensen lagres en kodet form av IP-adressen (en hash med nøkkel) sammen med tidspunktet. Selve IP-adressen lagres ikke, og koden kan ikke gjøres om til adressen uten serverens hemmelige nøkkel.",
         "resetLinks": "Tilbakestilling av passord: en kodet form av lenken vi sender deg på e-post, gyldig i 60 minutter.",
+        "feedback": "Tilbakemeldinger: sender du en tilbakemelding, sendes meldingen og e-postadressen du eventuelt oppgir, til oss på e-post. De lagres ikke på nettstedet, og slettes fra innboksen når de ikke lenger trengs.",
         "notStored": "Vi lagrer ikke IP-adressen din, og vi sporer deg ikke på andre nettsteder."
       },
       "purposes": {
@@ -38,8 +39,8 @@
         "text": "Disse selskapene behandler opplysninger på våre vegne (databehandlere), bare for formålet som er oppgitt:",
         "netcup": "netcup GmbH, Tyskland: serveren der databasen og appen kjører.",
         "cloudflare": "Cloudflare, Inc., USA: fører forbindelsen din fram til serveren vår og beskytter den. Cloudflare ser IP-adressen din og sidene du åpner mens de passerer.",
-        "google": "Google LLC, USA: språkmodellen Gemini, som beskrevet over.",
-        "resend": "Resend (Plus Five Five, Inc.), USA: sender e-postene for å tilbakestille passord. Får e-postadressen din og selve e-posten.",
+        "google": "Google LLC, USA: språkmodellen Gemini, som beskrevet over, og innboksen (Gmail) som tilbakemeldinger sendes til.",
+        "resend": "Resend (Plus Five Five, Inc.), USA: sender e-postene våre: lenker for å tilbakestille passord til deg, og tilbakemeldinger til oss. Får e-postadressene og selve e-postene.",
         "goatcounter": "GoatCounter: teller sidevisninger. Setter ingen informasjonskapsler og lagrer ingen personopplysninger; IP-adressen brukes bare i minnet for å skille besøk fra hverandre, og lagres aldri."
       },
       "transfers": {

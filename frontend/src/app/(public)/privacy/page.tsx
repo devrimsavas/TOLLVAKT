@@ -11,7 +11,15 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: `${t("title")} – Tollvakt` };
 }
 
-const COLLECTED = ["account", "classifications", "usage", "guests", "resetLinks", "notStored"] as const;
+const COLLECTED = [
+  "account",
+  "classifications",
+  "usage",
+  "guests",
+  "resetLinks",
+  "feedback",
+  "notStored",
+] as const;
 const PURPOSES = ["contract", "interest"] as const;
 const PROCESSORS = ["netcup", "cloudflare", "google", "resend", "goatcounter"] as const;
 const RETENTION = ["account", "usage", "resetLinks", "backups", "logs"] as const;

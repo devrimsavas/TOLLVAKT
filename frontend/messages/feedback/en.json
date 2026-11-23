@@ -1,0 +1,35 @@
+{
+  "feedback": {
+    "title": "Feedback",
+    "lead": "Tell us about your experience with Tollvakt: report bugs, wrong suggestions and ideas for what it should do. Tollvakt is new, and your feedback decides what comes next.",
+    "link": "Feedback",
+    "resultLink": "Is a suggestion wrong, or something unclear? Tell us",
+    "kind": {
+      "legend": "What is it about?",
+      "idea": "An idea or a wish",
+      "problem": "Something is wrong",
+      "other": "Something else"
+    },
+    "message": "Your message",
+    "messageHint": "If a classification was wrong, write the product and the code you think is right.",
+    "email": "Your email (optional)",
+    "emailHint": "Only if you want an answer. Leave it empty to send the feedback anonymously.",
+    "website": "Leave this field empty",
+    "privacy": "The message, and your email if you give it, are sent to us by email and not stored on the site. Do not write personal data about others or confidential information.",
+    "submit": "Send feedback",
+    "sent": "Thank you! Your feedback has been sent.",
+    "sentAnonymous": "Thank you! Your feedback has been sent anonymously.",
+    "sendAnother": "Send more feedback",
+    "counter": {
+      "under": "%d characters left",
+      "over": "%d characters too many"
+    },
+    "errors": {
+      "messageTooShort": "Write at least {min} characters.",
+      "messageTooLong": "The message can be at most {max} characters.",
+      "emailInvalid": "Write a valid email address, or leave the field empty.",
+      "tooMany": "You have sent many messages. Try again in {minutes} minutes.",
+      "unavailable": "The feedback could not be sent. Try again later, or write to {email}."
+    }
+  }
+}

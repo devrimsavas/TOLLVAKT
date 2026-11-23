@@ -81,3 +81,51 @@ export function passwordResetEmail(input: {
     ),
   };
 }
+
+export type FeedbackKind = "idea" | "problem" | "other";
+
+const FEEDBACK_KIND_NAMES: Record<FeedbackKind, string> = {
+  idea: "Idea",
+  problem: "Problem",
+  other: "Other",
+};
+
+// Feedback from a user, to the owner of Tollvakt. Always in English, the
+// language of the admin side; the user's language is written in it.
+export function feedbackEmail(input: {
+  to: string;
+  kind: FeedbackKind;
+  message: string;
+  replyTo: string | null;
+  language: EmailLanguage;
+  page: string | null;
+  sentAt: Date;
+}): Email {
+  const kind = FEEDBACK_KIND_NAMES[input.kind];
+  const from = input.replyTo ?? "anonymous";
+  const facts = [
+    `Kind: ${kind}`,
+    `From: ${from}`,
+    `Language: ${input.language}`,
+    ...(input.page ? [`Page: ${input.page}`] : []),
+    `Sent: ${input.sentAt.toISOString()}`,
+  ];
+  const answer = input.replyTo
+    ? "Reply to this email to answer the user."
+    : "The user did not give an email address, so there is no one to answer.";
+  const message = escapeHtml(input.message).replace(/\n/g, "<br>");
+  return {
+    to: input.to,
+    subject: `Tollvakt feedback: ${kind} (${from})`,
+    text: [input.message, "", "----", ...facts, "", answer].join("\n"),
+    html: `<!doctype html>
+<html><body style="margin:0;padding:24px;background:#f4f5f6;font-family:Arial,Helvetica,sans-serif;color:#24272b">
+<div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:8px;padding:32px">
+<p style="margin:0 0 24px;font-size:20px;font-weight:bold;color:#0a6b5e">Tollvakt feedback</p>
+<p style="margin:0 0 24px;line-height:1.5;white-space:normal">${message}</p>
+<p style="margin:0 0 16px;font-size:13px;line-height:1.6;color:#5d6066">${facts.map(escapeHtml).join("<br>")}</p>
+<p style="margin:0;font-size:13px;color:#5d6066">${escapeHtml(answer)}</p>
+</div></body></html>`,
+    ...(input.replyTo ? { replyTo: input.replyTo } : {}),
+  };
+}

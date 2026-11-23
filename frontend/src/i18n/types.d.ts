@@ -1,5 +1,6 @@
 import type appMessages from "../../messages/en.json";
 import type legalMessages from "../../messages/legal/en.json";
+import type feedbackMessages from "../../messages/feedback/en.json";
 import type { Locale } from "./config";
 
 // Makes translation keys type-checked: a missing or misspelled key is a
@@ -8,6 +9,6 @@ import type { Locale } from "./config";
 declare module "next-intl" {
   interface AppConfig {
     Locale: Locale;
-    Messages: typeof appMessages & typeof legalMessages;
+    Messages: typeof appMessages & typeof legalMessages & typeof feedbackMessages;
   }
 }

@@ -25,6 +25,7 @@ const doc = {
       name: "Duty",
       description: "Customs duty and VAT calculation with Tolletaten's rates",
     },
+    { name: "Feedback", description: "Feedback from users, sent to the owner by email" },
     { name: "General", description: "API status" },
   ],
   components: {

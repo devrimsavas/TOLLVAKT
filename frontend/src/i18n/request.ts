@@ -15,17 +15,19 @@ export async function resolveLocale(): Promise<Locale> {
   return localeFromAcceptLanguage((await headers()).get("accept-language"));
 }
 
-// The privacy statement and the terms of use are long texts that change on
-// their own, so they live in messages/legal/ and are merged in here
+// Parts with their own texts (the privacy statement and terms of use, the
+// feedback page) live in their own folders under messages/ and are merged
+// in here, each as its own namespace
 export default getRequestConfig(async () => {
   const locale = await resolveLocale();
-  const [app, legal] = await Promise.all([
+  const [app, legal, feedback] = await Promise.all([
     import(`../../messages/${locale}.json`),
     import(`../../messages/legal/${locale}.json`),
+    import(`../../messages/feedback/${locale}.json`),
   ]);
   return {
     locale,
-    messages: { ...app.default, ...legal.default },
+    messages: { ...app.default, ...legal.default, ...feedback.default },
     timeZone: "Europe/Oslo",
   };
 });

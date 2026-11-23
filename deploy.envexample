@@ -34,6 +34,8 @@ EMAIL_PROVIDER=resend
 RESEND_API_KEY=
 EMAIL_FROM=Tollvakt <noreply@devrimdev.no>
 WEB_APP_URL=https://tollvakt.devrimdev.no
+# Where feedback is emailed; ADMIN_EMAIL when empty
+FEEDBACK_EMAIL=
 
 # Daily quotas for the calls that use a model (see backend/envexample)
 GUEST_DAILY_LIMIT=1

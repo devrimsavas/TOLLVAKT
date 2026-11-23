@@ -114,6 +114,15 @@ export const passwordCheckLimit = rateLimit({
   handler: tooMany("Too many wrong passwords. Try again later."),
 });
 
+// Feedback messages from one address: a public form gets spam
+export const feedbackLimit = rateLimit({
+  ...common,
+  windowMs: 60 * MINUTE,
+  limit: envLimit("FEEDBACK_PER_ADDRESS", 5),
+  identifier: "feedback",
+  handler: tooMany("Too many messages. Try again later."),
+});
+
 // All API requests from one address
 export const apiLimit = rateLimit({
   ...common,

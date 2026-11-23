@@ -21,6 +21,7 @@ import classificationsRouter from "./routes/classifications.js";
 import usageRouter from "./routes/usage.js";
 import adminRouter from "./routes/admin.js";
 import tariffRouter from "./routes/tariff.js";
+import feedbackRouter from "./routes/feedback.js";
 
 const app = express();
 
@@ -70,6 +71,7 @@ app.use("/api/classifications", classificationsRouter);
 app.use("/api/usage", usageRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/tariff", tariffRouter);
+app.use("/api/feedback", feedbackRouter);
 
 const swaggerPath = path.join(process.cwd(), "swagger_output.json");
 

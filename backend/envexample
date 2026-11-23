@@ -40,6 +40,10 @@ EMAIL_PROVIDER=log
 RESEND_API_KEY=
 EMAIL_FROM=Tollvakt <onboarding@resend.dev>
 WEB_APP_URL=http://localhost:3001
+# Where feedback from the feedback page is emailed; ADMIN_EMAIL when empty.
+# At most FEEDBACK_PER_ADDRESS messages per hour from one address.
+FEEDBACK_EMAIL=
+FEEDBACK_PER_ADDRESS=5
 
 # Daily quotas for the calls that use a model (classification and search
 # with mode=semantic, hybrid or expanded), counted from midnight in Norway.

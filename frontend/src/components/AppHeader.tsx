@@ -14,6 +14,7 @@ import styles from "./SiteHeader.module.css";
 export async function AppHeader({ user }: { user: CurrentUser }) {
   const t = await getTranslations("header");
   const app = await getTranslations("app.nav");
+  const feedback = await getTranslations("feedback");
   const locale = await getLocale();
 
   const links = [
@@ -21,6 +22,7 @@ export async function AppHeader({ user }: { user: CurrentUser }) {
     { href: "/history", text: app("history") },
     { href: "/search", text: app("search") },
     ...(user.role === "admin" ? [{ href: "/admin", text: app("admin") }] : []),
+    { href: "/feedback", text: feedback("link") },
   ];
   const name = `${user.firstName} ${user.lastName}`;
 

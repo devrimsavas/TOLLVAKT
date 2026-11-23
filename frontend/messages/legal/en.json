@@ -20,6 +20,7 @@
         "usage": "Your use of the language model: the time and kind (classification or search) of each call, so the daily limit can be counted.",
         "guests": "Visitors without an account: for the daily limit, a coded form of the IP address (a keyed hash) is stored with the time of the call. The IP address itself is not stored, and the code cannot be turned back into the address without the server's secret key.",
         "resetLinks": "Password reset: a coded form of the link we email you, valid for 60 minutes.",
+        "feedback": "Feedback: if you send feedback, the message and the email address you choose to give are emailed to us. They are not stored on the site, and are deleted from the mailbox when they are no longer needed.",
         "notStored": "We do not store your IP address, and we do not track you across other websites."
       },
       "purposes": {
@@ -38,8 +39,8 @@
         "text": "These companies process data on our behalf (databehandlere), only for the purpose given:",
         "netcup": "netcup GmbH, Germany: the server where the database and the app run.",
         "cloudflare": "Cloudflare, Inc., USA: brings your connection to our server and protects it. Cloudflare sees your IP address and the pages you open while they pass through.",
-        "google": "Google LLC, USA: the Gemini language model, as described above.",
-        "resend": "Resend (Plus Five Five, Inc.), USA: sends the password reset emails. It receives your email address and the email.",
+        "google": "Google LLC, USA: the Gemini language model, as described above, and the mailbox (Gmail) feedback is sent to.",
+        "resend": "Resend (Plus Five Five, Inc.), USA: sends our emails: password reset links to you, and feedback to us. It receives the email addresses and the emails.",
         "goatcounter": "GoatCounter: counts page views. It sets no cookies and stores no personal data; the IP address is used only in memory to tell visits apart, and is never saved."
       },
       "transfers": {

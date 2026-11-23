@@ -12,12 +12,16 @@ import styles from "./SiteHeader.module.css";
 
 export async function SiteHeader() {
   const t = await getTranslations("header");
+  const feedback = await getTranslations("feedback");
   const locale = await getLocale();
   // Only checks that a session cookie exists; pages that need the user
   // verify the token with the API
   const loggedIn = Boolean(await getSessionToken());
 
-  const links = [{ href: "/about", text: t("about") }];
+  const links = [
+    { href: "/about", text: t("about") },
+    { href: "/feedback", text: feedback("link") },
+  ];
   const menuLinks = loggedIn
     ? [...links, { href: HOME_AFTER_LOGIN, text: t("toApp") }]
     : [

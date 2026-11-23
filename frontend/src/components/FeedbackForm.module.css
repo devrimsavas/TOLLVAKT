@@ -1,0 +1,18 @@
+.form {
+  display: grid;
+  gap: var(--ds-size-6);
+  margin-top: var(--ds-size-6);
+}
+
+.muted {
+  color: var(--ds-color-neutral-text-subtle);
+}
+
+/* Off screen rather than display: none, which some robots skip */
+.trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

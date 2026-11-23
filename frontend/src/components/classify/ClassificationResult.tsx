@@ -29,6 +29,7 @@ export function ClassificationResult({
   showSavedLink?: boolean;
 }) {
   const t = useTranslations("classify.result");
+  const feedback = useTranslations("feedback");
   const locale = useLocale();
 
   return (
@@ -130,6 +131,12 @@ export function ClassificationResult({
           </Link>
         </Paragraph>
       )}
+
+      <Paragraph data-size="sm" data-print="hide">
+        <Link asChild>
+          <NextLink href="/feedback?kind=problem&from=/classify">{feedback("resultLink")}</NextLink>
+        </Link>
+      </Paragraph>
 
       <Paragraph data-size="sm" className={styles.muted}>
         {t("notBinding")}
