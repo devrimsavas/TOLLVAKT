@@ -39,6 +39,7 @@
 }
 
 .nav a {
+  white-space: nowrap;
   color: var(--ds-color-neutral-text-default);
   text-decoration: none;
   font-weight: var(--ds-font-weight-medium);
@@ -143,6 +144,12 @@
 
 .userName {
   white-space: nowrap;
+  /* A long name is cut with "…", so it never pushes the links apart */
+  display: inline-block;
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
 }
 
 .userEmail {
