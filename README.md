@@ -6,7 +6,7 @@
 
 Tollvakt helps small Norwegian businesses find the right commodity code (varenummer), estimate customs duty and VAT, and check whether a free trade agreement can lower the duty, before the goods reach the border.
 
-> Status: in development, not yet in production. The backend (Norwegian data import, AI classification, search, duty calculation, accounts and daily quotas) and the web app (AI classification, tariff search and tree, code pages with a duty and VAT calculator, saved classifications, settings and admin) are working, with unit and end-to-end tests. Deployment is next.
+> Status: live at https://tollvakt.devrimdev.no as a pilot. The backend (Norwegian data import, AI classification, search, duty calculation, accounts and daily quotas) and the web app (AI classification, tariff search and tree, code pages with a duty and VAT calculator, saved classifications, settings and admin) run on a VPS with Docker Compose behind Cloudflare Tunnel, with nightly database backups. Next: export destinations (EU, UK, USA).
 
 ---
 
@@ -101,40 +101,53 @@ Later candidates: other destination countries only when customers ask for them.
 ## Roadmap
 
 ### Phase 0: Foundation
+
 - [x] Repository and README
 - [ ] Licence
 - [x] Common tariff data model (design + migrations)
 - [x] Backend skeleton (Express + TypeScript, auth, Swagger) reusing Leverandørvakt/Regelvakt patterns
-- [x] CI on GitHub Actions (backend and ETL tests against PostgreSQL)
+- [x] CI on GitHub Actions: backend and ETL tests against PostgreSQL, lint, type check, build
 - [x] End-to-end tests (Playwright) against the API in a test mode with fake models, in CI
+- [x] Docker images and Compose setup, built and started in CI
 
 ### Phase 1: Norway
+
 - [x] ETL: Tolletaten tariff structure, duty rates, fees, restrictions, exchange rates
+- [x] ETL: one command to download, import and embed (`update_norway`)
+- [ ] ETL run on a schedule, so rates and exchange rates stay current (now run by hand)
 - [ ] ETL: BKU rulings (not available as open data; asked Tolletaten)
+- [ ] Section and chapter notes extracted from the tariff PDF
 - [x] Duty + VAT calculator
 - [ ] Duty + VAT calculator checked against Tolletaten's own calculation examples
+- [ ] Other fees (særavgifter) and raw material duty calculated, not only listed
 - [x] Free-trade-agreement check (preferential vs. ordinary rate, possible saving)
-- [ ] Proof-of-origin guidance
+- [ ] Proof-of-origin guidance (which proof, rules of origin per agreement)
 - [x] Commodity search: full-text (nb/en) and code search
+- [x] Tariff tree to browse, one level at a time
 - [x] Semantic search (pgvector; Ollama locally, Gemini in production)
 - [x] Query rewriting into the tariff's wording (LLM) and hybrid search (full-text + semantic, rank fusion)
-- [x] Accuracy test sets: a tuning set and a held-out set of products with known correct codes
+- [x] Accuracy test sets from Statistics Norway import data: a tuning set and a held-out set
 - [x] Classification flow (retrieval + LLM + reasoning, top 3 codes, confidence, questions to the user)
-- [ ] Section and chapter notes extracted from the tariff PDF
+- [ ] Known weak spots: finished articles classified by their material (yoga mat), right code not among the candidates (dining table), "high" confidence that is wrong
+- [ ] Larger test set reviewed by a customs expert
 
 ### Phase 1b: Accounts and usage
+
 - [x] Daily quotas for model-backed calls: guests (by hashed IP), members, global cap
 - [x] Saved classifications: members see, print and delete their own
 - [x] Admin endpoints: users, daily limits, closing accounts, usage statistics
-- [x] Account: change password, delete account, data export (GDPR), language, password reset by email
+- [x] Account: change password, delete account, data export (GDPR), language, password reset by email (Resend)
 
 ### Phase 2: Export destinations
+
 - [ ] ETL: EU TARIC
 - [ ] ETL: UK Trade Tariff API
 - [ ] ETL: USA (USITC HTS API)
 - [ ] Destination duty lookup via 6-digit HS mapping
+- [ ] Export restrictions and licences
 
 ### Phase 3: Frontend and pilot
+
 - [x] Next.js UI (nb / en, light and dark mode)
 - [x] Accounts: register, log in, password reset by email, settings, data export, delete account
 - [x] AI classification page, with a one-a-day try-out for guests on the landing page
@@ -142,10 +155,14 @@ Later candidates: other destination countries only when customers ask for them.
 - [x] Code pages with a duty and VAT calculator
 - [x] Saved classifications: list, open, print, delete
 - [x] Admin page: use of the AI per day, accounts, daily limits
-- [ ] Deployment to production
+- [x] Deployment to production (Docker Compose on a VPS, Cloudflare Tunnel, nightly backups, GoatCounter)
+- [ ] Privacy statement and terms of use (descriptions are sent to the language model)
+- [ ] Monitoring: alerts when the site or the language model fails
+- [ ] Accessibility check (universell utforming)
 - [ ] Pilot with Norwegian importers and exporters
 
 ### Later
+
 - [ ] Batch classification (CSV upload of product lists)
 - [ ] Change alerts when a rate for a saved code changes
 - [ ] API for freight forwarders
