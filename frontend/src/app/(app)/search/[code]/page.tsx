@@ -5,6 +5,8 @@ import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { Alert, Heading, Link, Paragraph } from "@digdir/designsystemet-react";
 import { ArrowLeftIcon } from "@navikt/aksel-icons";
 import { TariffTree } from "@/components/tariff/TariffTree";
+import { DutyCalculator } from "@/components/duty/DutyCalculator";
+import { listCountries } from "@/lib/countries";
 import { getCommodity, treeChildren } from "@/lib/tariff";
 import { formatNodeCode, nodeText, type TreeNode } from "@/lib/tariffFormat";
 import styles from "@/components/tariff/tariff.module.css";
@@ -63,13 +65,14 @@ export default async function CodePage({ params }: PageProps<"/search/[code]">) 
   // The tree, open along the code's path: the children of every level
   // above it are loaded on the server
   const openIds = details.path.map((level) => level.nodeId);
-  const [sections, ...levels] = await Promise.all([
+  const [countries, sections, ...levels] = await Promise.all([
+    listCountries(),
     treeChildren(null),
     ...openIds.map((id) => treeChildren(id)),
   ]);
   const loaded: Record<number, TreeNode[]> = {};
   openIds.forEach((id, index) => {
-    const children = levels[index];
+    const children = levels[index] as TreeNode[] | null;
     if (children) loaded[id] = children;
   });
 
@@ -162,6 +165,20 @@ export default async function CodePage({ params }: PageProps<"/search/[code]">) 
           </ul>
         </section>
       )}
+
+      <section aria-labelledby="duty" className={styles.browse}>
+        <Heading id="duty" level={2} data-size="xs">
+          {t("duty")}
+        </Heading>
+        <Paragraph data-size="sm" className={styles.otherLanguage}>
+          {t("dutyLead")}
+        </Paragraph>
+        {countries ? (
+          <DutyCalculator code={details.code} countries={countries} />
+        ) : (
+          <Alert data-color="warning">{t("unavailable")}</Alert>
+        )}
+      </section>
 
       <section aria-labelledby="in-tariff" className={styles.browse}>
         <Heading id="in-tariff" level={2} data-size="xs">

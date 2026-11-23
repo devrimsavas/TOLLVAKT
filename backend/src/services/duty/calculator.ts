@@ -56,8 +56,22 @@ export interface DutyResult {
   otherFees: FeeRow[];
   restrictions: DutyData["restrictions"];
   totalNok: number | null;
+  // Things to know about the result, in English
   warnings: string[];
+  // The same, as codes with their values, so an app can show them in its
+  // own language
+  notes: DutyNote[];
 }
+
+export type DutyNote =
+  | { code: "notValid"; values: { commodityCode: string; date: string } }
+  | { code: "outOfSeason"; values: { commodityCode: string; from: string; to: string; date: string } }
+  | { code: "noOrdinaryRate"; values: { commodityCode: string; date: string } }
+  | { code: "quantityMissing"; values: { group: string; quantity: string } }
+  | { code: "placeholderRate"; values: { group: string; rate: string } }
+  | { code: "rawMaterial"; values: Record<string, never> }
+  | { code: "reducedVat"; values: { rate: number } }
+  | { code: "otherFees"; values: Record<string, never> };
 
 const round = (value: number) => Math.round(value * 100) / 100;
 
@@ -152,13 +166,30 @@ export function inSeason(date: string, from: string | null, to: string | null): 
 
 export function calculateDuty(input: DutyInput, data: DutyData): DutyResult {
   const warnings: string[] = [];
+  const notes: DutyNote[] = [];
+  const note = (entry: DutyNote, message: string) => {
+    notes.push(entry);
+    warnings.push(message);
+  };
   const { commodity, countryGroups } = data;
 
   if (commodity.validFrom > input.date || (commodity.validTo && commodity.validTo < input.date)) {
-    warnings.push(`Commodity code ${commodity.code} is not valid on ${input.date}.`);
+    note(
+      { code: "notValid", values: { commodityCode: commodity.code, date: input.date } },
+      `Commodity code ${commodity.code} is not valid on ${input.date}.`,
+    );
   }
   if (!inSeason(input.date, commodity.seasonFrom, commodity.seasonTo)) {
-    warnings.push(
+    note(
+      {
+        code: "outOfSeason",
+        values: {
+          commodityCode: commodity.code,
+          from: commodity.seasonFrom ?? "",
+          to: commodity.seasonTo ?? "",
+          date: input.date,
+        },
+      },
       `Commodity code ${commodity.code} is a seasonal code (${commodity.seasonFrom}–${commodity.seasonTo}) and does not apply on ${input.date}.`,
     );
   }
@@ -175,7 +206,10 @@ export function calculateDuty(input: DutyInput, data: DutyData): DutyResult {
     ? dutyLine(ordinaryRate, input, customsValueNok, groupName(ORDINARY_GROUP, countryGroups))
     : null;
   if (!ordinary) {
-    warnings.push(`No ordinary customs rate found for ${commodity.code} on ${input.date}.`);
+    note(
+      { code: "noOrdinaryRate", values: { commodityCode: commodity.code, date: input.date } },
+      `No ordinary customs rate found for ${commodity.code} on ${input.date}.`,
+    );
   }
 
   const preferentialGroups = countryGroups.filter(
@@ -197,13 +231,15 @@ export function calculateDuty(input: DutyInput, data: DutyData): DutyResult {
 
   for (const line of [ordinary, ...candidates]) {
     if (line?.missing) {
-      warnings.push(
+      note(
+        { code: "quantityMissing", values: { group: line.group, quantity: line.missing } },
         `The rate for group ${line.group} is per ${unitName(line.rateUnit)}; give ${line.missing} to calculate it.`,
       );
     }
   }
   for (const rate of data.rates.filter((r) => r.isSpecialValue)) {
-    warnings.push(
+    note(
+      { code: "placeholderRate", values: { group: rate.groupCode, rate: rate.rateRaw } },
       `The rate ${rate.rateRaw} for group ${rate.groupCode} is a placeholder in Tolletaten's data and is not used. Check with Tolletaten.`,
     );
   }
@@ -222,7 +258,8 @@ export function calculateDuty(input: DutyInput, data: DutyData): DutyResult {
     .map((r) => dutyLine(r, input, customsValueNok, groupName(r.groupCode, countryGroups)));
 
   if (data.rates.some((r) => r.dutyKind === "raw_material")) {
-    warnings.push(
+    note(
+      { code: "rawMaterial", values: {} },
       "Raw material duty (råvaretoll) may apply to this code. It is set by Landbruksdirektoratet and is not included.",
     );
   }
@@ -234,7 +271,8 @@ export function calculateDuty(input: DutyInput, data: DutyData): DutyResult {
   const isFood = commodity.classifications.includes(FOOD_CLASSIFICATION);
   const vatRate = (isFood && reduced?.rateValue) || standard?.rateValue || 25;
   if (reduced && !isFood) {
-    warnings.push(
+    note(
+      { code: "reducedVat", values: { rate: reduced.rateValue ?? 0 } },
       `A reduced VAT rate of ${reduced.rateValue} % exists for this code when the goods are food; the standard rate is used.`,
     );
   }
@@ -249,7 +287,8 @@ export function calculateDuty(input: DutyInput, data: DutyData): DutyResult {
 
   const otherFees = data.fees.filter((f) => f.feeType !== "MV");
   if (otherFees.length > 0) {
-    warnings.push(
+    note(
+      { code: "otherFees", values: {} },
       "Other fees (særavgifter) may apply; they depend on details of the goods and are listed but not included in the total.",
     );
   }
@@ -286,6 +325,7 @@ export function calculateDuty(input: DutyInput, data: DutyData): DutyResult {
     totalNok:
       totalDuty === null || vatAmount === null ? null : round(totalDuty + vatAmount),
     warnings,
+    notes,
   };
 }
 

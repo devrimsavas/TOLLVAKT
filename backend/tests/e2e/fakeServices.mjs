@@ -94,6 +94,35 @@ for (const row of texts) {
 }
 await sequelize.query("ANALYZE");
 
+// Duty, VAT and exchange rates for the duty calculator: T-shirts have an
+// ordinary rate in percent and duty-free preferences from the EU and
+// Türkiye; wool sweaters an ordinary rate per kg
+const isoDay = (offset) => new Date(Date.now() + offset * 86400000).toISOString().slice(0, 10);
+await sequelize.query(`
+  INSERT INTO country_groups (code, name_nb, preference_code, valid_from) VALUES
+    ('TALL', 'Toll fra alle land (ordinær toll)', 'N', '1990-01-01'),
+    ('TEF', 'Toll fra EU- land', 'B', '1990-01-01'),
+    ('TTYR', 'Toll fra Tyrkia', 'P', '1990-01-01'),
+    ('ALLE', 'Avgift fra alle land', 'N', '1990-01-01');
+  INSERT INTO countries (code, name_nb) VALUES ('DE', 'Tyskland'), ('TR', 'Tyrkia'), ('CN', 'Kina');
+  INSERT INTO country_group_members (country_code, group_code, valid_from) VALUES
+    ('DE', 'TEF', '1990-01-01'), ('TR', 'TTYR', '1992-04-17');
+  INSERT INTO duty_rates (commodity_code, duty_kind, country_group_code, rate_unit, rate_value, rate_raw, valid_from) VALUES
+    ('61091000', 'customs', 'TALL', 'P', 10.7, '10,70', '2004-01-01'),
+    ('61091000', 'customs', 'TEF', 'P', 0, '0,00', '1996-01-01'),
+    ('61091000', 'customs', 'TTYR', 'P', 0, '0,00', '1996-01-01'),
+    ('61101100', 'customs', 'TALL', 'K', 30, '30,00', '2004-01-01');
+  INSERT INTO fees (direction, commodity_code, country_group_code, fee_type, fee_group, fee_group_description, rate_value, rate_raw, rate_unit, valid_from) VALUES
+    ('import', '61091000', 'ALLE', 'MV', 1, 'Merverdiavgift', 25, '25,00', 'P', '2005-01-01'),
+    ('import', '61101100', 'ALLE', 'MV', 1, 'Merverdiavgift', 25, '25,00', 'P', '2005-01-01');
+`);
+await sequelize.query(
+  `INSERT INTO exchange_rates (currency_code, valid_from, valid_to, description, rate, rate_raw, unit) VALUES
+     ('EUR', :from, :to, 'EURO', 11.5, '11,500', 1),
+     ('USD', :from, :to, 'US DOLLAR', 10.0, '10,000', 1)`,
+  { replacements: { from: isoDay(-7), to: isoDay(7) } },
+);
+
 // ---- 2. The language model ----
 
 // The rewrite returns the description as it is. The classification picks

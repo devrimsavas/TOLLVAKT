@@ -1,0 +1,73 @@
+.calculator {
+  display: grid;
+  gap: var(--ds-size-6);
+}
+
+.form {
+  display: grid;
+  gap: var(--ds-size-4);
+  padding: var(--ds-size-5);
+  border: 1px solid var(--ds-color-neutral-border-subtle);
+  border-radius: var(--ds-border-radius-lg);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--ds-size-4);
+  align-items: start;
+}
+
+.muted {
+  margin: 0;
+  color: var(--ds-color-neutral-text-subtle);
+}
+
+.result {
+  display: grid;
+  gap: var(--ds-size-4);
+}
+
+.result h3 {
+  margin: 0;
+}
+
+.table {
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.table th {
+  font-weight: var(--ds-font-weight-regular);
+  text-align: left;
+}
+
+.amount {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table tr[data-applied] th,
+.table tr[data-applied] td {
+  font-weight: var(--ds-font-weight-semibold);
+}
+
+.total th,
+.total td {
+  font-weight: var(--ds-font-weight-semibold);
+  border-top: 2px solid var(--ds-color-neutral-border-default);
+  font-size: var(--ds-body-lg-font-size);
+}
+
+.tag {
+  margin-left: var(--ds-size-2);
+}
+
+.notes h4 {
+  margin: 0 0 var(--ds-size-1);
+}
+
+.notes ul {
+  margin: 0;
+  padding-left: var(--ds-size-5);
+}

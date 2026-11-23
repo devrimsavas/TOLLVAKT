@@ -122,6 +122,10 @@ describe("calculateDuty", () => {
     expect(result.duty.ordinary?.missing).toBe("netWeightKg");
     expect(result.totalNok).toBeNull();
     expect(result.warnings.some((w) => w.includes("netWeightKg"))).toBe(true);
+    expect(result.notes).toContainEqual({
+      code: "quantityMissing",
+      values: expect.objectContaining({ quantity: "netWeightKg" }),
+    });
   });
 
   it("needs no quantity for a zero rate", () => {
@@ -138,6 +142,7 @@ describe("calculateDuty", () => {
 
     expect(result.duty.amountNok).toBeNull();
     expect(result.warnings.some((w) => w.includes("placeholder"))).toBe(true);
+    expect(result.notes.map((n) => n.code)).toContain("placeholderRate");
   });
 
   it("adds additional duty for the origin's groups", () => {
@@ -171,6 +176,7 @@ describe("calculateDuty", () => {
     expect(food.vat.rate).toBe(15);
     expect(notFood.vat.rate).toBe(25);
     expect(notFood.warnings.some((w) => w.includes("reduced VAT"))).toBe(true);
+    expect(notFood.notes).toContainEqual({ code: "reducedVat", values: { rate: expect.any(Number) } });
   });
 
   it("lists other fees and restrictions for the origin, without adding them", () => {
@@ -197,6 +203,9 @@ describe("calculateDuty", () => {
 
     expect(result.warnings.some((w) => w.includes("not valid"))).toBe(true);
     expect(result.warnings.some((w) => w.includes("seasonal"))).toBe(true);
+    // Every warning has a note with the same meaning, for apps in other languages
+    expect(result.notes.map((n) => n.code)).toEqual(expect.arrayContaining(["notValid", "outOfSeason"]));
+    expect(result.notes).toHaveLength(result.warnings.length);
   });
 });
 

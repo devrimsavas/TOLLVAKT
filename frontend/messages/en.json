@@ -330,7 +330,9 @@
       "chapter": "Chapter",
       "loading": "Loading…",
       "failed": "Could not open this level. Try again."
-    }
+    },
+    "duty": "Duty and VAT on import",
+    "dutyLead": "Estimate the customs duty and import VAT for this code, with Tolletaten's rates and exchange rates for today."
   },
   "history": {
     "title": "My classifications",
@@ -448,6 +450,68 @@
       "password": "Password",
       "confirm": "Delete my account",
       "cancel": "Cancel"
+    }
+  },
+  "duty": {
+    "origin": "Origin country",
+    "chooseCountry": "Choose a country",
+    "currency": "Currency",
+    "value": "Value of the goods",
+    "valueHint": "As on the invoice",
+    "freight": "Freight to Norway",
+    "insurance": "Insurance",
+    "netWeightKg": "Net weight (kg)",
+    "liters": "Litres",
+    "pieces": "Pieces",
+    "quantityHint": "The quantities are only needed when the duty is per kg, litre or piece; the result says so.",
+    "proofOfOrigin": "I have a proof of origin",
+    "proofOfOriginHint": "For example a statement of origin on the invoice, under a free trade agreement",
+    "submit": "Calculate duty and VAT",
+    "errors": {
+      "countryRequired": "Choose the origin country.",
+      "valueInvalid": "Give the value as a number",
+      "numberInvalid": "Freight, insurance and quantities must be numbers of 0 or more.",
+      "noExchangeRate": "Tolletaten has no exchange rate for this currency today. Choose another currency.",
+      "unknown": "The calculation could not be made for this code and country.",
+      "unavailable": "The calculation is not available right now. Try again in a little while."
+    },
+    "result": {
+      "title": "Import from {country}",
+      "customsValue": "Customs value (goods, freight, insurance)",
+      "ordinary": "Ordinary duty",
+      "preferential": "Preferential duty ({group})",
+      "additional": "Additional duty ({group})",
+      "applied": "Used",
+      "vatBase": "VAT base (customs value + duty)",
+      "vat": "Import VAT",
+      "total": "Duty and VAT in total",
+      "unknown": "Not calculated",
+      "perUnit": {
+        "K": "{rate} kr/kg",
+        "L": "{rate} kr/l",
+        "S": "{rate} kr/piece",
+        "P": "{rate} %"
+      },
+      "saving": "With a proof of origin, the duty would be {amount} lower.",
+      "notesTitle": "Good to know",
+      "restrictions": "Import restrictions",
+      "otherFees": "Other fees that may apply",
+      "exchangeRate": "1 {currency} = {rate} NOK (Tolletaten, from {from}).",
+      "notBinding": "An estimate from Tolletaten's rates, not a binding decision."
+    },
+    "notes": {
+      "notValid": "The code is not valid on {date}.",
+      "outOfSeason": "The code is seasonal and does not apply on {date}.",
+      "noOrdinaryRate": "No ordinary duty rate was found for this code.",
+      "quantityMissing": {
+        "netWeightKg": "The duty is per kg: give the net weight to calculate it.",
+        "liters": "The duty is per litre: give the litres to calculate it.",
+        "pieces": "The duty is per piece: give the number of pieces to calculate it."
+      },
+      "placeholderRate": "Tolletaten's data has a placeholder rate ({rate}) that is not used. Check with Tolletaten.",
+      "rawMaterial": "Raw material duty (råvaretoll) may apply. It is set by Landbruksdirektoratet and is not included.",
+      "reducedVat": "A reduced VAT rate of {rate} % applies when the goods are food; the standard rate is used here.",
+      "otherFees": "Other fees (særavgifter) may apply. They depend on the goods and are not in the total."
     }
   }
 }

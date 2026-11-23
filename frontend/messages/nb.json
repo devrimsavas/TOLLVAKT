@@ -330,7 +330,9 @@
       "chapter": "Kapittel",
       "loading": "Laster …",
       "failed": "Kunne ikke åpne dette nivået. Prøv igjen."
-    }
+    },
+    "duty": "Toll og mva ved import",
+    "dutyLead": "Anslå tollen og merverdiavgiften for denne koden, med Tolletatens satser og valutakurser for i dag."
   },
   "history": {
     "title": "Mine klassifiseringer",
@@ -448,6 +450,68 @@
       "password": "Passord",
       "confirm": "Slett kontoen min",
       "cancel": "Avbryt"
+    }
+  },
+  "duty": {
+    "origin": "Opprinnelsesland",
+    "chooseCountry": "Velg et land",
+    "currency": "Valuta",
+    "value": "Varens verdi",
+    "valueHint": "Som på fakturaen",
+    "freight": "Frakt til Norge",
+    "insurance": "Forsikring",
+    "netWeightKg": "Nettovekt (kg)",
+    "liters": "Liter",
+    "pieces": "Stykk",
+    "quantityHint": "Mengdene trengs bare når tollen er per kg, liter eller stykk; resultatet sier fra.",
+    "proofOfOrigin": "Jeg har opprinnelsesbevis",
+    "proofOfOriginHint": "For eksempel en opprinnelseserklæring på fakturaen, etter en frihandelsavtale",
+    "submit": "Beregn toll og mva",
+    "errors": {
+      "countryRequired": "Velg opprinnelseslandet.",
+      "valueInvalid": "Oppgi verdien som et tall",
+      "numberInvalid": "Frakt, forsikring og mengder må være tall på 0 eller mer.",
+      "noExchangeRate": "Tolletaten har ingen valutakurs for denne valutaen i dag. Velg en annen valuta.",
+      "unknown": "Beregningen kunne ikke gjøres for denne koden og dette landet.",
+      "unavailable": "Beregningen er ikke tilgjengelig akkurat nå. Prøv igjen om litt."
+    },
+    "result": {
+      "title": "Import fra {country}",
+      "customsValue": "Tollverdi (vare, frakt, forsikring)",
+      "ordinary": "Ordinær toll",
+      "preferential": "Preferansetoll ({group})",
+      "additional": "Tilleggstoll ({group})",
+      "applied": "Brukt",
+      "vatBase": "Grunnlag for mva (tollverdi + toll)",
+      "vat": "Merverdiavgift ved innførsel",
+      "total": "Toll og mva til sammen",
+      "unknown": "Ikke beregnet",
+      "perUnit": {
+        "K": "{rate} kr/kg",
+        "L": "{rate} kr/l",
+        "S": "{rate} kr/stk",
+        "P": "{rate} %"
+      },
+      "saving": "Med opprinnelsesbevis ville tollen blitt {amount} lavere.",
+      "notesTitle": "Godt å vite",
+      "restrictions": "Restriksjoner ved innførsel",
+      "otherFees": "Andre avgifter som kan gjelde",
+      "exchangeRate": "1 {currency} = {rate} NOK (Tolletaten, fra {from}).",
+      "notBinding": "Et anslag etter Tolletatens satser, ikke en bindende avgjørelse."
+    },
+    "notes": {
+      "notValid": "Koden er ikke gyldig {date}.",
+      "outOfSeason": "Koden er sesongbestemt og gjelder ikke {date}.",
+      "noOrdinaryRate": "Fant ingen ordinær tollsats for denne koden.",
+      "quantityMissing": {
+        "netWeightKg": "Tollen er per kg: oppgi nettovekten for å beregne den.",
+        "liters": "Tollen er per liter: oppgi literne for å beregne den.",
+        "pieces": "Tollen er per stykk: oppgi antall stykk for å beregne den."
+      },
+      "placeholderRate": "Tolletatens data har en plassholdersats ({rate}) som ikke brukes. Sjekk med Tolletaten.",
+      "rawMaterial": "Råvaretoll kan gjelde. Den fastsettes av Landbruksdirektoratet og er ikke tatt med.",
+      "reducedVat": "Redusert mva-sats på {rate} % gjelder når varen er næringsmiddel; her brukes standardsatsen.",
+      "otherFees": "Særavgifter kan gjelde. De avhenger av varen og er ikke med i summen."
     }
   }
 }
