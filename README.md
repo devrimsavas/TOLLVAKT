@@ -6,7 +6,7 @@
 
 Tollvakt helps small Norwegian businesses find the right commodity code (varenummer), estimate customs duty and VAT, and check whether a free trade agreement can lower the duty, before the goods reach the border.
 
-> Status: in development. Norwegian data import, duty calculation, commodity search and AI classification are working in the backend, with accounts, daily quotas and saved classifications. The frontend is next.
+> Status: in development, not yet in production. The backend (Norwegian data import, AI classification, search, duty calculation, accounts and daily quotas) and the web app (AI classification, tariff search and tree, code pages with a duty and VAT calculator, saved classifications, settings and admin) are working, with unit and end-to-end tests. Deployment is next.
 
 ---
 
@@ -106,6 +106,7 @@ Later candidates: other destination countries only when customers ask for them.
 - [x] Common tariff data model (design + migrations)
 - [x] Backend skeleton (Express + TypeScript, auth, Swagger) reusing Leverandørvakt/Regelvakt patterns
 - [x] CI on GitHub Actions (backend and ETL tests against PostgreSQL)
+- [x] End-to-end tests (Playwright) against the API in a test mode with fake models, in CI
 
 ### Phase 1: Norway
 - [x] ETL: Tolletaten tariff structure, duty rates, fees, restrictions, exchange rates
@@ -134,8 +135,13 @@ Later candidates: other destination countries only when customers ask for them.
 - [ ] Destination duty lookup via 6-digit HS mapping
 
 ### Phase 3: Frontend and pilot
-- [ ] Next.js UI (nb / en)
-- [ ] "Free customs check" demo for pilot users
+- [x] Next.js UI (nb / en, light and dark mode)
+- [x] Accounts: register, log in, password reset by email, settings, data export, delete account
+- [x] AI classification page, with a one-a-day try-out for guests on the landing page
+- [x] Tariff search (code and text) and a tree to browse the tariff
+- [x] Code pages with a duty and VAT calculator
+- [x] Saved classifications: list, open, print, delete
+- [x] Admin page: use of the AI per day, accounts, daily limits
 - [ ] Deployment to production
 - [ ] Pilot with Norwegian importers and exporters
 
