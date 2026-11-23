@@ -1,0 +1,77 @@
+# Runs the web app, the API and its database locally, the same way as on
+# the server:
+#   docker compose up --build
+#   docker compose run --rm etl      (load the tariff; takes a while)
+# The web app is then at http://localhost:3001, the API at
+# http://localhost:3000 and its docs at /api/docs.
+# Settings come from .env next to this file (copy deploy.envexample); the
+# database connection and the Ollama address are set here, because they
+# differ inside Docker.
+
+services:
+  db:
+    image: pgvector/pgvector:pg18
+    environment:
+      POSTGRES_USER: tollvakt
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tollvakt}
+      POSTGRES_DB: tollvakt
+    volumes:
+      - db-data:/var/lib/postgresql
+    ports:
+      # 5433 on your machine, so it does not clash with a local PostgreSQL on 5432
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tollvakt -d tollvakt"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      # These override .env: inside Docker the database is the "db" service,
+      # and Ollama runs on your machine, not in the container
+      DATABASE_URL: postgres://tollvakt:${POSTGRES_PASSWORD:-tollvakt}@db:5432/tollvakt
+      OLLAMA_HOST: ${DOCKER_OLLAMA_HOST:-http://host.docker.internal:11434}
+      PORT: "3000"
+      LOG_FORMAT: json
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      # Docker Desktop (Windows, macOS) knows host.docker.internal already;
+      # this makes it work on Linux too
+      - "host.docker.internal:host-gateway"
+
+  web:
+    build: ./frontend
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_URL: http://api:3000
+      GOATCOUNTER_URL: ${GOATCOUNTER_URL:-}
+    ports:
+      - "3001:3001"
+
+  etl:
+    build: ./etl
+    profiles: ["etl"]
+    depends_on:
+      api:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://tollvakt:${POSTGRES_PASSWORD:-tollvakt}@db:5432/tollvakt
+      OLLAMA_HOST: ${DOCKER_OLLAMA_HOST:-http://host.docker.internal:11434}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - etl-data:/app/data
+
+volumes:
+  db-data:
+  etl-data:

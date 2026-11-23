@@ -1,0 +1,51 @@
+# Settings for docker-compose.prod.yml (and docker-compose.yml), in one .env
+# next to the Compose files. Copy this file to .env and fill it in; .env is
+# never committed. The API, the web app and the ETL all read it.
+# DATABASE_URL and PORT are not here: Compose sets them for Docker's network.
+
+# ---- Compose ----
+# The database password. Make a long random one: openssl rand -hex 24
+POSTGRES_PASSWORD=change_me
+# The port the web app answers on, on the server only (127.0.0.1), for
+# cloudflared. Pick one that no other project on the server uses.
+WEB_PORT=3002
+# Behind Cloudflare the visitor's address is in cf-connecting-ip
+CLIENT_IP_HEADER=cf-connecting-ip
+# GoatCounter page view counts (the address in its script); empty counts nothing
+GOATCOUNTER_URL=
+
+# ---- API ----
+# Sessions. Make a long random secret: openssl rand -hex 32
+JWT_SECRET=change_me
+JWT_EXPIRES_IN=12h
+
+# The admin account, created on startup if no admin exists yet
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=change_me
+ADMIN_FIRST_NAME=Admin
+ADMIN_LAST_NAME=Tollvakt
+
+LOG_FORMAT=json
+LOG_LEVEL=info
+
+# Email (password reset links), with Resend and an address on a verified
+# domain. WEB_APP_URL is where the links in emails point.
+EMAIL_PROVIDER=resend
+RESEND_API_KEY=
+EMAIL_FROM=Tollvakt <noreply@devrimdev.no>
+WEB_APP_URL=https://tollvakt.devrimdev.no
+
+# Daily quotas for the calls that use a model (see backend/envexample)
+GUEST_DAILY_LIMIT=1
+USER_DAILY_LIMIT=10
+GLOBAL_DAILY_LIMIT=200
+
+# The models: Gemini in production. The ETL creates the tariff vectors with
+# the same embedding model, so the API and the ETL must use the same one.
+EMBEDDING_PROVIDER=gemini
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=
+GEMINI_EMBEDDING_MODEL=gemini-embedding-001
+GEMINI_LLM_MODEL=gemini-3.6-flash
+GEMINI_THINKING_LEVEL=low
+LLM_TIMEOUT_SECONDS=60

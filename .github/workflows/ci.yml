@@ -195,3 +195,54 @@ jobs:
             frontend/playwright-report
             frontend/test-results
           retention-days: 7
+
+  # Builds the Docker images and starts the server setup with Docker
+  # Compose, as on the server, then checks that only the web app answers,
+  # and that the backup script works
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      # The example values are enough for this check; no model keys, so no
+      # model is called
+      - name: Create .env from the example
+        run: |
+          cp deploy.envexample .env
+          sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=ci$(openssl rand -hex 12)/" .env
+          sed -i "s/^JWT_SECRET=.*/JWT_SECRET=ci$(openssl rand -hex 16)/" .env
+          sed -i 's/^ADMIN_PASSWORD=.*/ADMIN_PASSWORD=CiAdminSecure2026/' .env
+
+      # --wait returns when every container reports healthy, or fails
+      - name: Build and start the server setup
+        run: docker compose -f docker-compose.prod.yml up --build --detach --wait --wait-timeout 240
+
+      - name: Check that only the web app answers, and only on the machine
+        run: |
+          curl --fail --silent --show-error --output /dev/null http://127.0.0.1:3002/
+          curl --fail --silent --show-error --output /dev/null http://127.0.0.1:3002/about
+          # The API and the database must not be reachable from outside Docker
+          for port in 3000 5432 5433; do
+            if curl --silent --max-time 3 --output /dev/null "http://localhost:$port/"; then
+              echo "Port $port answers, but should not be published"
+              exit 1
+            fi
+          done
+
+      - name: Check that the ETL image builds
+        run: docker compose -f docker-compose.prod.yml --profile etl build etl
+
+      - name: Back up the database with the backup script
+        run: |
+          bash scripts/backup-db.sh
+          gunzip -c backups/tollvakt-*.sql.gz | grep -c "CREATE TABLE public.users"
+
+      - name: Show the container logs
+        if: failure()
+        run: docker compose -f docker-compose.prod.yml logs
+
+      - name: Stop the containers
+        if: always()
+        run: docker compose -f docker-compose.prod.yml down --volumes

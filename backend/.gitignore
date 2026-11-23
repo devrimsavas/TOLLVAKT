@@ -6,8 +6,8 @@ dist/
 
 # Environment variables (sensitive data)
 .env
-.env.local
-.env.test
+.env
+.env.*
 
 # Logs
 logs/
@@ -22,3 +22,5 @@ swagger_output.json
 
 # Search evaluation output (npm run eval:search -- --save)
 eval/results/
+
+backups/

@@ -1,0 +1,83 @@
+# Runs Tollvakt on a server: the web app, the API, its database and, when
+# asked, the ETL that loads Tolletaten's data.
+#   docker compose -f docker-compose.prod.yml up -d --build
+#   docker compose -f docker-compose.prod.yml run --rm etl    (load or update the tariff)
+# Settings come from .env next to this file (copy deploy.envexample); what
+# differs between servers is only in that file, never in this one.
+#
+# Only the web app can be reached, and only from the server itself
+# (127.0.0.1): Cloudflare Tunnel (cloudflared) brings visitors to it, so no
+# port is open to the internet. The API and the database are reachable only
+# inside Docker's network.
+
+# Its own project name, so it never touches the containers or the data of
+# the other projects on the same server
+name: tollvakt-server
+
+services:
+  db:
+    # PostgreSQL with pgvector, for the semantic search
+    image: pgvector/pgvector:pg18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tollvakt
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: tollvakt
+    volumes:
+      # Keeps the data when the containers are recreated
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tollvakt -d tollvakt"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      # These override .env: inside Docker the database is the "db" service
+      DATABASE_URL: postgres://tollvakt:${POSTGRES_PASSWORD}@db:5432/tollvakt
+      PORT: "3000"
+      # JSON lines, read with "docker compose logs"
+      LOG_FORMAT: json
+    # No ports: only the web app calls the API
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_URL: http://api:3000
+      # Behind Cloudflare the visitor's address is in cf-connecting-ip
+      CLIENT_IP_HEADER: ${CLIENT_IP_HEADER:-cf-connecting-ip}
+      # Page view counts; empty counts nothing
+      GOATCOUNTER_URL: ${GOATCOUNTER_URL:-}
+    ports:
+      # Only on the server itself, for cloudflared
+      - "127.0.0.1:${WEB_PORT:-3002}:3001"
+
+  etl:
+    build: ./etl
+    # Not started with "up": only with "run --rm etl"
+    profiles: ["etl"]
+    depends_on:
+      api:
+        # The API's migrations create the tables the ETL fills
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://tollvakt:${POSTGRES_PASSWORD}@db:5432/tollvakt
+    volumes:
+      # The downloaded files, kept for tracing and re-runs
+      - etl-data:/app/data
+
+volumes:
+  db-data:
+  etl-data:
