@@ -332,5 +332,80 @@
       "loading": "Loading…",
       "failed": "Could not open this level. Try again."
     }
+  },
+  "history": {
+    "title": "My classifications",
+    "lead": "Every product you have classified, with the answer as it was given. Open one to read it again, print it or delete it.",
+    "one": "Classification",
+    "count": "{count, plural, one {# classification} other {# classifications}}",
+    "empty": "You have not classified any products yet.",
+    "toClassify": "Classify a product",
+    "noCode": "No code fitted",
+    "unavailable": "Your classifications cannot be loaded right now. Try again in a little while.",
+    "deleted": "The classification has been deleted.",
+    "pages": "Pages",
+    "newer": "Newer",
+    "older": "Older",
+    "pageOf": "Page {page} of {pages}",
+    "back": "Back to my classifications",
+    "madeAt": "Classified {when}",
+    "printedFrom": "Tollvakt – classification by the AI assistant. Suggestions, not a binding classification.",
+    "actions": {
+      "print": "Print",
+      "delete": "Delete",
+      "confirmTitle": "Delete this classification?",
+      "confirmText": "It is removed from your classifications and cannot be brought back.",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "failed": "The classification could not be deleted. Try again."
+    }
+  },
+  "admin": {
+    "title": "Admin",
+    "lead": "Use of the AI today and over the last month, and the accounts with their daily limits.",
+    "unavailable": "This cannot be loaded right now. Try again in a little while.",
+    "today": {
+      "title": "Today",
+      "used": "Model calls today, of the global limit",
+      "remaining": "Left today for everyone",
+      "limits": "Daily limits",
+      "limitsValue": "Guests {guest}, members {user}",
+      "note": "A model call is a classification or a semantic, hybrid or expanded search. The day starts at midnight in Norway."
+    },
+    "days": {
+      "title": "The last {days} days",
+      "date": "Day",
+      "classify": "Classifications",
+      "search": "AI searches",
+      "members": "Members",
+      "guests": "Guests",
+      "bar": "Use that day"
+    },
+    "users": {
+      "title": "Accounts ({count})",
+      "titlePlain": "Accounts",
+      "user": "User",
+      "status": "Status",
+      "today": "Used today",
+      "saved": "Saved",
+      "lastLogin": "Last login",
+      "limit": "Daily limit",
+      "admin": "Admin",
+      "active": "Open",
+      "closed": "Closed",
+      "never": "Never",
+      "limitFor": "Daily limit for {name}",
+      "save": "Save",
+      "useDefault": "Use default",
+      "close": "Close account",
+      "reopen": "Reopen",
+      "closeFor": "Close the account of {name}",
+      "reopenFor": "Reopen the account of {name}",
+      "errors": {
+        "limitInvalid": "A whole number from 0 to 10000",
+        "ownAccount": "You cannot close your own account",
+        "failed": "Could not save. Try again."
+      }
+    }
   }
 }

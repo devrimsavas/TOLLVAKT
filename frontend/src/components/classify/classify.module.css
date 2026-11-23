@@ -254,9 +254,22 @@
   margin: var(--ds-size-2) 0 0;
 }
 
+/* On paper the place in the tariff is always written out */
+.pathPrint {
+  display: none;
+}
+
 @media print {
   .form,
-  .guestNote {
+  .guestNote,
+  .path {
     display: none;
+  }
+
+  .pathPrint {
+    display: block;
+    margin: 0;
+    padding-left: var(--ds-size-5);
+    font-size: var(--ds-body-sm-font-size);
   }
 }

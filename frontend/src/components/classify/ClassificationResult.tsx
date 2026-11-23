@@ -79,6 +79,13 @@ export function ClassificationResult({
                 )}
                 <Paragraph>{suggestion.reason}</Paragraph>
                 {levels.length > 0 && (
+                  <ol className={styles.pathPrint}>
+                    {levels.map((level, levelIndex) => (
+                      <li key={levelIndex}>{level}</li>
+                    ))}
+                  </ol>
+                )}
+                {levels.length > 0 && (
                   <details className={styles.path}>
                     <summary>{t("path")}</summary>
                     <ol>

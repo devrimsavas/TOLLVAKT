@@ -332,5 +332,80 @@
       "loading": "Laster …",
       "failed": "Kunne ikke åpne dette nivået. Prøv igjen."
     }
+  },
+  "history": {
+    "title": "Mine klassifiseringer",
+    "lead": "Alle varene du har klassifisert, med svaret slik det ble gitt. Åpne en for å lese den igjen, skrive den ut eller slette den.",
+    "one": "Klassifisering",
+    "count": "{count, plural, one {# klassifisering} other {# klassifiseringer}}",
+    "empty": "Du har ikke klassifisert noen varer ennå.",
+    "toClassify": "Klassifiser en vare",
+    "noCode": "Ingen kode passet",
+    "unavailable": "Klassifiseringene dine kan ikke lastes akkurat nå. Prøv igjen om litt.",
+    "deleted": "Klassifiseringen er slettet.",
+    "pages": "Sider",
+    "newer": "Nyere",
+    "older": "Eldre",
+    "pageOf": "Side {page} av {pages}",
+    "back": "Tilbake til mine klassifiseringer",
+    "madeAt": "Klassifisert {when}",
+    "printedFrom": "Tollvakt – klassifisering av AI-assistenten. Forslag, ikke en bindende klassifisering.",
+    "actions": {
+      "print": "Skriv ut",
+      "delete": "Slett",
+      "confirmTitle": "Slette denne klassifiseringen?",
+      "confirmText": "Den fjernes fra klassifiseringene dine og kan ikke hentes tilbake.",
+      "confirm": "Slett",
+      "cancel": "Avbryt",
+      "failed": "Klassifiseringen kunne ikke slettes. Prøv igjen."
+    }
+  },
+  "admin": {
+    "title": "Admin",
+    "lead": "Bruken av AI i dag og den siste måneden, og kontoene med sine daglige grenser.",
+    "unavailable": "Dette kan ikke lastes akkurat nå. Prøv igjen om litt.",
+    "today": {
+      "title": "I dag",
+      "used": "Modellkall i dag, av den samlede grensen",
+      "remaining": "Igjen i dag for alle",
+      "limits": "Daglige grenser",
+      "limitsValue": "Gjester {guest}, medlemmer {user}",
+      "note": "Et modellkall er en klassifisering eller et semantisk, hybrid eller utvidet søk. Dagen starter ved midnatt norsk tid."
+    },
+    "days": {
+      "title": "De siste {days} dagene",
+      "date": "Dag",
+      "classify": "Klassifiseringer",
+      "search": "AI-søk",
+      "members": "Medlemmer",
+      "guests": "Gjester",
+      "bar": "Bruk den dagen"
+    },
+    "users": {
+      "title": "Kontoer ({count})",
+      "titlePlain": "Kontoer",
+      "user": "Bruker",
+      "status": "Status",
+      "today": "Brukt i dag",
+      "saved": "Lagret",
+      "lastLogin": "Siste innlogging",
+      "limit": "Daglig grense",
+      "admin": "Admin",
+      "active": "Åpen",
+      "closed": "Stengt",
+      "never": "Aldri",
+      "limitFor": "Daglig grense for {name}",
+      "save": "Lagre",
+      "useDefault": "Bruk standard",
+      "close": "Steng kontoen",
+      "reopen": "Åpne igjen",
+      "closeFor": "Steng kontoen til {name}",
+      "reopenFor": "Åpne kontoen til {name} igjen",
+      "errors": {
+        "limitInvalid": "Et helt tall fra 0 til 10000",
+        "ownAccount": "Du kan ikke stenge din egen konto",
+        "failed": "Kunne ikke lagre. Prøv igjen."
+      }
+    }
   }
 }
