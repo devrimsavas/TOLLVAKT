@@ -13,6 +13,23 @@ main {
   flex: 1;
 }
 
+/* In light mode the page is a soft, slightly green white instead of pure
+   white, which is tiring on the eyes over a long session. Cards, form
+   fields and tables keep the theme's white, so they stand out from it. */
+:root {
+  --tollvakt-page-light: #f4f7f6;
+}
+
+[data-color-scheme="light"] body {
+  background: var(--tollvakt-page-light);
+}
+
+@media (prefers-color-scheme: light) {
+  [data-color-scheme="auto"] body {
+    background: var(--tollvakt-page-light);
+  }
+}
+
 /* Centers page content and keeps lines readable on wide screens */
 .container {
   width: 100%;
